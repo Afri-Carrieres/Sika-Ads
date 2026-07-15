@@ -1,0 +1,5 @@
+/* Tailwind helper — do not import the package file directly. */
+/* If you need Tailwind directives, they are included in styles/theme.css. */
+
+/* Optional: import animation utilities if required via npm package. */
+/* @import 'tw-animate-css'; */

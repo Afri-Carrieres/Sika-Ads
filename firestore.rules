@@ -1,0 +1,215 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────
+    // Helper functions
+    // ─────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && uid() == userId;
+    }
+
+    function hasUserProfile() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(uid()));
+    }
+
+    function userRole() {
+      return hasUserProfile()
+        ? get(/databases/$(database)/documents/users/$(uid())).data.role
+        : null;
+    }
+
+    function isStaff() {
+      return userRole() in ['ADMIN', 'MODERATOR'];
+    }
+
+    function isAdmin() {
+      return userRole() == 'ADMIN';
+    }
+
+    // Utilitaire pour limiter les champs modifiables
+    function onlyChanges(allowedKeys) {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(allowedKeys);
+    }
+
+    // ─────────────────────────────────────────────
+    // 1) Users + subcollections
+    // ─────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isStaff();
+
+      // Création uniquement sur son propre UID.
+      // On refuse toute élévation de rôle à l'inscription (ADMIN/MODERATOR).
+      allow create: if isSelf(userId)
+        && request.resource.data.id == userId
+        && (!('role' in request.resource.data) || request.resource.data.role == 'AMBASSADOR')
+        && (!('status' in request.resource.data) || request.resource.data.status == 'active')
+        && (!('balance' in request.resource.data) || request.resource.data.balance == 0)
+        && (!('totalEarned' in request.resource.data) || request.resource.data.totalEarned == 0)
+        && (!('clicks' in request.resource.data) || request.resource.data.clicks == 0)
+        && (!('referralCount' in request.resource.data) || request.resource.data.referralCount == 0)
+        && (!('referralEarnings' in request.resource.data) || request.resource.data.referralEarnings == 0);
+
+      // Update profil: le propriétaire ne peut modifier que des champs "profil"
+      // (pas de solde, rôle, statut, etc.). Le staff peut tout gérer.
+      allow update: if isStaff()
+        || (isSelf(userId)
+          && onlyChanges([
+            'name',
+            'email',
+            'momoNumber',
+            'gender',
+            'city',
+            'ageRange',
+            'paymentMethod',
+            'photoURL',
+            'dailyStats'
+          ])
+          && request.resource.data.id == resource.data.id
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.balance == resource.data.balance
+          && request.resource.data.totalEarned == resource.data.totalEarned
+          && request.resource.data.clicks == resource.data.clicks
+          && request.resource.data.referralCode == resource.data.referralCode
+          && request.resource.data.referralCount == resource.data.referralCount
+          && request.resource.data.referralEarnings == resource.data.referralEarnings
+        );
+
+      // Suppression de compte (profile page) autorisée au propriétaire, et à l'admin.
+      allow delete: if isSelf(userId) || isAdmin();
+
+      // ── proofs ────────────────────────────────
+      match /proofs/{proofId} {
+        allow read: if isSelf(userId) || isStaff();
+
+        // L'utilisateur soumet uniquement ses propres preuves et en "pending".
+        allow create: if isSelf(userId)
+          && request.resource.data.userId == userId
+          && request.resource.data.status == 'pending';
+
+        // Validation/rejet réservés au staff.
+        allow update: if isStaff();
+
+        // L'utilisateur peut supprimer ses propres preuves (TaskHistory) ; staff aussi.
+        allow delete: if isSelf(userId) || isStaff();
+      }
+
+      // ── notifications ─────────────────────────
+      match /notifications/{notifId} {
+        allow read: if isSelf(userId);
+        allow create: if isStaff();
+
+        // L'utilisateur peut uniquement marquer "read".
+        allow update: if (isSelf(userId) && onlyChanges(['read'])) || isStaff();
+        allow delete: if isStaff();
+      }
+
+      // ── notes ─────────────────────────────────
+      match /notes/{noteId} {
+        allow read, create, update, delete: if isSelf(userId);
+      }
+
+      // ── referrals ─────────────────────────────
+      match /referrals/{refId} {
+        allow read, create, update, delete: if isSelf(userId) || isStaff();
+      }
+    }
+
+    // ─────────────────────────────────────────────
+    // 2) Campaigns
+    // ─────────────────────────────────────────────
+    match /campaigns/{campaignId} {
+      allow read: if true;
+
+      // Création:
+      // - Staff: peut créer des campagnes admin (ex: VIP)
+      // - Utilisateur: peut créer une campagne "pending" qui lui appartient
+      allow create: if isSignedIn() && (
+        (isStaff() && request.resource.data.createdBy == 'admin')
+        || (!isStaff()
+          && request.resource.data.advertiserId == uid()
+          && request.resource.data.status == 'pending'
+          && request.resource.data.priority != true
+          && request.resource.data.paymentConfirmed != true
+          && (!('createdBy' in request.resource.data) || request.resource.data.createdBy == 'user')
+        )
+      );
+
+      // Update:
+      // - Staff: gestion complète (activation, budgets, validation paiement, etc.)
+      // - Annonceur: uniquement champs "paiement" et sans changer l'état de la campagne
+      allow update: if isStaff()
+        || (isSignedIn()
+          && resource.data.advertiserId == uid()
+          && resource.data.status == 'pending'
+          && onlyChanges([
+            'paymentStatus',
+            'paymentConfirmed',
+            'campaignPaymentStatus',
+            'paymentReference',
+            'paymentOperator',
+            'paymentAmount',
+            'paymentDate',
+            'paymentMethod',
+            'updatedAt'
+          ])
+          && request.resource.data.advertiserId == resource.data.advertiserId
+          && request.resource.data.status == resource.data.status
+          && request.resource.data.createdBy == resource.data.createdBy
+          && request.resource.data.paymentConfirmed != true
+          && request.resource.data.totalBudget == resource.data.totalBudget
+          && request.resource.data.remainingBudget == resource.data.remainingBudget
+          && request.resource.data.cpv == resource.data.cpv
+          && request.resource.data.cpc == resource.data.cpc
+          && request.resource.data.category == resource.data.category
+          && request.resource.data.title == resource.data.title
+          && request.resource.data.description == resource.data.description
+          && request.resource.data.imageUrl == resource.data.imageUrl
+          && request.resource.data.targetUrl == resource.data.targetUrl
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    // ─────────────────────────────────────────────
+    // 3) Withdrawals (created by Cloud Functions)
+    // ─────────────────────────────────────────────
+    match /withdrawals/{withdrawalId} {
+      allow read: if isStaff() || (isSignedIn() && resource.data.userId == uid());
+      allow create: if isSignedIn() && request.resource.data.userId == uid();
+      allow update, delete: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // 4) Announcements (global notifications)
+    // ─────────────────────────────────────────────
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow create, update, delete: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // 5) Legacy / misc (unused by current UI)
+    // ─────────────────────────────────────────────
+    match /campaign_visuals/{docId} {
+      allow read: if isStaff();
+      allow create, update, delete: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // Collection group access for Admin panel (proofs)
+    // ─────────────────────────────────────────────
+    match /{path=**}/proofs/{proofId} {
+      allow read: if isStaff();
+    }
+  }
+}

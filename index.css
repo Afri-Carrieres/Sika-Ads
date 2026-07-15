@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import './fonts.css';
+@import './theme.css';
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+.font-display {
+  font-family: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+@layer utilities {
+  @keyframes authFloat {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(0, -16px, 0) scale(1.03); }
+  }
+
+  @keyframes authFloat2 {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(0, 18px, 0) scale(0.98); }
+  }
+
+  @keyframes authShimmer {
+    0% { transform: translateX(-120%); }
+    100% { transform: translateX(120%); }
+  }
+
+  .animate-auth-float { animation: authFloat 12s ease-in-out infinite; }
+  .animate-auth-float2 { animation: authFloat2 14s ease-in-out infinite; }
+  .auth-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 40%, rgba(255,255,255,0.26) 50%, rgba(255,255,255,0.18) 60%, transparent 100%);
+    animation: authShimmer 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  background-color: #cbd3d8;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
