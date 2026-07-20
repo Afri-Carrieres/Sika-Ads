@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../supabase';
 import { Notification } from '../types';
-import { Bell, BellOff, CheckCircle2, AlertCircle, Info, XCircle, Megaphone, Wallet } from 'lucide-react';
+import { Bell, BellOff, CheckCircle2, AlertCircle, Info, XCircle, Megaphone, Wallet, FlashlightIcon } from 'lucide-react';
 
 const NotificationBell: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -218,6 +218,12 @@ const NotificationBell: React.FC = () => {
           icon: <Megaphone size={18} className="text-indigo-500" />,
           bg: 'bg-indigo-50/50 hover:bg-indigo-50',
           border: 'border-indigo-100'
+        };
+      case 'rejected':
+        return {
+          icon: <XCircle size={18} className="text-red-500" />,
+          bg: 'bg-red-50/50 hover:bg-red-50',
+          border: 'border-red-100'
         };
       case 'announcement':
         return {

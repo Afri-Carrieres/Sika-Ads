@@ -46,6 +46,17 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
   const cities = ['Lomé', 'Kara', 'Sokodé', 'Kpalimé', 'Atakpamé', 'Dapaong', 'Autre'];
   const ageRanges = ['15-20', '21-30', '31-45', '45+'];
 
+  // Password strength checks (must match Supabase policy)
+  const pwdChecks = {
+    length:    password.length >= 8,
+    lowercase: /[a-z]/.test(password),
+    uppercase: /[A-Z]/.test(password),
+    digit:     /[0-9]/.test(password),
+    special:   /[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?`~]/.test(password),
+  };
+  const pwdStrong = Object.values(pwdChecks).every(Boolean);
+  const pwdScore  = Object.values(pwdChecks).filter(Boolean).length;
+
   const handleNextStep = async () => {
     setError('');
 
@@ -111,7 +122,14 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
         onComplete();
       } catch (err: any) {
         console.error("Registration error:", err);
-        setError(`Erreur: ${err.message || 'Une erreur est survenue lors de l\'inscription.'}`);
+        // Translate Supabase weak password error to French
+        if (err.code === 'weak_password' || err.name === 'AuthWeakPasswordError') {
+          setError('Mot de passe trop faible. Il doit contenir au moins 8 caractères avec une majuscule, une minuscule, un chiffre et un caractère spécial (ex: Monpasse1!).');
+        } else if (err.message?.includes('User already registered')) {
+          setError('Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.');
+        } else {
+          setError(`Erreur: ${err.message || 'Une erreur est survenue lors de l\'inscription.'}`);
+        }
         setLoading(false);
       }
     } else {
@@ -311,6 +329,37 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                       </label>
                     </div>
 
+                    {/* Password strength indicator */}
+                    {password && (
+                      <div className="space-y-2">
+                        <div className="flex gap-1">
+                          {[1,2,3,4,5].map(i => (
+                            <div key={i} className={`h-1 flex-1 rounded-full transition-all ${
+                              pwdScore >= i
+                                ? pwdScore <= 2 ? 'bg-red-400'
+                                  : pwdScore <= 3 ? 'bg-orange-400'
+                                  : pwdScore <= 4 ? 'bg-yellow-400'
+                                  : 'bg-green-500'
+                                : 'bg-gray-200'
+                            }`} />
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                          {[
+                            { ok: pwdChecks.length,    label: '8+ caractères' },
+                            { ok: pwdChecks.lowercase, label: 'Minuscule (a-z)' },
+                            { ok: pwdChecks.uppercase, label: 'Majuscule (A-Z)' },
+                            { ok: pwdChecks.digit,     label: 'Chiffre (0-9)' },
+                            { ok: pwdChecks.special,   label: 'Caractère spécial (!@#...)' },
+                          ].map(({ ok, label }) => (
+                            <span key={label} className={`text-[10px] font-bold flex items-center gap-1 ${ ok ? 'text-green-600' : 'text-gray-400' }`}>
+                              <span>{ok ? '✓' : '○'}</span> {label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {password && confirmPassword && password !== confirmPassword && (
                       <p className="text-[10px] text-red-500 font-bold ml-1">Les mots de passe ne correspondent pas.</p>
                     )}
@@ -469,7 +518,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                 <button
                   disabled={
                     loading ||
-                    (step === 1 && (!email || !password || password !== confirmPassword || password.length < 6)) ||
+                    (step === 1 && (!email || !password || !pwdStrong || password !== confirmPassword)) ||
                     (step === 2 && (!name || !gender || !city || !ageRange)) ||
                     (step === 3 && (!paymentMethod || !momoNumber))
                   }

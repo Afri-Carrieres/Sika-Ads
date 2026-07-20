@@ -125,7 +125,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'campaign' | 'status' | 'payout' | 'announcement';
+  type: 'campaign' | 'status' | 'payout' | 'announcement' | 'rejected';
   read: boolean;
   createdAt: string;
 }

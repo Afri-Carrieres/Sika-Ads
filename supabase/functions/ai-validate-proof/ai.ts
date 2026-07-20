@@ -32,7 +32,7 @@ export async function callAI(imageUrl: string, apiKey: string): Promise<string> 
       Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'google/gemini-2.5-flash-lite',
+      model: 'openai/gpt-4o-mini',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         {
@@ -40,7 +40,7 @@ export async function callAI(imageUrl: string, apiKey: string): Promise<string> 
           content: [
             {
               type: 'text',
-              text: '"You are an automated compliance officer.Analyze the provided social media screenshot.Return ONLY a valid JSON object with exactly these fields:{ "isValid": boolean, "confidence": number, "viewsCount": number, "fraudAlert": boolean, "reason": string, "fraudType": string, "imageAuthenticityConfidence": number, "viewCountDetectionConfidence": number, "platformUICompliance": number, "fraudEvidenceDetails": string[] } Do not include markdown.'
+              text: "Vous êtes un agent de conformité automatisé. Analysez la capture d'écran de réseau social fournie. Renvoyez UNIQUEMENT un objet JSON valide contenant exactement les champs suivants : { \"isValid\": boolean, \"confidence\": number, \"viewsCount\": number, \"fraudAlert\": boolean, \"reason\": string, \"fraudType\": string, \"imageAuthenticityConfidence\": number, \"viewCountDetectionConfidence\": number, \"platformUICompliance\": number, \"fraudEvidenceDetails\": string[] } N'incluez pas de balisage Markdown. En langue française et bien détaillé"
               // text: 'Analyze this screenshot. Return strict JSON. Determine if it is a genuine social story/status, estimate views, and detect obvious fraud cues.'
             },
             { type: 'image_url', image_url: { url: imageUrl, detail: 'low' } }

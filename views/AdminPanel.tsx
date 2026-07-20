@@ -549,7 +549,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           userId: validatingProof.userId,
           title: wasBudgetLimited ? 'Rémunération plafonnée' : 'Preuve validée !',
           message: notificationMessage,
-          type: 'status',
+          type: 'payout',
           read: false,
           createdAt: new Date().toISOString()
         });
@@ -587,7 +587,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         .insert({
           userId: rejectingProof.userId,
           title: 'Preuve refusée',
-          message: `Votre preuve a été refusée. Motif : ${rejectionReason.trim()}`,
+          message: `Votre preuve pour la campagne ${rejectingProof.campaignName} a été refusée. Motif : ${rejectionReason.trim()}`,
           type: 'status',
           read: false,
           createdAt: new Date().toISOString()
