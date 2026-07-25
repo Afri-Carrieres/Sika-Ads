@@ -172,14 +172,6 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
     onNavigateToWallet();
   };
 
-  if (!displayUser) {
-    return (
-      <div className="flex items-center justify-center h-96 text-gray-500 font-bold">
-        Chargement de vos statistiques…
-      </div>
-    );
-  }
-
   const activities = useMemo<ActivityItem[]>(() => {
     const items: ActivityItem[] = [];
 
@@ -263,33 +255,35 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
   }, [activities, historyFilter]);
 
   const chartData = useMemo(() => {
-    const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const days: { date: Date; name: string }[] = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
+    const days: { [key: string]: number } = {};
     for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      days.push({ date: d, name: dayNames[d.getDay()] });
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days[d.toLocaleDateString('fr-FR', { weekday: 'short' })] = 0;
     }
-
-    const sums = new Map<string, number>();
-    for (const d of days) sums.set(d.date.toDateString(), 0);
 
     for (const p of proofDocs) {
-      if (String(p.status || '').toLowerCase() !== 'validated') continue;
-      const date = asDate(p.validatedAt || p.submittedAt);
-      if (!date) continue;
-      const dayKey = new Date(date.getFullYear(), date.getMonth(), date.getDate()).toDateString();
-      if (!sums.has(dayKey)) continue;
-
-      const earnings = Number(p.earnings ?? (Number(p.viewsCount || 0) * Number(p.cpv || 20))) || 0;
-      sums.set(dayKey, (sums.get(dayKey) || 0) + earnings);
+      if (String(p.status || '').toLowerCase() === 'validated') {
+        const date = asDate(p.validatedAt || p.submittedAt);
+        if (date) {
+          const key = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+          if (days[key] !== undefined) {
+            days[key] += Number(p.earnings ?? (Number(p.viewsCount || 0) * Number(p.cpv || 20))) || 0;
+          }
+        }
+      }
     }
 
-    return days.map((d) => ({ name: d.name, earnings: Math.round(sums.get(d.date.toDateString()) || 0) }));
+    return Object.entries(days).map(([name, amount]) => ({ name, earnings: Math.round(amount) }));
   }, [proofDocs]);
+
+  if (!displayUser) {
+    return (
+      <div className="flex items-center justify-center h-96 text-gray-500 font-bold">
+        Chargement de vos statistiques…
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">

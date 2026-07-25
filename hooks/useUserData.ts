@@ -59,24 +59,39 @@ export const useUserData = (): UserDataHook => {
         if (error) {
           console.error("useUserData: error fetching initial user data:", error);
           if (error.code === 'PGRST116') {
-            console.log("useUserData: Profile not found in public.users, auto-creating one...");
-            const generatedRefCode = ((user.user_metadata?.full_name || 'AMB').substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
+            // Profil manquant : arrive quand email_confirmations est activé dans Supabase.
+            // On auto-crée le profil en utilisant les données stockées dans user_metadata
+            // lors de l'inscription (voir RegistrationForm.tsx → signUp options.data).
+            console.log("useUserData: Profile not found in public.users, auto-creating from user_metadata...");
+            const meta = user.user_metadata || {};
+            const generatedRefCode = meta.referralCode
+              || ((meta.full_name || 'AMB').substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
+
+            // ⚠️ Colonnes réelles de la table (schéma migration 20260702_create_users.sql)
+            // gender, city, ageRange, paymentMethod ne sont PAS dans la table → omis
+            // momoNumber est NOT NULL dans le schéma → valeur vide si absent
             supabase.from('users').insert({
               id: user.id,
-              name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+              name: meta.full_name || user.email?.split('@')[0] || 'User',
               email: user.email,
+              momoNumber: meta.momoNumber || '',
               role: 'AMBASSADOR',
               status: 'active',
               balance: 0,
               totalEarned: 0,
               clicks: 0,
-              momoNumber: '90000000',
               referralCode: generatedRefCode,
               referralCount: 0,
-              referralEarnings: 0
+              referralEarnings: 0,
             }).then(({ error: insertErr }) => {
               if (insertErr) {
                 console.error("useUserData: Failed to auto-create missing user profile:", insertErr);
+              } else {
+                console.log("useUserData: Profile auto-created from user_metadata ✅");
+                // Re-fetch pour peupler le state immédiatement
+                supabase.from('users').select('*').eq('id', user.id).single().then(({ data: freshData }) => {
+                  if (freshData) setUserData(freshData as User);
+                });
               }
             });
           }

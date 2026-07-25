@@ -17,14 +17,86 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
   const [verifying, setVerifying] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setEmail(user.email || '');
-      } else {
-        setError("Le lien de réinitialisation est invalide ou a expiré.");
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const init = async () => {
+      // ─── Cas 1 : HashRouter double-hash  #/#access_token=...&type=recovery ───
+      // Supabase + HashRouter génèrent une URL comme :
+      //   /?mode=resetPassword#/#access_token=xxx&refresh_token=yyy&type=recovery
+      // window.location.hash vaut "#/#access_token=xxx..."
+      // On cherche le 2ème '#' pour extraire les params Supabase
+      const fullHash = window.location.hash; // ex : "#/#access_token=...&type=recovery"
+      const secondHash = fullHash.indexOf('#', 1);
+      const tokenFragment = secondHash !== -1
+        ? fullHash.substring(secondHash + 1)   // "access_token=...&type=recovery"
+        : fullHash.substring(1);               // fallback : hash simple sans '/'
+
+      const params = new URLSearchParams(tokenFragment);
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      const type = params.get('type');
+
+      if (access_token && refresh_token && type === 'recovery') {
+        // On établit la session manuellement avec les tokens extraits
+        const { data, error: sessionError } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+
+        if (sessionError) {
+          setError("Le lien de réinitialisation est invalide ou a expiré.");
+          setVerifying(false);
+          return;
+        }
+
+        if (data.session?.user) {
+          setEmail(data.session.user.email || '');
+          // Nettoyer l'URL (retirer les tokens du hash pour sécurité)
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          setVerifying(false);
+          return;
+        }
       }
-      setVerifying(false);
-    });
+
+      // ─── Cas 2 : Session déjà active (token déjà échangé avant ce composant) ───
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setEmail(session.user.email || '');
+        setVerifying(false);
+        return;
+      }
+
+      // ─── Cas 3 : Attendre PASSWORD_RECOVERY via onAuthStateChange ───
+      // (cas où Supabase détecte le token tout seul dans un hash simple)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
+          if (session?.user) {
+            setEmail(session.user.email || '');
+            clearTimeout(timeoutId);
+            setVerifying(false);
+          }
+        }
+      });
+
+      // Timeout de sécurité : 6 secondes, puis message d'erreur
+      timeoutId = setTimeout(() => {
+        setVerifying((prev) => {
+          if (prev) {
+            setError("Le lien de réinitialisation est invalide ou a expiré. Veuillez en demander un nouveau.");
+            return false;
+          }
+          return prev;
+        });
+        subscription.unsubscribe();
+      }, 6000);
+
+      return () => {
+        subscription.unsubscribe();
+        clearTimeout(timeoutId);
+      };
+    };
+
+    init();
   }, []);
 
   const handleReset = async (e: React.FormEvent) => {

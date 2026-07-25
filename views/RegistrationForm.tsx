@@ -64,34 +64,57 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
       // Final step: Create user in Supabase
       setLoading(true);
       try {
+        // Generate referral code BEFORE signUp so it can be stored in user_metadata
+        const referralCode = (name.substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
+
         const { data, error: signUpErr } = await supabase.auth.signUp({
           email,
           password,
           options: {
+            // Stocker toutes les données de profil dans user_metadata.
+            // Elles seront utilisées pour créer le profil public lors de la
+            // première connexion (cf. useUserData.ts auto-create fallback).
             data: {
               full_name: name,
-            }
+              gender,
+              city,
+              ageRange,
+              paymentMethod,
+              momoNumber,
+              referralCode,
+            },
+            emailRedirectTo: `${window.location.origin}/#/app?tab=dashboard`
           }
         });
         console.log("Supabase Auth signUp response:", { data, signUpErr });
         if (signUpErr) throw signUpErr;
+
         const user = data.user;
-        if (!user) throw new Error("Erreur de création d'utilisateur (la réponse de Supabase ne contient pas d'utilisateur).");
+
+        // ✅ Quand "Enable email confirmations" est activé dans Supabase,
+        // signUp() retourne intentionnellement { user: null, session: null }.
+        // L'utilisateur EST créé dans auth.users mais le SDK ne le renvoie pas
+        // tant que l'email n'est pas vérifié. Ce n'est PAS une erreur.
+        if (!user) {
+          // Email de confirmation envoyé → rediriger vers VerificationPending
+          onComplete();
+          return;
+        }
+
+        // ── Cas où email_confirmations est désactivé (user renvoyé immédiatement) ──
         const uid = user.id;
 
         // Generate a random referral code
-        const referralCode = (name.substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
+        // const referralCode = (name.substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
 
         // --- CREATE USER PROFILE ---
+        // ⚠️ Colonnes réelles de la table (voir migration 20260702_create_users.sql)
+        // gender, city, ageRange, paymentMethod, createdAt ne sont PAS dans le schéma → omis
         const { error: dbErr } = await supabase.from('users').insert({
           id: uid,
           name,
           email,
           momoNumber,
-          gender,
-          city,
-          ageRange,
-          paymentMethod,
           role: 'AMBASSADOR',
           status: 'active',
           balance: 0,
@@ -100,9 +123,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
           referralCode: referralCode,
           referralCount: 0,
           referralEarnings: 0,
-          createdAt: new Date().toISOString()
         });
         if (dbErr) throw dbErr;
+
 
         // Send verification email via Supabase Edge Function (non-blocking)
         try {
@@ -137,6 +160,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
     }
   };
 
+
   const handleGoogleSignup = async () => {
     setLoading(true);
     setError('');
@@ -144,7 +168,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/#/app`
         }
       });
       if (err) throw err;

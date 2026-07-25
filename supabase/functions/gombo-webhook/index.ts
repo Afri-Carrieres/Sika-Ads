@@ -72,11 +72,41 @@ serve(async (req: Request) => {
                     .select(); // Crucial pour voir le résultat dans les logs
 
                 if (error) throw error;
-                
+
                 if (!data || data.length === 0) {
                     console.warn(`⚠️ Aucune campagne trouvée en base pour la référence: ${transactionRef}. Possible retard d'écriture (Race Condition).`);
                 } else {
                     console.log(`✅ Campaign status updated to ACTIVE for ref: ${cleanRef}`, data);
+
+                    // Notification par email de l'annonceur
+                    const campaign = data[0];
+                    const recipientEmail = campaign.advertiserEmail || campaign.advertiser_email;
+                    if (recipientEmail) {
+                        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+                        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+                        fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${supabaseServiceKey}`,
+                            },
+                            body: JSON.stringify({
+                                to: recipientEmail,
+                                type: "campaign_confirmed",
+                                data: {
+                                    advertiserName: campaign.advertiserName || campaign.advertiser_name || "Annonceur",
+                                    campaignTitle: campaign.title,
+                                    amount: campaign.totalBudget || campaign.total_budget || campaign.budget,
+                                    campaignId: campaign.id,
+                                },
+                            }),
+                        }).then(() => {
+                            console.log(`📧 Email de confirmation envoyé à ${recipientEmail}`);
+                        }).catch((emailErr) => {
+                            console.error("❌ Erreur lors de l'envoi de l'email depuis le webhook:", emailErr);
+                        });
+                    }
                 }
             }
             else if (isFailure(statusMessage)) {
@@ -94,6 +124,36 @@ serve(async (req: Request) => {
                     })
                     .or(`paymentReference.eq."${transactionRef}",paymentReference.eq."${cleanRef}"`)
                     .select();
+
+                // Notification par email de l'annonceur
+                const campaign = data[0];
+                const recipientEmail = campaign.advertiserEmail || campaign.advertiser_email;
+                if (recipientEmail) {
+                    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+                    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+                    fetch(`${supabaseUrl}/functions/v1/send-email`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${supabaseServiceKey}`,
+                        },
+                        body: JSON.stringify({
+                            to: recipientEmail,
+                            type: "campaign_failed",
+                            data: {
+                                advertiserName: campaign.advertiserName || campaign.advertiser_name || "Annonceur",
+                                campaignTitle: campaign.title,
+                                amount: campaign.totalBudget || campaign.total_budget || campaign.budget,
+                                campaignId: campaign.id,
+                            },
+                        }),
+                    }).then(() => {
+                        console.log(`📧 Email de confirmation envoyé à ${recipientEmail}`);
+                    }).catch((emailErr) => {
+                        console.error("❌ Erreur lors de l'envoi de l'email depuis le webhook:", emailErr);
+                    });
+                }
 
                 if (error) {
                     console.error(`❌ Error updating campaign status to FAILED for ref ${cleanRef}:`, error);

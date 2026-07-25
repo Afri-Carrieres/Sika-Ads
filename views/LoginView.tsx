@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../supabase';
 import { Mail, Lock, Loader2, ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
 
+
 interface LoginViewProps {
   onSuccess: () => void;
   onGoBack: () => void;
@@ -46,7 +47,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/#/app`
         }
       });
       if (err) throw err;

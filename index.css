@@ -1,8 +1,8 @@
+/* ⚠ Les @import doivent être TOUT au début (avant @tailwind) */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './fonts.css';
-@import './theme.css';
 
 @layer base {
   body {

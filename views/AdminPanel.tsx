@@ -497,22 +497,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       }
 
       // Update proof
-      await supabase
+      const { error: proofErr } = await supabase
         .from('proofs')
         .update({
           status: 'validated',
-          viewsCount: views,
-          cpv,
-          earnings,
-          validatedAt: new Date().toISOString()
+          viewsCount: views
         })
         .eq('id', validatingProof.id)
         .eq('userId', validatingProof.userId);
 
-      // Get user profile to calculate increments
+      if (proofErr) console.error("Erreur de mise à jour de la preuve:", proofErr);
+
+      // Get user profile to calculate increments and retrieve email
       const { data: userProfile, error: fetchErr } = await supabase
         .from('users')
-        .select('balance, totalEarned')
+        .select('balance, totalEarned, email')
         .eq('id', validatingProof.userId)
         .single();
 
@@ -554,9 +553,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           createdAt: new Date().toISOString()
         });
 
+      // Envoi de l'email de confirmation de preuve validée à l'ambassadeur
+      if (userProfile?.email) {
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: userProfile.email,
+            type: 'validated',
+            data: {
+              userName: validatingProof.userName || 'Ambassadeur',
+              campaignTitle: campaign.title || validatingProof.campaignName || 'Campagne',
+              views,
+              earnings,
+            }
+          }
+        }).catch(err => console.error("Erreur d'envoi de l'email de validation de preuve:", err));
+      }
+
       showFeedback(`Preuve validée ! +${earnings.toLocaleString()} FCFA crédités.`);
       setValidatingProof(null);
-      await deleteProof(validatingProof);
+      // await deleteProof(validatingProof);
       setViewsInput('');
       setWasBudgetLimited(false);
 
@@ -572,15 +587,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     if (!rejectingProof || !rejectionReason.trim()) return;
     setIsRejecting(true);
     try {
-      await supabase
+      const { error: proofErr } = await supabase
         .from('proofs')
         .update({
           status: 'rejected',
-          rejectionReason: rejectionReason.trim(),
-          rejectedAt: new Date().toISOString()
+          rejectionReason: rejectionReason.trim()
         })
         .eq('id', rejectingProof.id)
         .eq('userId', rejectingProof.userId);
+
+      if (proofErr) console.error("Erreur de mise à jour de la preuve:", proofErr);
 
       await supabase
         .from('notifications')
@@ -588,21 +604,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           userId: rejectingProof.userId,
           title: 'Preuve refusée',
           message: `Votre preuve pour la campagne ${rejectingProof.campaignName} a été refusée. Motif : ${rejectionReason.trim()}`,
-          type: 'status',
+          type: 'rejected',
           read: false,
           createdAt: new Date().toISOString()
         });
 
+      // Envoi de l'email de refus de preuve à l'ambassadeur
+      const { data: user, error: fetchErr } = await supabase
+        .from('users')
+        .select('email')
+        .eq('id', rejectingProof.userId)
+        .single();
+
+      if (!fetchErr && user?.email) {
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: user.email,
+            type: 'rejected',
+            data: {
+              userName: rejectingProof.userName || 'Ambassadeur',
+              campaignTitle: rejectingProof.campaignName || 'Campagne',
+              reason: rejectionReason.trim()
+            }
+          }
+        }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
+      }
+
       await deleteProof(rejectingProof);
-
-      // // supprimer la preuve après refus 
-      // await supabase.storage.from('proofs').remove([rejectingProof.storagePath]).catch(() => { });
-
 
       showFeedback("Preuve refusée et supprimée.", "info");
       setRejectingProof(null);
       setRejectionReason('');
-    } catch (e) { showFeedback("Erreur lors du refus", "error"); }
+    } catch (e) { 
+      showFeedback("Erreur lors du refus", "error");
+      console.error(e);
+    }
     finally { setIsRejecting(false); }
   };
 

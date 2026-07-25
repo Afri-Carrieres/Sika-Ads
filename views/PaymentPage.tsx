@@ -234,9 +234,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
 
             {/* Title */}
             <div>
-              <h3 className="text-4xl font-black text-gray-900 leading-tight">Ok!</h3>
+              <h3 className="text-4xl font-black text-gray-900 leading-tight">Demande de paiement!</h3>
               <p className="text-gray-600 font-medium mt-3 leading-relaxed text-sm">
-                Veuillez valider votre paiement sur votre portable. Ensuite recharger la page de voting
+                Veuillez valider votre paiement sur votre portable. Ensuite recharger la page
               </p>
             </div>
 
@@ -425,7 +425,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                   {status === "pending" && <h4 className="font-black text-sm uppercase tracking-wider mb-1">Ok!</h4>}
                   <p className={`text-xs font-bold leading-relaxed ${status === "pending" ? "opacity-90" : ""}`}>
                     {status === "pending"
-                      ? "Veuillez valider votre paiement sur votre portable. Ensuite recharger la page de voting"
+                      ? "Veuillez valider votre paiement sur votre portable. Ensuite recharger la page."
                       : message}
                   </p>
                 </div>
