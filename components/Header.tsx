@@ -61,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
       if (view !== 'landing') setView('landing');
       setActiveSection('how-it-works');
       setTimeout(() => {
-        const el = document.getElementById('how-it-works');
+        const el = document.getElementById('comment');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else if (id === 'contact') {
@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
       if (view !== 'landing') setView('landing');
       setActiveSection('advertise');
       setTimeout(() => {
-        const el = document.getElementById('business');
+        const el = document.getElementById('annonceurs');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else if (id === 'login') {

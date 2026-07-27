@@ -23,7 +23,12 @@ import {
   BarChart2,
   Banknote,
   Play,
+  LogInIcon,
 } from "lucide-react";
+
+import Footer from "@/components/Footer";
+
+import LandingLogo from "@/public/Header-LogoSika-Ads.png";
 
 // import mock_up from "./Mock-up.png";
 
@@ -139,7 +144,7 @@ const campaigns = [
 const faqs = [
   { q: "Est-ce vraiment gratuit ?", a: "Oui, totalement gratuit. Vous n'avez rien à payer pour commencer à gagner. Nous sommes rémunérés par les annonceurs." },
   { q: "Combien puis-je gagner par mois ?", a: "Les gains varient selon le nombre de contacts et la fréquence de publication. En moyenne, nos utilisateurs actifs gagnent entre 15 000 et 80 000 FCFA par mois." },
-  { q: "Quels réseaux sont supportés ?", a: "WhatsApp et Facebook sont actuellement supportés. Instagram et TikTok arrivent bientôt." },
+  { q: "Quels réseaux sont supportés ?", a: "WhatsApp, Facebook, Instagram et TikTok sont actuellement supportés.." },
   { q: "Comment se fait le retrait ?", a: "Nous supportons Moov Money, T-Money et les transferts bancaires. Le minimum de retrait est 2 000 FCFA." },
   { q: "Mes contacts verront-ils que c'est une pub ?", a: "Les publicités ressemblent à des statuts normaux. Vous choisissez toujours ce que vous publiez." },
 ];
@@ -321,11 +326,24 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const scrollToSection = (href: string) => {
+    const sectionId = href.replace("#", "");
+    const el = document.getElementById(sectionId);
+
+    setMenuOpen(false);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const navLinks = [
+    // { href: "#accueil", label: "Accueil" },
     { href: "#avantages", label: "Avantages" },
     { href: "#comment", label: "Comment ça marche" },
+    { href: "#annonceurs", label: "Entreprises" },
     { href: "#temoignages", label: "Témoignages" },
     { href: "#faq", label: "FAQ" },
+    // { href: "#contact", label: "Contact" },
   ];
 
   return (
@@ -338,13 +356,18 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
           }`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-2 h-16 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1e3a8a" }}>
-              <Wallet className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-lg" style={{ color: "#1e3a8a" }}>SikaAds</span>
+          <a
+            href="#accueil"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("#accueil");
+            }}
+            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+          >
+            <img className="w-60 " src={LandingLogo} alt="Logo SikaAds" />
+
           </a>
 
           {/* Desktop nav */}
@@ -353,6 +376,10 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               <a
                 key={href}
                 href={href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(href);
+                }}
                 className={`text-sm font-medium transition-colors duration-200 ${scrolled
                   ? "text-foreground/70 hover:text-foreground"
                   : "text-white/80 hover:text-white"
@@ -368,17 +395,18 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               onClick={() => {
                 if (user) onStart?.(); else setView('login');
               }}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               style={{ backgroundColor: "#ea580c" }}
+              className="flex gap-1 items-center justify-center py-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Commencer gratuitement
+              Commencer
+              <LogInIcon className="w-8" />
             </button>
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="md:hidden w-11 h-11 flex items-center text-white justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -387,30 +415,40 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
 
         {/* Mobile menu */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="bg-white border-t border-border px-4 py-4 flex flex-col gap-1">
+          <div className="bg-white border-t border-border px-4 py-4 flex flex-col gap-1 items-start">
             {navLinks.map(({ href, label }) => (
               <a
                 key={href}
                 href={href}
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(href);
+                }}
                 className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 {label}
               </a>
             ))}
+            <div className="flex ">
             <button
-              onClick={() => { setMenuOpen(false); if (user) onStart?.(); else setView('login'); }}
-              className="mt-2 px-4 py-3 rounded-xl text-sm font-semibold text-white text-center transition-all duration-200 hover:opacity-90 active:scale-95"
+              onClick={() => {
+                if (user) onStart?.(); else setView('login');
+              }}
               style={{ backgroundColor: "#ea580c" }}
+              className="flex gap-1 items-center justify-center py-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Commencer gratuitement
+              Commencer
+              <LogInIcon className="w-8" />
             </button>
+
+            </div>
           </div>
         </div>
       </header>
 
       {/* ── HERO ── */}
       <section
+        id="accueil"
         className="relative pt-24 pb-0 overflow-hidden"
         style={{
           background: "linear-gradient(135deg, #0f1b35 0%, #1e3a8a 55%, #1d4ed8 100%)",
@@ -442,7 +480,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 <span style={{ color: "#ea580c" }}>Statuts</span>{" "}
                 <span className="text-white">WhatsApp</span>{" "}
                 &amp;{" "}
-                <span style={{ color: "#34d399" }}>Facebook</span>
+                <span style={{ color: "#34d395" }}>Facebook</span>
               </h1>
 
               <p className="text-lg text-blue-100 leading-relaxed mb-8 max-w-lg mx-auto md:mx-0">
@@ -697,15 +735,14 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             ))}
           </div>
 
-          <a
-            href=""
+          <button
             onClick={() => { if (user) onAdvertise?.(); else setView('login'); }}
             className="group inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl text-base font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white whitespace-nowrap"
             style={{ backgroundColor: "#ea580c", boxShadow: "0 8px 32px rgba(234,88,12,0.4)" }}
           >
             Lancer ma première campagne
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
-          </a>
+          </button>
         </div>
 
         <div className="mt-16">
@@ -841,45 +878,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ backgroundColor: "#080f20" }} className="py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-            <div>
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1e3a8a" }}>
-                  <Wallet className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-bold text-white">SikaAds</span>
-              </div>
-              <p className="text-blue-300 text-sm leading-relaxed">
-                La plateforme n°1 de monétisation de statuts sociaux au Togo.
-              </p>
-            </div>
-
-            {[
-              { title: "Produit", links: ["Comment ça marche", "Témoignages", "Tarifs", "FAQ"] },
-              { title: "Légal", links: ["Conditions d'utilisation", "Politique de confidentialité", "Cookies"] },
-              { title: "Contact", links: ["Support WhatsApp", "Email", "Lomé, Togo"] },
-            ].map(({ title, links }) => (
-              <div key={title}>
-                <h4 className="font-semibold text-white mb-3 text-sm">{title}</h4>
-                <ul className="space-y-2">
-                  {links.map((l) => (
-                    <li key={l}>
-                      <a href="#" className="text-blue-300 hover:text-white text-sm transition-colors duration-200">{l}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="border-t pt-6 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-            <p className="text-blue-400 text-sm">© 2025 SikaAds. Tous droits réservés.</p>
-            <p className="text-blue-500 text-xs">Conçu avec ♥ pour le Togo</p>
-          </div>
-        </div>
-      </footer>
+      <Footer onNavigate={(v) => setView(v)} />
     </div>
   );
 }

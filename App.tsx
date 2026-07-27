@@ -529,7 +529,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-gray-50 relative">
         <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
         {/* Header uniquement pour les utilisateurs non connectes (landing page) */}
-        {!user && (
+        {/* {!user && (
           <Header
             view={view === 'app' || view === 'profile' ? 'app' : 'landing'}
             role={userData?.role || UserRole.AMBASSADOR}
@@ -537,7 +537,7 @@ const App: React.FC = () => {
             setRole={() => { }}
             user={user}
           />
-        )}
+        )} */}
         {view === 'landing' ? (
           <LandingPage
             user={user}

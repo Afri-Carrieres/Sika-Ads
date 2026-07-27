@@ -5,6 +5,7 @@ import { UserRole } from '../types';
 import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
+import LandingLogo from "@/public/Header-LogoSika-Ads.png";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -49,9 +50,9 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         { id: 'admin-create-vip', label: 'Création VIP', icon: Crown },
         { id: 'admin-payouts', label: 'Finances', icon: CreditCard },
         { id: 'admin-users', label: 'Utilisateurs', icon: Users },
-        {id: 'admin-team', label: 'Mon Équipe', icon: ShieldCheck },
-        {id: 'admin-gombo-status', label: 'Vérif GomboPlus', icon: Check },
-        {id: 'profile', label: 'Mon Profil', icon: User },
+        { id: 'admin-team', label: 'Mon Équipe', icon: ShieldCheck },
+        { id: 'admin-gombo-status', label: 'Vérif GomboPlus', icon: Check },
+        { id: 'profile', label: 'Mon Profil', icon: User },
       );
     }
 
@@ -83,25 +84,13 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
 
         {/* 1. Header Sticky */}
-        <div className="p-6 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
-          <div className="flex items-center gap-3">
-            <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-900/50">
-              <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-                <Megaphone className="text-white" size={20} />
-              </div>
-              {/* <LayoutDashboard size={20} className="text-white" /> */}
-            </div>
-            <div>
-              <span className="text-xl font-black text-white-50 tracking-tighter">SikaAds</span>
-              {/* </div> */}
-
-            </div>
-          </div>
-          <div className="p-3 bg-indigo-600/30 mt-4 rounded-lg flex flex-col items-center">
-            <h2 className="text-lg font-black tracking-tight leading-none text-white">
+        <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
+          <div className="p-1  rounded-lg flex flex-col items-center">
+            <img className="w-80 " src={LandingLogo} alt="Logo SikaAds" />
+            {/* <h2 className="text-lg font-black tracking-tight leading-none text-white">
               {userData?.role === UserRole.ADMIN ? 'SikaAds HQ' : 'Espace Membre'}
-            </h2>
-            <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-1">
+            </h2> */}
+            <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
               {getRoleLabel()}
             </p>
           </div>
@@ -184,42 +173,33 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       </aside>
 
       {/* MOBILE SIDEBAR (DRAWER) */}
-      <div 
+      <div
         className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
         {/* Backdrop */}
-        <div 
+        <div
           className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
         />
-        
+
         {/* Sidebar content */}
-        <aside 
+        <aside
           className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
         >
           {/* Header */}
-          <div className="p-6 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-900/50">
-                <Megaphone className="text-white" size={20} />
-              </div>
-              <span className="text-xl font-black text-white tracking-tighter">SikaAds</span>
+          <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
+            <div className="flex flex-col items-center gap-3">
+              <img className="w-80 " src={LandingLogo} alt="Logo SikaAds" />
+              <p className="text-[10px] bg-indigo-600/30  p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                {getRoleLabel()}
+              </p>
             </div>
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 text-slate-400 hover:text-white transition-colors"
             >
               <X size={24} />
             </button>
-          </div>
-
-          <div className="p-3 bg-indigo-600/30 mx-4 mt-4 rounded-lg flex flex-col items-center">
-            <h2 className="text-lg font-black tracking-tight leading-none text-white">
-              {userData?.role === UserRole.ADMIN ? 'SikaAds HQ' : 'Espace Membre'}
-            </h2>
-            <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-1">
-              {getRoleLabel()}
-            </p>
           </div>
 
           {/* Navigation */}
@@ -305,7 +285,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       {/* MOBILE HEADER / NAV (Visible only on mobile) */}
       <div className="md:hidden sticky top-0 z-[40] bg-[#0F172A] text-white p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-2">
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-2 -ml-2 text-indigo-400 hover:text-white transition-colors"
           >
