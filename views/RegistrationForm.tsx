@@ -15,8 +15,12 @@ import {
   AlertCircle,
   Sparkles,
   Users,
-  Landmark
+  Landmark,
+  EyeOff,
+  Eye
 } from 'lucide-react';
+
+import LandingLogo from '@/public/Header-LogoSika-Ads.png';
 
 interface RegistrationFormProps {
   onComplete: () => void;
@@ -24,10 +28,12 @@ interface RegistrationFormProps {
   onGoToLogin: () => void;
 }
 
-const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCancel, onGoToLogin }) => {
+const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel, onGoToLogin }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
 
   // Step 1 Data (Auth)
   const [email, setEmail] = useState('');
@@ -191,7 +197,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
       {[1, 2, 3].map((s) => (
         <div
           key={s}
-          className={`h-1.5 rounded-full transition-all duration-300 ${step === s ? 'w-8 bg-indigo-600' : step > s ? 'w-8 bg-indigo-300' : 'w-8 bg-gray-200'
+          className={`h-1.5 rounded-full transition-all duration-300 ${step === s ? 'w-8 bg-[#f55d05]' : step > s ? 'w-8 bg-[#128785]' : 'w-8 bg-gray-200'
             }`}
         />
       ))}
@@ -199,34 +205,28 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[0.75fr_1.05fr]">
       
       {/* LEFT PANEL — brand / progress */}
-      <div className="hidden lg:flex lg:w-[42%] xl:w-[38%] relative overflow-hidden flex-col justify-between p-10 xl:p-12 bg-[radial-gradient(1200px_circle_at_20%_15%,rgba(99,102,241,0.35),transparent_60%),radial-gradient(900px_circle_at_85%_20%,rgba(16,185,129,0.20),transparent_55%),radial-gradient(900px_circle_at_70%_85%,rgba(244,63,94,0.18),transparent_55%),linear-gradient(135deg,#05070f_0%,#0b1030_45%,#06152b_100%)]">
-        <div className="pointer-events-none absolute -top-24 -left-24 w-[420px] h-[420px] rounded-full bg-indigo-500/25 blur-3xl animate-auth-float" />
-        <div className="pointer-events-none absolute -bottom-28 -right-28 w-[420px] h-[420px] rounded-full bg-emerald-400/20 blur-3xl animate-auth-float2" />
-        <div className="pointer-events-none absolute top-1/3 -right-24 w-[340px] h-[340px] rounded-full bg-rose-400/15 blur-3xl animate-auth-float" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.9)_1px,transparent_0)] [background-size:18px_18px]" />
+      <div className="hidden flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-6 text-white lg:flex xl:px-14">
 
         {/* Logo */}
-        <div className="relative flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center">
-            <Sparkles className="text-indigo-300" size={18} />
-          </div>
-          <div className="leading-tight">
-            <p className="text-white font-black text-lg font-display">Adwalet</p>
-            <p className="text-[10px] text-white/50 font-bold uppercase tracking-widest">Programme Ambassadeur</p>
-          </div>
-        </div>
+        {/* <div className="relative flex items-center"> */}
+          <div className="flex justify-start place-items-start">
+             <button onClick={onCancel} className="inline-flex items-center" aria-label="Retour à l'accueil">
+              <img src={LandingLogo} alt="SikaAds" className="w-100 object-contain" />
+            </button>
+           </div>
+        {/* </div> */}
 
         {/* Headline + steps */}
-        <div className="relative">
+        <div className="relative min-w-x">
           <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-black text-white font-display">
-            Recommandez.<br />
-            <span className="text-emerald-300">Soyez payé.</span>
+            Partagez !<br />
+            <span className="text-[#128785]">Soyez payé.</span>
           </h1>
           <p className="mt-4 text-white/70 font-medium max-w-sm">
-            Créez votre compte Ambassadeur en trois étapes rapides et commencez à gagner sur chaque parrainage.
+            Créez votre compte Ambassadeur en trois étapes rapides et commencez à gagner grâce à vos vues.
           </p>
 
           <div className="mt-10 space-y-3">
@@ -237,12 +237,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
               return (
                 <div
                   key={s.n}
-                  className={`flex items-center justify-between rounded-2xl p-4 border transition-all ${isActive ? 'bg-white/12 border-white/15' : 'bg-white/5 border-white/10'
+                  className={`flex items-center justify-between rounded-2xl p-4 border transition-all ${isActive ? 'bg-white/12 border-[#f55d05]' : 'bg-white/5 border-white/10'
                     }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isDone ? 'bg-emerald-500/80 text-white' : isActive ? 'bg-indigo-500/80 text-white' : 'bg-white/10 text-white/60'
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isDone ? 'bg-emerald-500/80 text-white' : isActive ? 'bg-[#f55d05] text-white ' : 'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-teal-300/25 bg-teal-300/10 text-teal-300'
                         }`}
                     >
                       {isDone ? <CheckCircle2 size={18} /> : <Icon size={18} />}
@@ -253,7 +253,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-indigo-200' : isDone ? 'text-emerald-300' : 'text-white/35'
+                    className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-[#f55d05]' : isDone ? 'text-emerald-300' : 'text-white/35'
                       }`}
                   >
                     {isActive ? 'En cours' : isDone ? 'OK' : `0${s.n}`}
@@ -264,9 +264,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
           </div>
         </div>
 
-        <div className="relative flex items-center justify-between text-white/50 text-xs font-bold">
-          <span>© 2026 Adwalet</span>
-          <span className="uppercase tracking-widest">Togo</span>
+        <div className=" mt-2 relative text-white/50 text-xs font-bold">
+          <span>© 2026 SikaAds Togo</span>
+          {/* <span className="uppercase tracking-widest">Togo</span> */}
         </div>
       </div>
 
@@ -274,13 +274,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
       <div className="flex-1 bg-white flex flex-col">
         <div className="flex justify-between items-center px-6 py-6 lg:px-14 lg:py-8">
           {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-              <Sparkles className="text-white" size={16} />
-            </div>
-            <span className="font-black text-gray-900 font-display">Adwalet</span>
-          </div>
-          <div className="hidden lg:block" />
           <button
             onClick={onCancel}
             className="flex items-center gap-1.5 text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors"
@@ -288,11 +281,18 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
             <ArrowLeft size={16} />
             Accueil
           </button>
+          <div className="flex lg:hidden items-center gap-2">
+           <button onClick={onCancel} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
+              <img src={LandingLogo} alt="SikaAds" className="w-60 object-contain" />
+            </button>
+          </div>
+          <div className="hidden lg:block" />
+          
         </div>
 
         <div className="flex-1 flex items-center justify-center px-6 pb-10 lg:px-14">
           <div className="w-full max-w-md">
-            <p className="text-[11px] font-black uppercase tracking-widest text-indigo-500 mb-2">
+            <p className="text-[11px] font-black uppercase tracking-widest text-[#f55d05] mb-2">
               Étape {step} / 3
             </p>
             <h2 className="text-3xl font-black text-gray-900 leading-tight font-display">
@@ -344,7 +344,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all"
+                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
                         placeholder="jean@exemple.com"
                       />
                     </div>
@@ -356,12 +356,13 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all"
+                          type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} 
+                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
                           placeholder="••••••••"
                         />
+                        <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                       </div>
                     </label>
                     <label className="block">
@@ -369,12 +370,14 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
-                          type="password"
-                          value={confirmPassword}
+                          type={showPassword ? 'text' : 'password'} required value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all"
+                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
                           placeholder="••••••••"
                         />
+                        <button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                       </div>
                     </label>
                   </div>
@@ -426,7 +429,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all"
+                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
                         placeholder="Jean-Pierre Koffi"
                       />
                     </div>
@@ -438,11 +441,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                       <div className="flex gap-2">
                         <button
                           onClick={() => setGender('M')}
-                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'M' ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
+                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'M' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
                         >Homme</button>
                         <button
                           onClick={() => setGender('F')}
-                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'F' ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
+                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'F' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
                         >Femme</button>
                       </div>
                     </div>
@@ -454,7 +457,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                         <select
                           value={ageRange}
                           onChange={(e) => setAgeRange(e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all appearance-none"
+                          className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all appearance-none"
                         >
                           <option value="">Choisir...</option>
                           {ageRanges.map(range => <option key={range} value={range}>{range} ans</option>)}
@@ -470,7 +473,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                       <select
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all appearance-none"
+                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all appearance-none"
                       >
                         <option value="">Sélectionnez votre ville...</option>
                         {cities.map(c => <option key={c} value={c}>{c}</option>)}
@@ -495,7 +498,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         onClick={() => setPaymentMethod('Mixx')}
-                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Mixx' ? 'border-indigo-600 bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Mixx' ? 'border-[#f55d05] bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                       >
                         <div className="w-11 h-11 rounded-xl overflow-hidden relative shadow-sm border border-white shrink-0">
                           <div className="absolute inset-0 bg-[#00338d] flex items-center justify-center">
@@ -507,12 +510,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                           <span className="font-black text-gray-900 block leading-tight text-sm">Mixx by YAS</span>
                           <span className="text-[10px] text-gray-400 font-bold uppercase">YAS</span>
                         </div>
-                        {paymentMethod === 'Mixx' && <CheckCircle2 className="absolute top-3 right-3 text-indigo-600" size={16} />}
+                        {paymentMethod === 'Mixx' && <CheckCircle2 className="absolute top-3 right-3 text-[#f55d05]" size={16} />}
                       </button>
 
                       <button
                         onClick={() => setPaymentMethod('Moov')}
-                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Moov' ? 'border-indigo-600 bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Moov' ? 'border-[#f55d05] bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                       >
                         <div className="w-11 h-11 rounded-xl overflow-hidden relative shadow-sm border border-white shrink-0">
                           <div className="absolute inset-0 bg-[#0066cc] flex items-center justify-center">
@@ -525,7 +528,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                           <span className="font-black text-gray-900 block leading-tight text-sm">Moov Africa</span>
                           <span className="text-[10px] text-gray-400 font-bold uppercase">Moov Money</span>
                         </div>
-                        {paymentMethod === 'Moov' && <CheckCircle2 className="absolute top-3 right-3 text-indigo-600" size={16} />}
+                        {paymentMethod === 'Moov' && <CheckCircle2 className="absolute top-3 right-3 text-[#f55d05]" size={16} />}
                       </button>
                     </div>
                   </div>
@@ -538,7 +541,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                         type="tel"
                         value={momoNumber}
                         onChange={(e) => setMomoNumber(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-bold text-gray-900 transition-all"
+                        className="w-full bg-white border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
                         placeholder="+228 90 00 00 00"
                       />
                     </div>
@@ -572,7 +575,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
                   (step === 3 && (!paymentMethod || !momoNumber))
                 }
                 onClick={handleNextStep}
-                className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
+                className="flex-1 py-4 bg-[#f55d05] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-200 hover:bg-[#f56505e3] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
               >
                 {loading ? <Loader2 className="animate-spin" size={22} /> : (
                   <>
@@ -587,12 +590,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ onComplete, onCance
               <div className="space-y-4">
                 <p className="mt-8 text-center text-xs font-bold text-gray-500">
                   Déjà un compte ?{' '}
-                  <button onClick={onGoToLogin} className="text-indigo-600 underline hover:text-indigo-800">
+                  <button onClick={onGoToLogin} className="text-[#128785] underline hover:text-{#128785}">
                     Se connecter
                   </button>
                 </p>
                 <p className="text-center text-[10px] text-gray-400 font-bold leading-relaxed px-4">
-                  En continuant, vous acceptez nos <span className="text-indigo-600 underline cursor-pointer">Conditions Générales d'Utilisation</span> et notre <span className="text-indigo-600 underline cursor-pointer">Politique de Confidentialité</span>.
+                  En continuant, vous acceptez nos <span className="text-[#128785] underline cursor-pointer">Conditions Générales d'Utilisation</span> et notre <span className="text-[#128785] underline cursor-pointer">Politique de Confidentialité</span>.
                 </p>
               </div>
             )}

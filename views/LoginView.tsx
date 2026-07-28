@@ -153,7 +153,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
 
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
             <span>© 2026 SikaAds Togo</span>
-            <span>Plateforme sécurisée</span>
+            {/* <span>Plateforme sécurisée</span> */}
           </div>
         </aside>
 
@@ -215,7 +215,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
                 </div>
               )}
 
-              <button type="submit" disabled={loading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-[#f55d05] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
+              <button type="submit" disabled={loading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
                 {loading ? <Loader2 className="animate-spin" size={22} /> : 'Se connecter'}
               </button>
             </form>

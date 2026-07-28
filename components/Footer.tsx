@@ -37,13 +37,13 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               Monétisez vos réseaux sociaux tout en aidant les entreprises locales à grandir.
             </p>
             <div className="flex gap-4">
-              <button type="button" aria-label="Facebook" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all duration-300 border border-slate-800">
+              <button type="button" aria-label="Facebook" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128785] hover:text-white transition-all duration-300 border border-slate-800">
                 <Facebook size={18} />
               </button>
-              <button type="button" aria-label="Instagram" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all duration-300 border border-slate-800">
+              <button type="button" aria-label="Instagram" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128785] hover:text-white transition-all duration-300 border border-slate-800">
                 <Instagram size={18} />
               </button>
-              <button type="button" aria-label="LinkedIn" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-indigo-600 hover:text-white transition-all duration-300 border border-slate-800">
+              <button type="button" aria-label="LinkedIn" className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128785] hover:text-white transition-all duration-300 border border-slate-800">
                 <Linkedin size={18} />
               </button>
             </div>
@@ -77,19 +77,19 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <ul className="space-y-5 text-sm">
               <li className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
-                  <MapPin size={16} className="text-indigo-500" />
+                  <MapPin size={16} className="text-[#128785]" />
                 </div>
                 <span className="font-bold text-slate-300">Lomé, Quartier Agoè, Boulevard Eyadema, Togo</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
-                  <Phone size={16} className="text-indigo-500" />
+                  <Phone size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-bold text-slate-300">+228 90 00 00 00</span>
+                <span className="font-bold text-slate-300">+228 91 41 67 45</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
-                  <Mail size={16} className="text-indigo-500" />
+                  <Mail size={16} className="text-[#128785]" />
                 </div>
                 <span className="font-bold text-slate-300">contact@sikaads.tg</span>
               </li>
