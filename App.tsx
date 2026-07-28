@@ -7,6 +7,7 @@ import { supabase } from './supabase';
 import Layout from './components/Layout';
 import Header from './components/Header';
 import { InstallPrompt } from './components/InstallPrompt';
+import PushNotificationBanner from './components/PushNotificationBanner';
 import ToastContainer from './components/ToastContainer';
 import { ToastMessage } from './components/Toast';
 import AmbassadorDashboard from './views/AmbassadorDashboard';
@@ -567,10 +568,13 @@ const App: React.FC = () => {
             onRoleSwitch={handleRoleSwitch}
             onNavigateToProfile={() => setView('profile')}
           >
-            <InstallPrompt />
             {renderContent()}
           </Layout>
         )}
+
+        {/* ── Cartes flottantes (position: fixed → toujours en bas à droite) ── */}
+        <InstallPrompt />
+        <PushNotificationBanner userId={user?.id ?? null} />
 
         {/* ────── Overlay de chargement ──────
           Superposé par-dessus le contenu existant (fixed) pour ne PAS démonter

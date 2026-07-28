@@ -292,10 +292,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-2" onClick={() => navigate('/app')}>
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
-              <Megaphone size={16} className="text-white" />
-            </div>
-            <span className="font-black tracking-tight">SikaAds</span>
+           <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
           </div>
         </div>
         <p className="text-[10px] font-black uppercase bg-white/10 px-2 py-1 rounded text-indigo-200">{getRoleLabel()}</p>

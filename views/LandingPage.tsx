@@ -187,8 +187,32 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 /* ─── campaign carousel ─── */
 function CampaignCarousel() {
   const [index, setIndex] = useState(0);
-  const visible = 3;
-  const max = campaigns.length - visible;
+  const [visible, setVisible] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setVisible(1);
+      } else if (window.innerWidth < 1024) {
+        setVisible(2);
+      } else {
+        setVisible(3);
+      }
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const max = Math.max(0, campaigns.length - visible);
+
+  // Keep index within correct bounds when 'visible' changes
+  useEffect(() => {
+    if (index > max) {
+      setIndex(max);
+    }
+  }, [visible, max, index]);
 
   const prev = () => setIndex((i) => Math.max(0, i - 1));
   const next = () => setIndex((i) => Math.min(max, i + 1));
@@ -213,17 +237,17 @@ function CampaignCarousel() {
             onClick={prev}
             disabled={index === 0}
             aria-label="Campagne précédente"
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c]  border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5 text-white" />
           </button>
           <button
             onClick={next}
             disabled={index >= max}
             aria-label="Campagne suivante"
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c] border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
-            <ChevronRight className="w-5 h-5 text-foreground" />
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
 
           <div className="overflow-hidden ">
@@ -356,7 +380,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
           }`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-2 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto  sm:px-2 h-16 flex items-center justify-between">
           {/* Logo */}
           <a
             href="#accueil"
@@ -366,7 +390,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             }}
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <img className="w-60 " src={LandingLogo} alt="Logo SikaAds" />
+            <img className="w-60" src={LandingLogo} alt="Logo SikaAds" />
 
           </a>
 
@@ -409,7 +433,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             className="md:hidden w-11 h-11 flex items-center text-white justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {menuOpen ? <X className="w-5 h-5 text-[#ea580c]" /> : <Menu className="w-5 h-5 text-[#ea580c]" />}
           </button>
         </div>
 
@@ -435,7 +459,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 if (user) onStart?.(); else setView('login');
               }}
               style={{ backgroundColor: "#ea580c" }}
-              className="flex gap-1 items-center justify-center py-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex gap-1 items-center justify-center ml-4 py-2 px-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Commencer
               <LogInIcon className="w-8" />
