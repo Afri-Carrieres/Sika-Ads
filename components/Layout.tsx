@@ -189,7 +189,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
           {/* Header */}
           <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
             <div className="flex flex-col items-center gap-3">
-              <img className="w-80 " src={LandingLogo} alt="Logo SikaAds" />
+              <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
               <p className="text-[10px] bg-indigo-600/30  p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
                 {getRoleLabel()}
               </p>

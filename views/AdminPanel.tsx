@@ -569,6 +569,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         }).catch(err => console.error("Erreur d'envoi de l'email de validation de preuve:", err));
       }
 
+      if (validatingProof?.userId) {
+        supabase.functions.invoke('send-push-notification', {
+          body: {
+            userId: validatingProof.userId,
+            title: 'Preuve validée ✅',
+            body: `+${earnings} FCFA pour "${campaign.title || validatingProof.campaignName || 'votre campagne'}"`,
+            data: {
+              type: 'proof_validated',
+              url: '/#/app/wallet',
+            },
+          },
+        }).catch(err => console.error("Erreur d'envoi de la notification de validation:", err));
+      }
+
       showFeedback(`Preuve validée ! +${earnings.toLocaleString()} FCFA crédités.`);
       setValidatingProof(null);
       // await deleteProof(validatingProof);
@@ -604,7 +618,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           userId: rejectingProof.userId,
           title: 'Preuve refusée',
           message: `Votre preuve pour la campagne ${rejectingProof.campaignName} a été refusée. Motif : ${rejectionReason.trim()}`,
-          type: 'rejected',
+          type: 'status',
           read: false,
           createdAt: new Date().toISOString()
         });
@@ -630,12 +644,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
       }
 
-      await deleteProof(rejectingProof);
+      if (validatingProof?.userId) {
+        supabase.functions.invoke('send-push-notification', {
+          body: {
+            userId: validatingProof.userId,
+            title: 'Preuve Refusée ❌',
+            body: `Votre preuve pour la ${rejectingProof.campaignName || 'campagne'} a été refusée. Motif : ${rejectionReason.trim()}`,
+            data: {
+              type: 'rejected',
+              url: '/#/app/wallet',
+            },
+          },
+        }).catch(err => console.error("Erreur d'envoi de la notification de validation:", err));
+      }
+
+      // await deleteProof(rejectingProof);
 
       showFeedback("Preuve refusée et supprimée.", "info");
       setRejectingProof(null);
       setRejectionReason('');
-    } catch (e) { 
+    } catch (e) {
       showFeedback("Erreur lors du refus", "error");
       console.error(e);
     }

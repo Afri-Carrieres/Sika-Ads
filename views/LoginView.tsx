@@ -118,7 +118,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
           <div>
            <div className="flex justify-start place-items-start">
              <button onClick={onGoBack} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
-              <img src={LandingLogo} alt="SikaAds" className="w-100 object-contain" />
+              <img src={LandingLogo} alt="SikaAds" className="w-[400px] object-contain" />
             </button>
            </div>
 

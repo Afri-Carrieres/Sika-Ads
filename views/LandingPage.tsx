@@ -592,10 +592,10 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
       {/* ── STATS ── */}
       <section style={{ backgroundColor: "#1e3a8a" }} className="py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-row justify-between gap-10 md:gap-17 flex-wrap">
-            <StatCard label="Utilisateurs actifs" value={12400} prefix="+" />
-            <StatCard label="Versé ce mois" value={4800000} suffix=" FCFA" />
-            <StatCard label="Vues générées" value={3200000} prefix="+" />
+          <div className="flex flex-col justify-between gap-10 md:gap-17 l md:flex-row items-center">
+            <StatCard label="Utilisateurs actifs" value={1000} prefix="+" />
+            <StatCard label="Versé ce mois" value={400000} suffix=" FCFA" />
+            <StatCard label="Vues générées" value={30000} prefix="+" />
             <StatCard label="Villes couvertes" value={24} />
           </div>
         </div>
@@ -873,7 +873,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             <span style={{ color: "#ea580c" }}>dès aujourd'hui</span>
           </h2>
           <p className="text-blue-200 text-lg mb-10 max-w-xl mx-auto">
-            Rejoignez 12 000 Togolais qui transforment leurs statuts en revenus réels. C'est gratuit, c'est simple, c'est maintenant.
+            Rejoignez 2000 Togolais qui transforment leurs statuts en revenus réels. C'est gratuit, c'est simple, c'est maintenant.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
