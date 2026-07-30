@@ -15,12 +15,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-com
 // Ces valeurs sont publiques (elles se retrouvent dans le bundle JS de toute façon).
 // La sécurité réelle vient des règles Firestore/FCM côté serveur.
 firebase.initializeApp({
-  apiKey:            self.FIREBASE_API_KEY            || '__VITE_FIREBASE_API_KEY__',
-  authDomain:        self.FIREBASE_AUTH_DOMAIN        || '__VITE_FIREBASE_AUTH_DOMAIN__',
-  projectId:         self.FIREBASE_PROJECT_ID         || '__VITE_FIREBASE_PROJECT_ID__',
-  storageBucket:     self.FIREBASE_STORAGE_BUCKET     || '__VITE_FIREBASE_STORAGE_BUCKET__',
-  messagingSenderId: self.FIREBASE_MESSAGING_SENDER_ID || '__VITE_FIREBASE_MESSAGING_SENDER_ID__',
-  appId:             self.FIREBASE_APP_ID             || '__VITE_FIREBASE_APP_ID__',
+  apiKey:            self.FIREBASE_API_KEY            || 'VITE_FIREBASE_API_KEY',
+  authDomain:        self.FIREBASE_AUTH_DOMAIN        || 'VITE_FIREBASE_AUTH_DOMAIN',
+  projectId:         self.FIREBASE_PROJECT_ID         || 'VITE_FIREBASE_PROJECT_ID',
+  storageBucket:     self.FIREBASE_STORAGE_BUCKET     || 'VITE_FIREBASE_STORAGE_BUCKET',
+  messagingSenderId: self.FIREBASE_MESSAGING_SENDER_ID || 'VITE_FIREBASE_MESSAGING_SENDER_ID',
+  appId:             self.FIREBASE_APP_ID             || 'VITE_FIREBASE_APP_ID',
 });
 
 const messaging = firebase.messaging();
