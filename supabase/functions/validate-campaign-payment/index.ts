@@ -107,6 +107,32 @@ serve(async (req: Request) => {
 
     console.log("✅ Campaign validated and activated:", campaignId);
 
+    // Insert a global announcement for all users
+    await supabase.from('announcements').insert([{
+      title: `Campagne activée : ${campaign.title}`,
+      content: `La campagne "${campaign.title}" est maintenant payée et active. Les ambassadeurs peuvent commencer à la promouvoir dès maintenant.`,
+      createdAt: new Date().toISOString(),
+    }]);
+
+    // Send a global push notification to all subscribed users
+    fetch(`${supabaseUrl}/functions/v1/send-push-notification`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({
+        broadcast: true,
+        title: 'Nouvelle campagne activée',
+        body: `La campagne "${campaign.title}" est maintenant active. Découvrez-la dès maintenant !`,
+        icon: '/Web-Icon.png',
+        data: {
+          type: 'announcement',
+          url: '/#/app',
+        },
+      }),
+    }).catch((e) => console.warn('Push broadcast failed (non-blocking):', e.message));
+
     // Send confirmation email (fire and forget)
     if (campaign.advertiserEmail) {
       const emailPayload = {

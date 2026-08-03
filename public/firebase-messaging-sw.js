@@ -15,12 +15,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-com
 // Ces valeurs sont publiques (elles se retrouvent dans le bundle JS de toute façon).
 // La sécurité réelle vient des règles Firestore/FCM côté serveur.
 firebase.initializeApp({
-  apiKey:            self.FIREBASE_API_KEY            || 'VITE_FIREBASE_API_KEY',
-  authDomain:        self.FIREBASE_AUTH_DOMAIN        || 'VITE_FIREBASE_AUTH_DOMAIN',
-  projectId:         self.FIREBASE_PROJECT_ID         || 'VITE_FIREBASE_PROJECT_ID',
-  storageBucket:     self.FIREBASE_STORAGE_BUCKET     || 'VITE_FIREBASE_STORAGE_BUCKET',
-  messagingSenderId: self.FIREBASE_MESSAGING_SENDER_ID || 'VITE_FIREBASE_MESSAGING_SENDER_ID',
-  appId:             self.FIREBASE_APP_ID             || 'VITE_FIREBASE_APP_ID',
+  apiKey: "AIzaSyDhq0Cba7MX_bx7kZMJXeKZmZd8Bf9cn00",
+  authDomain: "adwallet-7b9bc.firebaseapp.com",
+  projectId: "adwallet-7b9bc",
+  storageBucket: "adwallet-7b9bc.firebasestorage.app",
+  messagingSenderId: "329461381798",
+  appId: "1:329461381798:web:924b1d3befddeb9ca05267"
 });
 
 const messaging = firebase.messaging();
@@ -40,15 +40,15 @@ messaging.onBackgroundMessage((payload) => {
 
   const notificationTitle = title || 'SikaAds';
   const notificationOptions = {
-    body:    body    || 'Vous avez une nouvelle notification.',
-    icon:    icon    || '/Web-Icon.png',
-    badge:   badge   || '/Web-Icon.png',
-    image:   image,
-    data:    { url: clickUrl, ...data },
+    body: body || 'Vous avez une nouvelle notification.',
+    icon: icon || '/Web-Icon.png',
+    badge: badge || '/Web-Icon.png',
+    image: image,
+    data: { url: clickUrl, ...data },
     // Vibration pattern (mobile)
     vibrate: [200, 100, 200],
     // Tag : remplace la notification précédente du même type au lieu d'en empiler
-    tag: data.type  || 'sikaads-notification',
+    tag: data.type || 'sikaads-notification',
     // Garder la notification visible jusqu'au clic
     requireInteraction: false,
     // Actions rapides sous la notification

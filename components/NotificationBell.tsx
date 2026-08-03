@@ -70,7 +70,7 @@ const NotificationBell: React.FC = () => {
       setGlobalNotifs(data.map(d => ({
         id: d.id,
         title: d.title,
-        message: d.message,
+        message: d.content,
         type: 'announcement',
         read: readAnnouncements.includes(d.id),
         createdAt: d.createdAt,
