@@ -15,7 +15,7 @@ const BRAND = {
   teal: "#118a88",
   tealDark: "#0d6d6b",
   orange: "#f3661e",
-  logoUrl: "https://drive.google.com/file/d/1jR9VvnbXEDFdsZQqBuuvJtR50pD_4eGb/view?usp=sharing"
+  logoUrl: "https://zgzomwsujqtzjfmfhuow.supabase.co/storage/v1/object/public/logo%20SikaAds/Email-Signature.png"
   // logoUrl: "https://www.sika-ads.com/assets/images/logo.png",
 };
 

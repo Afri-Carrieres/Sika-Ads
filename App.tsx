@@ -72,6 +72,7 @@ const App: React.FC = () => {
   useAuthRedirect({
     onRecovery: () => {
       setViewInternal('reset-password');
+      window.history.replaceState(null, '', window.location.pathname + window.location.search + '#/reset-password');
     }
   });
 

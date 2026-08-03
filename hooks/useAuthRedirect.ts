@@ -28,9 +28,9 @@ export function useAuthRedirect({ onRecovery }: UseAuthRedirectOptions = {}) {
         return;
       }
 
-      // Nettoie l'URL : garde uniquement le path du HashRouter (avant le 2e #)
+      // Nettoie l'URL sans perdre la route de reset-password
       const cleanHash = hash.substring(0, secondHashIndex); // "#/"
-      const newUrl = window.location.pathname + window.location.search + cleanHash;
+      const newUrl = window.location.pathname + window.location.search + cleanHash + 'reset-password';
       window.history.replaceState(null, '', newUrl);
 
       // On gère nous-mêmes le cas 'recovery', car l'event PASSWORD_RECOVERY

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
-import { Lock, Loader2, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Loader2, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react';
+import LandingLogo from '@/public/Header-LogoSika-Ads.png';
 
 interface ResetPasswordViewProps {
   onSuccess: () => void;
@@ -131,128 +132,141 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
 
   if (verifying) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#05070f] text-indigo-400 gap-4">
-        <Loader2 className="animate-spin" size={40} />
-        <p className="font-bold text-sm uppercase tracking-widest animate-pulse">Vérification de la session...</p>
+      <div className="min-h-screen bg-white text-slate-950 selection:bg-[#f55d05] selection:text-slate-950">
+        <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+          <img src={LandingLogo} alt="SikaAds" className="mb-8 w-56 object-contain" />
+          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-[#128785]">
+              <Loader2 className="animate-spin" size={24} />
+            </div>
+            <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Sécurité</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Vérification de la session</h2>
+            <p className="mt-3 text-sm font-medium leading-6 text-slate-500">Nous validons votre lien de réinitialisation. Cela ne prendra qu’un instant.</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[radial-gradient(1200px_circle_at_20%_15%,rgba(99,102,241,0.35),transparent_60%),radial-gradient(900px_circle_at_85%_20%,rgba(16,185,129,0.20),transparent_55%),radial-gradient(900px_circle_at_70%_85%,rgba(244,63,94,0.18),transparent_55%),linear-gradient(135deg,#05070f_0%,#0b1030_45%,#06152b_100%)] selection:bg-indigo-200/40 selection:text-white">
-      <div className="pointer-events-none absolute -top-24 -left-24 w-[520px] h-[520px] rounded-full bg-indigo-500/25 blur-3xl animate-auth-float" />
-      <div className="pointer-events-none absolute -bottom-28 -right-28 w-[520px] h-[520px] rounded-full bg-emerald-400/20 blur-3xl animate-auth-float2" />
-
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white/85 backdrop-blur-xl rounded-[3rem] shadow-[0_30px_90px_rgba(0,0,0,0.45)] border border-white/40 p-8 md:p-12 relative overflow-hidden animate-in zoom-in-95 duration-500">
-          
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-600 mb-6 shadow-sm border border-indigo-100/50">
-              <ShieldCheck size={32} />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Sécurité</p>
-            <h2 className="mt-2 text-3xl font-black text-gray-900 leading-tight font-display">
-              Nouveau départ.
-            </h2>
-            {email && (
-              <p className="text-gray-600 font-medium mt-2">
-                Réinitialisation pour <span className="text-indigo-600 font-bold">{email}</span>
+    <div className="min-h-screen bg-white text-slate-950 selection:bg-[#f55d05] selection:text-slate-950">
+      <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+        <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
+          <div>
+            <img src={LandingLogo} alt="SikaAds" className="w-[320px] object-contain" />
+            <div className="mt-8 max-w-xl">
+              <h1 className="text-4xl font-black leading-[1.02] tracking-tight xl:text-5xl">
+                Réinitialisez votre accès <span className="text-[#128785]">en toute sécurité.</span>
+              </h1>
+              <p className="mt-6 max-w-md text-base font-medium leading-8 text-slate-300">
+                Choisissez un nouveau mot de passe pour reprendre l’accès à vos campagnes, preuves et gains SikaAds.
               </p>
-            )}
+            </div>
           </div>
 
-          {success ? (
-            <div className="space-y-6 text-center animate-in fade-in zoom-in duration-500">
-              <div className="flex flex-col items-center justify-center p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 text-emerald-800">
-                <CheckCircle2 size={48} className="mb-4" />
-                <h3 className="text-xl font-black mb-2">Succès !</h3>
-                <p className="text-sm font-bold opacity-80">Votre mot de passe a été modifié avec succès.</p>
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>© 2026 SikaAds Togo</span>
+          </div>
+        </aside>
+
+        <main className="flex min-h-screen flex-col bg-white px-5 py-6 sm:px-8 lg:px-12 xl:px-20">
+          <div className="flex items-center justify-between">
+            <button onClick={onBackToLogin} className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-bold text-slate-500 transition hover:text-slate-900">
+              <ArrowLeft size={17} />
+              Retour
+            </button>
+            <img src={LandingLogo} alt="SikaAds" className="w-60 object-contain lg:hidden" />
+          </div>
+
+          <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">
+            <div className="mb-8">
+              <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-[#128785] shadow-sm">
+                <ShieldCheck size={24} />
               </div>
-              <p className="text-gray-500 text-xs font-bold animate-pulse">Redirection vers la connexion dans quelques secondes...</p>
-              <button
-                onClick={onBackToLogin}
-                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-indigo-700 transition-all"
-              >
-                Retourner à la connexion
-                <ArrowRight size={18} />
-              </button>
+              <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-950">Nouveau mot de passe</h2>
+              <p className="mt-3 text-sm font-medium leading-6 text-slate-500">
+                {email ? `Réinitialisation pour ${email}` : 'Choisissez un mot de passe robuste pour sécuriser votre compte.'}
+              </p>
             </div>
-          ) : (
-            <form onSubmit={handleReset} className="space-y-6">
-              <div className="space-y-4">
+
+            {success ? (
+              <div className="space-y-6 rounded-[2rem] border border-slate-200 bg-slate-50 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.06)]">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+                  <CheckCircle2 size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-950">Succès !</h3>
+                  <p className="mt-2 text-sm font-bold leading-6 text-slate-600">Votre mot de passe a été modifié avec succès.</p>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Redirection vers la connexion dans quelques secondes...</p>
+                <button
+                  onClick={onBackToLogin}
+                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-orange-100 transition hover:bg-[#f56505e3] active:scale-[0.99]"
+                >
+                  Retourner à la connexion
+                  <ArrowRight size={18} />
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleReset} className="space-y-5">
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 mb-2 block">
-                    Nouveau mot de passe
-                  </span>
+                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Nouveau mot de passe</span>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                       type="password"
                       required
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-slate-100 border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold transition-all text-gray-900"
+                      className="h-14 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pl-12 text-sm font-bold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-100"
                       placeholder="••••••••"
                     />
                   </div>
                 </label>
 
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 mb-2 block">
-                    Confirmer le mot de passe
-                  </span>
+                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Confirmer le mot de passe</span>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                       type="password"
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full bg-slate-100 border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold transition-all text-gray-900"
+                      className="h-14 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pl-12 text-sm font-bold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-100"
                       placeholder="••••••••"
                     />
                   </div>
                 </label>
-              </div>
 
-              {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-100 animate-in slide-in-from-top-2">
-                  <AlertCircle size={18} className="shrink-0" />
-                  <p className="text-xs font-bold">{error}</p>
-                </div>
-              )}
+                {error && (
+                  <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-red-700">
+                    <AlertCircle size={18} className="mt-0.5 shrink-0" />
+                    <p className="text-xs font-bold leading-5">{error}</p>
+                  </div>
+                )}
 
-              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={loading || (!!error && !email)}
-                  className="w-full relative overflow-hidden py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-indigo-200/50 hover:bg-indigo-700 active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {loading ? (
-                    <Loader2 className="animate-spin" size={24} />
-                  ) : (
-                    <>
-                      Changer mon mot de passe
-                      <ArrowRight size={20} />
-                    </>
-                  )}
-                  <span className="pointer-events-none absolute inset-0 opacity-0 hover:opacity-100 transition-opacity bg-[radial-gradient(500px_circle_at_30%_10%,rgba(255,255,255,0.20),transparent_60%)]" />
+                  {loading ? <Loader2 className="animate-spin" size={22} /> : <>
+                    Changer mon mot de passe
+                    <ArrowRight size={18} />
+                  </>}
                 </button>
-              </div>
 
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={onBackToLogin}
-                  className="text-xs font-black text-gray-500 hover:text-indigo-600 transition-colors"
-                >
-                  Retourner à la connexion
-                </button>
-              </div>
-            </form>
-          )}
-
-        </div>
+                <p className="text-center text-sm font-medium text-slate-500">
+                  Vous vous souvenez de votre mot de passe ?{' '}
+                  <button type="button" onClick={onBackToLogin} className="font-black text-[#128785] transition hover:text-teal-700">
+                    Retourner à la connexion
+                  </button>
+                </p>
+              </form>
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );

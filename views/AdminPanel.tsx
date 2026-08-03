@@ -630,19 +630,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         .eq('id', rejectingProof.userId)
         .single();
 
-      // if (!fetchErr && user?.email) {
-      //   supabase.functions.invoke('send-email', {
-      //     body: {
-      //       to: user.email,
-      //       type: 'rejected',
-      //       data: {
-      //         userName: rejectingProof.userName || 'Ambassadeur',
-      //         campaignTitle: rejectingProof.campaignName || 'Campagne',
-      //         reason: rejectionReason.trim()
-      //       }
-      //     }
-      //   }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
-      // }
+      if (!fetchErr && user?.email) {
+        supabase.functions.invoke('send-email', {
+          body: {
+            to: user.email,
+            type: 'rejected',
+            data: {
+              userName: rejectingProof.userName || 'Ambassadeur',
+              campaignTitle: rejectingProof.campaignName || 'Campagne',
+              reason: rejectionReason.trim()
+            }
+          }
+        }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
+      }
 
       if (validatingProof?.userId) {
         supabase.functions.invoke('send-push-notification', {
