@@ -259,7 +259,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setResetOpen(false)} className="h-12 flex-1 rounded-xl bg-slate-100 text-xs font-black uppercase tracking-widest text-slate-600 transition hover:bg-slate-200">Annuler</button>
-                <button type="submit" disabled={resetLoading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#f55d05] text-xs font-black uppercase tracking-widest text-white transition hover:bg-teal-300 disabled:cursor-not-allowed disabled:opacity-70">
+                <button type="submit" disabled={resetLoading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#f55d05] text-xs font-black uppercase tracking-widest text-white transition hover:bg-[#f55d05] disabled:cursor-not-allowed disabled:opacity-70">
                   {resetLoading ? <Loader2 className="animate-spin" size={18} /> : 'Envoyer'}
                 </button>
               </div>

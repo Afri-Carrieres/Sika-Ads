@@ -52,7 +52,7 @@ const baseLayout = (content: string) => `
           <!-- Header : logo, fond blanc (identique au template natif) -->
           <tr>
             <td align="center" style="padding:40px 20px 20px 20px;background-color:#ffffff;">
-              <img src="${BRAND.logoUrl}" alt="SikaAds Togo" width="180" style="display:block;max-width:100%;height:auto;border:0;">
+              <img src="https://zgzomwsujqtzjfmfhuow.supabase.co/storage/v1/object/public/logo%20SikaAds/Email-Signature.png" alt="SikaAds Togo" width="180" style="display:block;max-width:100%;height:auto;border:0;">
             </td>
           </tr>
 

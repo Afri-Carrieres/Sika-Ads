@@ -59,6 +59,16 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
         }
       }
 
+      const pwdChecks = {
+        length: newPassword.length >= 8,
+        lowercase: /[a-z]/.test(newPassword),
+        uppercase: /[A-Z]/.test(newPassword),
+        digit: /[0-9]/.test(newPassword),
+        special: /[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?`~]/.test(newPassword),
+      };
+      const pwdStrong = Object.values(pwdChecks).every(Boolean);
+      const pwdScore = Object.values(pwdChecks).filter(Boolean).length;
+
       // ─── Cas 2 : Session déjà active (token déjà échangé avant ce composant) ───
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -117,7 +127,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
     try {
       const { error: err } = await supabase.auth.updateUser({ password: newPassword });
       if (err) throw err;
-      
+
       setSuccess(true);
       setTimeout(() => {
         onSuccess();
@@ -238,6 +248,36 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
                     />
                   </div>
                 </label>
+
+                {/* {newPassword && (
+                    <div className="space-y-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <div key={i} className={`h-1 flex-1 rounded-full transition-all ${pwdScore >= i
+                              ? pwdScore <= 2 ? 'bg-red-400'
+                                : pwdScore <= 3 ? 'bg-orange-400'
+                                  : pwdScore <= 4 ? 'bg-yellow-400'
+                                    : 'bg-emerald-500'
+                              : 'bg-gray-200'
+                            }`} />
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                        {[
+                          { ok: pwdChecks.length, label: '8+ caractères' },
+                          { ok: pwdChecks.lowercase, label: 'Minuscule (a-z)' },
+                          { ok: pwdChecks.uppercase, label: 'Majuscule (A-Z)' },
+                          { ok: pwdChecks.digit, label: 'Chiffre (0-9)' },
+                          { ok: pwdChecks.special, label: 'Caractère spécial (!@#...)' },
+                        ].map(({ ok, label }) => (
+                          <span key={label} className={`text-[10px] font-bold flex items-center gap-1 ${ok ? 'text-emerald-600' : 'text-gray-400'}`}>
+                            <span>{ok ? '✓' : '○'}</span> {label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )} */}
+
 
                 {error && (
                   <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-red-700">
