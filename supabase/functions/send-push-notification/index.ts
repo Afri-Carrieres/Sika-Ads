@@ -52,8 +52,8 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
 
 function parseSubscription(raw: string): Record<string, unknown> | null {
   try {
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && parsed.endpoint) {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (parsed && typeof parsed === 'object' && parsed.endpoint && parsed.keys && parsed.keys.p256dh && parsed.keys.auth) {
       return parsed as Record<string, unknown>;
     }
   } catch {
@@ -154,7 +154,10 @@ Deno.serve(async (req: Request) => {
           title,
           body: messageBody,
           icon: icon || '/Web-Icon.png',
-          data: data || {},
+          data: {
+            url: data?.url || '/',
+            ...data,
+          },
         };
 
         const result = await sendWebPushNotification(parsedSubscription, payload);

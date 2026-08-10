@@ -90,7 +90,7 @@ export function InstallPrompt() {
     return (
       <div className="floating-card-popup">
         <div className="floating-card-popup__header">
-          <div className="floating-card-popup__logo">
+          <div className="floating-card-popup__logo bg-white">
             <img src="/Web-Icon.png" alt="SikaAds" className="floating-card-popup__logo-img" />
           </div>
           <div className="floating-card-popup__title-block">
