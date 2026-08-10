@@ -390,7 +390,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             }}
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <img className="w-60" src={LandingLogo} alt="Logo SikaAds" />
+            <img className="w-40" src={LandingLogo} alt="Logo SikaAds" />
 
           </a>
 

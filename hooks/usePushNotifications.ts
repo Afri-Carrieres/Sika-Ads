@@ -86,7 +86,13 @@ export function usePushNotifications({ userId }: UsePushNotificationsOptions): U
     }
 
     if (!VAPID_PUBLIC_KEY) {
-      console.error('[WebPush] VITE_VAPID_PUBLIC_KEY manquante dans le .env — impossible de continuer.');
+      alert("Erreur de configuration : La clé VITE_VAPID_PUBLIC_KEY n'est pas définie dans l'environnement du serveur (Vercel).");
+      console.error('[WebPush] VITE_VAPID_PUBLIC_KEY manquante dans l\'environnement.');
+      return;
+    }
+
+    if (Notification.permission === 'denied') {
+      alert("Les notifications sont bloquées pour ce site. Veuillez cliquer sur le cadenas dans la barre d'adresse de votre navigateur pour réautoriser les notifications.");
       return;
     }
 
@@ -96,7 +102,7 @@ export function usePushNotifications({ userId }: UsePushNotificationsOptions): U
       setPermission(result as PushPermissionState);
 
       if (result !== 'granted') {
-        console.log('[WebPush] Permission refusée:', result);
+        console.log('[WebPush] Permission refusée par l\'utilisateur:', result);
         return;
       }
 
@@ -114,6 +120,7 @@ export function usePushNotifications({ userId }: UsePushNotificationsOptions): U
       await saveSubscription(subscription);
     } catch (error) {
       console.error('[WebPush] Erreur lors de la demande de permission:', error);
+      alert("Impossible de s'abonner aux notifications push : " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsLoading(false);
     }

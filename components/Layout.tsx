@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../types';
-import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check } from 'lucide-react';
+import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check, BarChart2 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
 import LandingLogo from "@/public/Header-LogoSika-Ads.png";
@@ -27,6 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
         { id: 'marketplace', label: 'Campagnes', icon: Megaphone },
         { id: 'create-campaign', label: 'Créer une campagne', icon: PlusCircle },
+        { id: 'my-campaigns', label: 'Mes Campagnes', icon: BarChart2 },
         { id: 'tasks', label: 'Mes Preuves', icon: CheckCircle2 },
         // { id: 'notes', label: 'Stratégies', icon: StickyNote },
         { id: 'wallet', label: 'Portefeuille', icon: Wallet },
@@ -86,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         {/* 1. Header Sticky */}
         <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
           <div className="p-1  rounded-lg flex flex-col items-center">
-            <img className="w-80 " src={LandingLogo} alt="Logo SikaAds" />
+            <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
             {/* <h2 className="text-lg font-black tracking-tight leading-none text-white">
               {userData?.role === UserRole.ADMIN ? 'SikaAds HQ' : 'Espace Membre'}
             </h2> */}
@@ -110,6 +111,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
               case 'wallet': to = '/app?tab=wallet'; break;
               case 'profile': to = '/app?tab=profile'; break;
               case 'create-campaign': to = '/app?tab=create-campaign'; break;
+              case 'my-campaigns': to = '/app?tab=my-campaigns'; break;
               case 'admin-dashboard': to = '/app?tab=admin-dashboard'; break;
               case 'admin-campaigns': to = '/app?tab=admin-campaigns'; break;
               case 'admin-validation': to = '/app?tab=admin-validation'; break;

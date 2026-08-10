@@ -487,6 +487,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       const cpv = campaign.cpv ?? 5;
       const earnings = views * cpv;
       const remainingBudget = campaign.remainingBudget ?? 0;
+      const viewsCurrent = campaign.viewsCurrent ?? 0;
 
       // Vérification du budget restant
       if (earnings > remainingBudget) {
@@ -529,11 +530,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         })
         .eq('id', validatingProof.userId);
 
-      // Update campaign budget
       await supabase
         .from('campaigns')
         .update({
-          remainingBudget: remainingBudget - earnings
+          remainingBudget: remainingBudget - earnings,
+          viewsCurrent: viewsCurrent + views,
         })
         .eq('id', campaign.id);
 
@@ -624,25 +625,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         });
 
       // Envoi de l'email de refus de preuve à l'ambassadeur
-      const { data: user, error: fetchErr } = await supabase
-        .from('users')
-        .select('email')
-        .eq('id', rejectingProof.userId)
-        .single();
+      // const { data: user, error: fetchErr } = await supabase
+      //   .from('users')
+      //   .select('email')
+      //   .eq('id', rejectingProof.userId)
+      //   .single();
 
-      if (!fetchErr && user?.email) {
-        supabase.functions.invoke('send-email', {
-          body: {
-            to: user.email,
-            type: 'rejected',
-            data: {
-              userName: rejectingProof.userName || 'Ambassadeur',
-              campaignTitle: rejectingProof.campaignName || 'Campagne',
-              reason: rejectionReason.trim()
-            }
-          }
-        }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
-      }
+      // if (!fetchErr && user?.email) {
+      //   supabase.functions.invoke('send-email', {
+      //     body: {
+      //       to: user.email,
+      //       type: 'rejected',
+      //       data: {
+      //         userName: rejectingProof.userName || 'Ambassadeur',
+      //         campaignTitle: rejectingProof.campaignName || 'Campagne',
+      //         reason: rejectionReason.trim()
+      //       }
+      //     }
+      //   }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
+      // }
 
       if (validatingProof?.userId) {
         supabase.functions.invoke('send-push-notification', {

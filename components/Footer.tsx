@@ -30,7 +30,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Brand Column */}
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center cursor-pointer group" onClick={() => navigateToLandingSection('accueil')}>
-              <img className="w-60 sm:w-68 lg:w-80" src={LandingLogo} alt="Logo SikaAds" />
+              <img className="w-40 sm:w-68 lg:w-80" src={LandingLogo} alt="Logo SikaAds" />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-slate-400/80">
               La première plateforme de nano-influence au Togo.

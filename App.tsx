@@ -30,6 +30,7 @@ import ResetPasswordView from './views/ResetPasswordView';
 import AboutView from './views/AboutView';
 import LegalView from './views/LegalView';
 import TermsView from './views/TermsView';
+import MyCampaigns from './views/MyCampaigns';
 import "./styles/index.css";
 import { useAuthRedirect } from './hooks/useAuthRedirect';
 
@@ -303,6 +304,7 @@ const App: React.FC = () => {
         case 'notes': return <StrategyNotes />;
         case 'wallet': return <WalletView onWithdrawalRequested={(a, p) => console.log('Withdrawal requested', a, p)} />;
         case 'create-campaign': return <CreateCampaign onSuccess={handleCampaignFormSuccess} onCancel={() => setTab('dashboard')} />;
+        case 'my-campaigns': return <MyCampaigns onRetryPayment={(id, amount) => { setPendingCampaignId(id); setPendingAmount(amount); setShowPayment(true); }} onNavigateToCreate={() => setTab('create-campaign')} />;
         default: return <AmbassadorDashboard userData={userData} onNavigateToWallet={() => setTab('wallet')} />;
       }
     };
@@ -485,7 +487,12 @@ const App: React.FC = () => {
       setShowPayment(false);
       setPendingCampaignId(null);
       setPendingAmount(0);
-      setView('advertise-success');
+      if (user) {
+        setView('app');
+        setTab('my-campaigns');
+      } else {
+        setView('advertise-success');
+      }
     };
 
     // Handler annulation paiement
@@ -510,7 +517,12 @@ const App: React.FC = () => {
       setShowPayment(false);
       setPendingCampaignId(null);
       setPendingAmount(0);
-      setView('landing');
+      if (user) {
+        setView('app');
+        setTab('my-campaigns');
+      } else {
+        setView('landing');
+      }
     };
 
     if (showPayment && pendingCampaignId) {
