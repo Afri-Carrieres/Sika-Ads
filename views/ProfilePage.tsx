@@ -1,7 +1,81 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, ArrowLeft, Lock, ShieldCheck, AlertCircle } from 'lucide-react';
+import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, ArrowLeft, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
+
+const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ userId }) => {
+  const { permission, isSubscribed, isLoading, requestPermission, unsubscribe } = usePushNotifications({ userId });
+
+  if (permission === 'unsupported') {
+    return (
+      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="bg-gray-100 p-2.5 rounded-xl text-gray-400">
+            <BellOff size={20} />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-gray-800">Notifications Push</h4>
+            <p className="text-xs text-gray-500 font-medium">Non prises en charge sur ce navigateur</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+          <Bell size={20} />
+        </div>
+        <div>
+          <h4 className="text-sm font-bold text-gray-900">Notifications du navigateur</h4>
+          <p className="text-xs text-gray-500 font-medium">Recevez des alerte directes sur vos revenus et validations.</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <div className="text-xs font-semibold">
+          Statut : {permission === 'granted' && isSubscribed ? (
+            <span className="text-emerald-600 font-bold">Actif (Abonné)</span>
+          ) : permission === 'denied' ? (
+            <span className="text-red-500 font-bold">Bloqué par le navigateur</span>
+          ) : (
+            <span className="text-amber-500 font-bold">Inactif</span>
+          )}
+        </div>
+
+        {permission === 'granted' && isSubscribed ? (
+          <button
+            onClick={unsubscribe}
+            disabled={isLoading}
+            className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+          >
+            {isLoading ? '...' : 'Désactiver'}
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              localStorage.removeItem('sikaads_push_dismissed');
+              requestPermission();
+            }}
+            disabled={isLoading || permission === 'denied'}
+            className="px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all disabled:opacity-50"
+          >
+            {isLoading ? 'Activation...' : 'Activer les notifications'}
+          </button>
+        )}
+      </div>
+
+      {permission === 'denied' && (
+        <p className="text-[11px] text-red-500 bg-red-50 p-3 rounded-xl font-medium">
+          Les notifications sont bloquées dans votre navigateur. Cliquez sur le cadenas à côté de l'URL pour réautoriser les notifications.
+        </p>
+      )}
+    </div>
+  );
+};
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -326,6 +400,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               )}
             </div>
 
+             {/* Notification Web Push Settings */}
+            <PushNotificationSettingsCard userId={user?.id ?? null} />
+
           </div>
 
 
@@ -493,6 +570,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                 </button>
               </div>
             </form>
+
+           
           </div>
         </div>
       </div>

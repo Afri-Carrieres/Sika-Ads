@@ -660,7 +660,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
       // await deleteProof(rejectingProof);
 
-      showFeedback("Preuve refusée et supprimée.", "info");
+      showFeedback("Preuve refusée avec succès", "info");
       setRejectingProof(null);
       setRejectionReason('');
     } catch (e) {
