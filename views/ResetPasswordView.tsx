@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { Lock, Loader2, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, ArrowLeft } from 'lucide-react';
-import LandingLogo from '@/public/Header-LogoSika-Ads.png';
 
 interface ResetPasswordViewProps {
   onSuccess: () => void;
@@ -144,7 +143,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
     return (
       <div className="min-h-screen bg-white text-slate-950 selection:bg-[#f55d05] selection:text-slate-950">
         <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
-          <img src={LandingLogo} alt="SikaAds" className="mb-8 w-56 object-contain" />
+          <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="mb-8 w-56 object-contain" />
           <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-[#128785]">
               <Loader2 className="animate-spin" size={24} />
@@ -163,7 +162,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
       <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
         <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
           <div>
-            <img src={LandingLogo} alt="SikaAds" className="w-[320px] object-contain" />
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[320px] object-contain" />
             <div className="mt-8 max-w-xl">
               <h1 className="text-4xl font-black leading-[1.02] tracking-tight xl:text-5xl">
                 Réinitialisez votre accès <span className="text-[#128785]">en toute sécurité.</span>
@@ -185,7 +184,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
               <ArrowLeft size={17} />
               Retour
             </button>
-            <img src={LandingLogo} alt="SikaAds" className="w-60 object-contain lg:hidden" />
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain lg:hidden" />
           </div>
 
           <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">

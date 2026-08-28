@@ -16,7 +16,6 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
-import LandingLogo from '@/public/Header-LogoSika-Ads.png';
 
 interface LoginViewProps {
   onSuccess: () => void;
@@ -118,7 +117,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
           <div>
            <div className="flex justify-start place-items-start">
              <button onClick={onGoBack} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
-              <img src={LandingLogo} alt="SikaAds" className="w-[400px] object-contain" />
+              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[400px] object-contain" />
             </button>
            </div>
 
@@ -163,7 +162,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
               <ArrowLeft size={17} />
               Accueil
             </button>
-            <img src={LandingLogo} alt="SikaAds" className="w-60 object-contain lg:hidden" />
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain lg:hidden" />
           </div>
 
           <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">

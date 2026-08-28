@@ -28,7 +28,6 @@ import {
 
 import Footer from "@/components/Footer";
 
-import LandingLogo from "@/public/Header-LogoSika-Ads.png";
 
 // import mock_up from "./Mock-up.png";
 
@@ -390,7 +389,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             }}
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <img className="w-40" src={LandingLogo} alt="Logo SikaAds" />
+            <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
 
           </a>
 

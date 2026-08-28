@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="#fff"/>
+  <g transform="translate(60,60)">
+    <rect width="1080" height="480" rx="24" fill="#F8FAFC" stroke="#E6EDF5"/>
+    <g transform="translate(40,40)">
+      <rect x="0" y="0" width="300" height="120" rx="12" fill="url(#g)" opacity="0.12"/>
+      <rect x="340" y="0" width="300" height="120" rx="12" fill="url(#g)" opacity="0.12"/>
+      <rect x="680" y="0" width="300" height="120" rx="12" fill="url(#g)" opacity="0.12"/>
+
+      <g transform="translate(0,160)">
+        <circle cx="40" cy="40" r="28" fill="#EEF2FF"/>
+        <rect x="80" y="12" width="560" height="56" rx="8" fill="#fff" stroke="#E6EDF5"/>
+      </g>
+
+      <g transform="translate(0,260)">
+        <circle cx="40" cy="40" r="28" fill="#FEF3C7"/>
+        <rect x="80" y="12" width="560" height="56" rx="8" fill="#fff" stroke="#E6EDF5"/>
+      </g>
+
+      <g transform="translate(0,360)">
+        <circle cx="40" cy="40" r="28" fill="#EEF2F7"/>
+        <rect x="80" y="12" width="560" height="56" rx="8" fill="#fff" stroke="#E6EDF5"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -20,7 +20,6 @@ import {
   Eye
 } from 'lucide-react';
 
-import LandingLogo from '@/public/Header-LogoSika-Ads.png';
 
 interface RegistrationFormProps {
   onComplete: () => void;
@@ -214,7 +213,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
         {/* <div className="relative flex items-center"> */}
           <div className="flex justify-start place-items-start">
              <button onClick={onCancel} className="inline-flex items-center" aria-label="Retour à l'accueil">
-              <img src={LandingLogo} alt="SikaAds" className="w-[300px] object-contain" />
+              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[300px] object-contain" />
             </button>
            </div>
         {/* </div> */}
@@ -283,7 +282,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
           </button>
           <div className="flex lg:hidden items-center gap-2">
            <button onClick={onCancel} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
-              <img src={LandingLogo} alt="SikaAds" className="w-60 object-contain" />
+              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain" />
             </button>
           </div>
           <div className="hidden lg:block" />

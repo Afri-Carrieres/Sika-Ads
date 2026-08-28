@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <rect width="1200" height="600" fill="#fff"/>
+  <g transform="translate(80,60)">
+    <rect width="1040" height="480" rx="24" fill="#F8FAFC" stroke="#E6EDF5"/>
+    <g transform="translate(40,40)">
+      <path d="M0 220 C160 100, 440 100, 600 220 C760 340, 1040 340, 1200 220" fill="none" stroke="#7C3AED" stroke-opacity="0.08" stroke-width="120"/>
+      <g transform="translate(60,40)">
+        <circle cx="120" cy="120" r="60" fill="#FEE2E2"/>
+        <circle cx="280" cy="100" r="80" fill="#E0F2FE"/>
+        <rect x="420" y="40" width="420" height="220" rx="18" fill="#fff" stroke="#E6EDF5"/>
+        <text x="450" y="120" font-family="Inter, sans-serif" font-size="22" fill="#0F172A">Afrique — une approche locale</text>
+      </g>
+    </g>
+  </g>
+</svg>

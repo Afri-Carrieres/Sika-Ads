@@ -5,7 +5,6 @@ import { UserRole } from '../types';
 import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check, BarChart2 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
-import LandingLogo from "@/public/Header-LogoSika-Ads.png";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -87,7 +86,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         {/* 1. Header Sticky */}
         <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
           <div className="p-1  rounded-lg flex flex-col items-center">
-            <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
+            <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
             {/* <h2 className="text-lg font-black tracking-tight leading-none text-white">
               {userData?.role === UserRole.ADMIN ? 'SikaAds HQ' : 'Espace Membre'}
             </h2> */}
@@ -191,7 +190,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
           {/* Header */}
           <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
             <div className="flex flex-col items-center gap-3">
-              <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
+              <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
               <p className="text-[10px] bg-indigo-600/30  p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
                 {getRoleLabel()}
               </p>
@@ -294,7 +293,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-2" onClick={() => navigate('/app')}>
-           <img className="w-40 " src={LandingLogo} alt="Logo SikaAds" />
+          <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
           </div>
         </div>
         <p className="text-[10px] font-black uppercase bg-white/10 px-2 py-1 rounded text-indigo-200">{getRoleLabel()}</p>
