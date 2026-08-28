@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { UserRole, Notification, Proof, Campaign } from './types';
@@ -43,49 +44,35 @@ import { Clock, Loader2 } from 'lucide-react';
 
 type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'profile' | 'reset-password';
 
-const parseHash = (): { view: AppView; tab: string } => {
-  const hash = window.location.hash.replace('#/', '');
-  if (!hash) return { view: 'landing', tab: 'dashboard' };
+// Helper to parse current path and return view + tab
+const parsePathname = (pathname: string): { view: AppView; tab: string } => {
+  const pathWithoutLeadingSlash = pathname.replace(/^\//, '');
+  
+  if (!pathWithoutLeadingSlash || pathWithoutLeadingSlash === '') {
+    return { view: 'landing', tab: 'dashboard' };
+  }
 
-  const [view, ...tabParts] = hash.split('/');
-  return {
-    view: (view || 'landing') as AppView,
-    tab: tabParts.join('/') || 'dashboard'
-  };
-};
+  const parts = pathWithoutLeadingSlash.split('/').filter(Boolean);
+  const firstPart = parts[0] as AppView;
 
+  if (firstPart === 'app') {
+    return { view: 'app', tab: parts.slice(1).join('/') || 'dashboard' };
+  }
 
+  if (['about', 'legal', 'terms', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'profile', 'reset-password'].includes(firstPart)) {
+    return { view: firstPart, tab: 'dashboard' };
+  }
 
-// Détecte si on arrive depuis un lien de réinitialisation de mot de passe
-// Doit être appelé AVANT le premier render pour que ResetPasswordView soit monté immédiatement
-const getInitialView = (): AppView => {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('mode') === 'resetPassword') return 'reset-password';
-  return parseHash().view;
+  return { view: 'landing', tab: 'dashboard' };
 };
 
 const App: React.FC = () => {
-  const [view, setViewInternal] = useState<AppView>(getInitialView());
-  const [currentTab, setCurrentTabInternal] = useState<string>(parseHash().tab);
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [view, setViewInternal] = useState<AppView>(parsePathname(location.pathname).view);
+  const [currentTab, setCurrentTabInternal] = useState<string>(parsePathname(location.pathname).tab);
 
-   // 🔑 Parse le hash cassé (#/#access_token=...) causé par le HashRouter
-  // combiné aux redirections Supabase (recovery ET OAuth Google)
-  useAuthRedirect({
-    onRecovery: () => {
-      setViewInternal('reset-password');
-      window.history.replaceState(null, '', window.location.pathname + window.location.search + '#/reset-password');
-    }
-  });
-
-  // Wrapper for setView to also update hash
-  const setView = (v: AppView) => {
-    setViewInternal(v);
-  };
-
-  // Wrapper for setTab to also update hash
-  const setTab = (t: string) => {
-    setCurrentTabInternal(t);
-  };
   const [proofs, setProofs] = useState<(Proof & { campaignTitle: string; userName: string })[]>(MOCK_PROOFS);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
@@ -96,21 +83,28 @@ const App: React.FC = () => {
 
   const { user, userData, loading, isAdmin, isStaff } = useUserData();
 
-   useEffect(() => {
+  // Sync pathname changes to view/tab state
+  useEffect(() => {
+    const { view: newView, tab: newTab } = parsePathname(location.pathname);
+    setViewInternal(newView);
+    setCurrentTabInternal(newTab);
+  }, [location.pathname]);
+
+  // Auth state change handler
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        setViewInternal('reset-password');
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        navigate('/reset-password');
       }
       // Quand l'utilisateur clique sur le lien de vérification dans l'email,
       // Supabase émet USER_UPDATED avec email_confirmed_at renseigné.
       // On redirige alors automatiquement vers le dashboard.
       if ((event === 'USER_UPDATED' || event === 'SIGNED_IN') && session?.user?.email_confirmed_at) {
-        setViewInternal('app');
+        navigate('/app');
       }
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
     useEffect(() => {
       // Special handling: tracking redirect URLs like /ref/:ref/:campaignId or /ref?ref=:ref&campaignId=:campaignId
@@ -140,8 +134,7 @@ const App: React.FC = () => {
           }
 
           // Redirect to homepage (spa) after logging
-          const dest = window.location.origin + '/#/';
-          window.location.replace(dest);
+          navigate('/');
           return; // stop further init
         }
 
@@ -154,37 +147,26 @@ const App: React.FC = () => {
       const mode = urlParams.get('mode');
       if (mode === 'resetPassword') {
         // Ne pas naviguer ici : onAuthStateChange (PASSWORD_RECOVERY) le fera de façon fiable
-        // On laisse Supabase traiter le token dans le hash
+        // On laisse Supabase traiter le token dans la query string
         return;
       }
+    }, [navigate]);
 
-      // Handle initial hash routing
-      const { view: initialView, tab: initialTab } = parseHash();
-      if (initialView !== 'landing' || initialTab !== 'dashboard') {
-        setViewInternal(initialView);
-        setCurrentTabInternal(initialTab);
+    // Wrapper for setView to navigate using React Router
+    const setView = (v: AppView) => {
+      if (v === 'landing') {
+        navigate('/');
+      } else if (v === 'app') {
+        navigate(`/app/${currentTab}`);
+      } else {
+        navigate(`/${v}`);
       }
+    };
 
-      // Listen to back/forward button
-      const handlePopState = () => {
-        const { view: newView, tab: newTab } = parseHash();
-        setViewInternal(newView);
-        setCurrentTabInternal(newTab);
-      };
-      window.addEventListener('popstate', handlePopState);
-      return () => window.removeEventListener('popstate', handlePopState);
-    }, []);
-
-    // Sync state to URL Hash
-    // ⚠️ Ne pas remplacer le hash si on est en mode reset-password (le token de récupération est dans le hash)
-    useEffect(() => {
-      if (view === 'reset-password') return; // laisser Supabase gérer le hash
-      const path = view === 'app' ? `/${view}/${currentTab}` : `/${view}`;
-      const newHash = `#${path}`;
-      if (window.location.hash !== newHash) {
-        window.history.replaceState(null, '', newHash);
-      }
-    }, [view, currentTab]);
+    // Wrapper for setTab to update app path
+    const setTab = (t: string) => {
+      navigate(`/app/${t}`);
+    };
 
     useEffect(() => {
       if (loading) return;
