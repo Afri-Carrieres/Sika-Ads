@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Megaphone, Users, TrendingUp, Zap, Globe, ShieldCheck, Heart, Award } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Megaphone, Users, TrendingUp, Zap, Globe, ShieldCheck, Heart, Award, Menu, X, LogInIcon } from 'lucide-react';
 import Footer from '../components/Footer';
 
 interface AboutViewProps {
@@ -8,6 +8,15 @@ interface AboutViewProps {
 }
 
 const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     const title = "Sika Ads | Plateforme de marketing d'influence en Afrique";
     document.title = title;
@@ -60,7 +69,121 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
   };
 
   return (
-    <main className="bg-white min-h-screen flex flex-col pt-20 text-slate-900">
+    <>
+      {/* ── NAV ── */}
+      <header
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+          }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-2 h-16 flex items-center justify-between">
+          {/* Logo */}
+          <button
+            onClick={() => onNavigate('landing')}
+            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+          >
+            <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+          </button>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            <button
+              onClick={() => onNavigate('landing')}
+              className={`text-sm font-medium transition-colors duration-200 ${scrolled
+                ? "text-foreground/70 hover:text-foreground"
+                : "text-white/80 hover:text-white"
+                }`}
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => onNavigate('legal')}
+              className={`text-sm font-medium transition-colors duration-200 ${scrolled
+                ? "text-foreground/70 hover:text-foreground"
+                : "text-white/80 hover:text-white"
+                }`}
+            >
+              Mentions Légales
+            </button>
+            <button
+              onClick={() => onNavigate('terms')}
+              className={`text-sm font-medium transition-colors duration-200 ${scrolled
+                ? "text-foreground/70 hover:text-foreground"
+                : "text-white/80 hover:text-white"
+                }`}
+            >
+              Conditions
+            </button>
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={onStart}
+              style={{ backgroundColor: "#ea580c" }}
+              className="flex gap-1 items-center justify-center py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Commencer
+              <LogInIcon className="w-4" />
+            </button>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          >
+            {menuOpen ? <X className="w-5 h-5 text-[#ea580c]" /> : <Menu className="w-5 h-5 text-[#ea580c]" />}
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="bg-white border-t border-border px-4 py-4 flex flex-col gap-1 items-start">
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onNavigate('landing');
+              }}
+              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
+            >
+              Accueil
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onNavigate('legal');
+              }}
+              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
+            >
+              Mentions Légales
+            </button>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onNavigate('terms');
+              }}
+              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
+            >
+              Conditions
+            </button>
+            <div className="flex pt-2">
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  onStart();
+                }}
+                style={{ backgroundColor: "#ea580c" }}
+                className="flex gap-1 items-center justify-center ml-4 py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Commencer
+                <LogInIcon className="w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="bg-white min-h-screen flex flex-col pt-20 text-slate-900">
       {/* HERO */}
       <header className="relative py-20 bg-slate-950 text-white overflow-hidden">
         <div className="container mx-auto px-6 relative z-10">
@@ -203,6 +326,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
 
       <Footer onNavigate={onNavigate} />
     </main>
+    </>
   );
 };
 
