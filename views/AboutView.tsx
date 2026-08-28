@@ -72,7 +72,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
     <>
       {/* ── NAV ── */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white/80 backdrop-blur-md"
           }`}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-2 h-16 flex items-center justify-between">
@@ -90,7 +90,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
               onClick={() => onNavigate('landing')}
               className={`text-sm font-medium transition-colors duration-200 ${scrolled
                 ? "text-foreground/70 hover:text-foreground"
-                : "text-white/80 hover:text-white"
+                : "text-slate-700 hover:text-slate-900"
                 }`}
             >
               Accueil
@@ -99,7 +99,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
               onClick={() => onNavigate('legal')}
               className={`text-sm font-medium transition-colors duration-200 ${scrolled
                 ? "text-foreground/70 hover:text-foreground"
-                : "text-white/80 hover:text-white"
+                : "text-slate-700 hover:text-slate-900"
                 }`}
             >
               Mentions Légales
@@ -108,7 +108,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
               onClick={() => onNavigate('terms')}
               className={`text-sm font-medium transition-colors duration-200 ${scrolled
                 ? "text-foreground/70 hover:text-foreground"
-                : "text-white/80 hover:text-white"
+                : "text-slate-700 hover:text-slate-900"
                 }`}
             >
               Conditions

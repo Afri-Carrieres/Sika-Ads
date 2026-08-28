@@ -32,8 +32,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <img className="w-40 sm:w-68 lg:w-80" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-slate-400/80">
-              La première plateforme de nano-influence au Togo.
-              Monétisez vos réseaux sociaux tout en aidant les entreprises locales à grandir.
+              La plateforme qui connecte les nano-influenceurs aux marques. Monétisez vos réseaux sociaux grâce à des collaborations et aidez les entreprises à se faire connaître.
             </p>
             <div className="flex gap-3 sm:gap-4">
               <button type="button" aria-label="Facebook" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128785] hover:text-white transition-all duration-300 border border-slate-800">
