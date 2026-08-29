@@ -9,7 +9,14 @@ export default {
         "./index.tsx",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+                body: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+                heading: ['Space Grotesk', 'sans-serif'],
+                display: ['Space Grotesk', 'sans-serif'],
+            },
+        },
     },
     plugins: [],
 }

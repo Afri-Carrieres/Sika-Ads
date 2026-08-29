@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sikaads.tg/sitemap.xml
+Sitemap: https://www.sika-ads.com/sitemap.xml

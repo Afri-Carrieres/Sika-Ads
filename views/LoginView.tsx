@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabase';
 import {
   AlertCircle,
@@ -67,7 +67,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
     try {
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: `${window.location.origin}/#/app` },
+        options: { redirectTo: `${window.location.origin}/app` },
       });
       if (err) throw err;
     } catch (err: any) {

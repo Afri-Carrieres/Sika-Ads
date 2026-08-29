@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FileText, ShieldCheck, Mail, MapPin, Building, Globe, Zap, Info, ChevronRight, Lock, Shield, Database, Eye, AlertCircle, CheckCircle2, ArrowLeft, MessageCircle, User, Icon } from 'lucide-react';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
 
 interface LegalViewProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
@@ -11,6 +12,11 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
+      <SEOHead
+        title="Mentions Légales & Confidentialité | SikaAds Togo"
+        description="Mentions légales, politique de confidentialité des données personnelles et conditions d'hébergement de SikaAds."
+        canonicalPath="/legal"
+      />
       {/* Breadcrumb Navigation */}
       <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
         <div className="container mx-auto px-6 py-4">

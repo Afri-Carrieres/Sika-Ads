@@ -32,7 +32,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <img className="w-40 sm:w-68 lg:w-80" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-slate-400/80">
-              La plateforme qui connecte les nano-influenceurs aux marques. Monétisez vos réseaux sociaux grâce à des collaborations et aidez les entreprises à se faire connaître.
+              La plateforme qui connecte les créateurs de contenu aux marques en Afrique. Monétisez vos réseaux sociaux et aidez les entreprises à se faire connaître.
             </p>
             <div className="flex gap-3 sm:gap-4">
               <button type="button" aria-label="Facebook" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128785] hover:text-white transition-all duration-300 border border-slate-800">
@@ -49,8 +49,8 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Platform Column */}
           <div>
-            <h3 className="text-white font-black uppercase text-[10px] tracking-[0.2em] mb-6 sm:mb-8">Plateforme</h3>
-            <ul className="space-y-3 sm:space-y-4 text-sm font-bold">
+            <h3 className="font-heading text-white font-bold uppercase text-xs tracking-[0.15em] mb-6 sm:mb-8">Plateforme</h3>
+            <ul className="space-y-3 sm:space-y-4 text-sm font-medium">
               <li><button onClick={() => navigateToLandingSection('accueil')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Accueil</button></li>
               <li><button onClick={() => onNavigate('about')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">À Propos</button></li>
               <li><button onClick={() => navigateToLandingSection('comment')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Comment ça marche</button></li>
@@ -60,8 +60,8 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Legal Column */}
           <div>
-            <h3 className="text-white font-black uppercase text-[10px] tracking-[0.2em] mb-6 sm:mb-8">Légal & Aide</h3>
-            <ul className="space-y-3 sm:space-y-4 text-sm font-bold">
+            <h3 className="font-heading text-white font-bold uppercase text-xs tracking-[0.15em] mb-6 sm:mb-8">Légal & Aide</h3>
+            <ul className="space-y-3 sm:space-y-4 text-sm font-medium">
               <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Mentions Légales</button></li>
               <li><button onClick={() => onNavigate('terms')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">CGU & Anti-Fraude</button></li>
               <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Confidentialité</button></li>
@@ -71,33 +71,33 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Contact Column */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <h3 className="text-white font-black uppercase text-[10px] tracking-[0.2em] mb-6 sm:mb-8">Contactez-nous</h3>
+            <h3 className="font-heading text-white font-bold uppercase text-xs tracking-[0.15em] mb-6 sm:mb-8">Contactez-nous</h3>
             <ul className="space-y-4 sm:space-y-5 text-sm">
               <li className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
                   <MapPin size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-bold text-slate-300">Lomé-Togo, Quartier Hédranawoé</span>
+                <span className="font-medium text-slate-300">Lomé-Togo, Quartier Hédranawoé</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
                   <Phone size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-bold text-slate-300">+228 91 41 67 45</span>
+                <span className="font-medium text-slate-300">+228 91 41 67 45</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
                   <Mail size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-bold text-slate-300 break-all sm:break-normal">contact@sikaads.tg</span>
+                <span className="font-medium text-slate-300 break-all sm:break-normal">contact@sikaads.tg</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="pt-8 sm:pt-10 border-t border-slate-900 flex flex-col md:flex-row justify-center items-center gap-6 text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-            Copyright © 2026 SikaAds Togo. Tous droits réservés.
+          <p className="text-xs font-medium text-slate-500">
+            Copyright © 2026 SikaAds. Tous droits réservés.
           </p>
         </div>
       </div>

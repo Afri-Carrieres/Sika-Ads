@@ -95,7 +95,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               momoNumber,
               referralCode,
             },
-            emailRedirectTo: `${window.location.origin}/#/app?tab=dashboard`
+            emailRedirectTo: `${window.location.origin}/app?tab=dashboard`
           }
         });
         console.log("Supabase Auth signUp response:", { data, signUpErr });
@@ -175,7 +175,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/#/app`
+          redirectTo: `${window.location.origin}/app`
         }
       });
       if (err) throw err;

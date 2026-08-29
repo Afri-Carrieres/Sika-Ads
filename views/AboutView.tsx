@@ -1,10 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Megaphone, Users, TrendingUp, Zap, Globe, ShieldCheck, Heart, Award, Menu, X, LogInIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  ArrowRight, 
+  CheckCircle2, 
+  Target, 
+  Users, 
+  ShieldCheck, 
+  TrendingUp, 
+  Award, 
+  Globe2, 
+  Zap, 
+  Share2, 
+  Lock, 
+  Smartphone, 
+  Building2, 
+  DollarSign, 
+  Sparkles,
+  CheckCircle,
+  Menu,
+  X,
+  LogInIcon,
+  HelpCircle,
+  ArrowUpRight
+} from 'lucide-react';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
+import MobileDrawer from '../components/MobileDrawer';
 
 interface AboutViewProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
-  onStart: () => void;
+  onStart?: () => void;
 }
 
 const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
@@ -12,53 +36,18 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const title = "Sika Ads | Plateforme de marketing d'influence en Afrique";
-    document.title = title;
-
-    const setMeta = (name: string, content: string) => {
-      let el = document.querySelector(`meta[name="${name}"]`);
-      if (el) el.setAttribute('content', content);
-      else {
-        el = document.createElement('meta');
-        el.setAttribute('name', name);
-        el.setAttribute('content', content);
-        document.head.appendChild(el);
-      }
-    };
-
-    setMeta('description', "Sika Ads connecte les marques aux créateurs de contenu africains pour des campagnes d'influence ciblées et performantes.");
-
-    const setOg = (prop: string, content: string) => {
-      let el = document.querySelector(`meta[property="${prop}"]`);
-      if (el) el.setAttribute('content', content);
-      else {
-        el = document.createElement('meta');
-        el.setAttribute('property', prop);
-        el.setAttribute('content', content);
-        document.head.appendChild(el);
-      }
-    };
-
-    setOg('og:title', title);
-    setOg('og:description', "Sika Ads connecte les marques aux créateurs de contenu africains pour des campagnes d'influence ciblées et performantes.");
-    setOg('og:type', 'website');
-    setOg('og:image', `${window.location.origin}/about_hero.png`);
-
-    let link = document.querySelector('link[rel="canonical"]');
-    if (link) link.setAttribute('href', `${window.location.origin}/#/about`);
-    else {
-      link = document.createElement('link');
-      link.setAttribute('rel', 'canonical');
-      link.setAttribute('href', `${window.location.origin}/#/about`);
-      document.head.appendChild(link);
-    }
-  }, []);
+  const navLinks = [
+    { href: 'landing', label: 'Accueil' },
+    { href: 'legal', label: 'Mentions Légales' },
+    { href: 'terms', label: 'Conditions & CGU' },
+  ];
 
   const goToAdvertisers = () => {
     onNavigate('landing');
@@ -70,46 +59,50 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
 
   return (
     <>
+      <SEOHead
+        title="À Propos de SikaAds | Plateforme d'Influence et Nano-Marketing au Togo"
+        description="Découvrez SikaAds Togo : la plateforme qui connecte les marques aux créateurs et ambassadeurs WhatsApp et Facebook."
+        canonicalPath="/about"
+        ogImage="https://www.sika-ads.com/about_hero.png"
+      />
       {/* ── NAV ── */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white/80 backdrop-blur-md"
-          }`}
+        className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
+          scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white/80 backdrop-blur-md"
+        }`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-2 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           {/* Logo */}
           <button
             onClick={() => onNavigate('landing')}
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+            <img className="w-36 sm:w-40 h-auto object-contain" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
           </button>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
             <button
               onClick={() => onNavigate('landing')}
-              className={`text-sm font-medium transition-colors duration-200 ${scrolled
-                ? "text-foreground/70 hover:text-foreground"
-                : "text-slate-700 hover:text-slate-900"
-                }`}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
+              }`}
             >
               Accueil
             </button>
             <button
               onClick={() => onNavigate('legal')}
-              className={`text-sm font-medium transition-colors duration-200 ${scrolled
-                ? "text-foreground/70 hover:text-foreground"
-                : "text-slate-700 hover:text-slate-900"
-                }`}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
+              }`}
             >
               Mentions Légales
             </button>
             <button
               onClick={() => onNavigate('terms')}
-              className={`text-sm font-medium transition-colors duration-200 ${scrolled
-                ? "text-foreground/70 hover:text-foreground"
-                : "text-slate-700 hover:text-slate-900"
-                }`}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
+              }`}
             >
               Conditions
             </button>
@@ -128,60 +121,26 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
 
           {/* Mobile menu button */}
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+            aria-label="Ouvrir le menu"
           >
-            {menuOpen ? <X className="w-5 h-5 text-[#ea580c]" /> : <Menu className="w-5 h-5 text-[#ea580c]" />}
+            <Menu className="w-6 h-6 text-[#ea580c]" />
           </button>
         </div>
-
-        {/* Mobile menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="bg-white border-t border-border px-4 py-4 flex flex-col gap-1 items-start">
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                onNavigate('landing');
-              }}
-              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
-            >
-              Accueil
-            </button>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                onNavigate('legal');
-              }}
-              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
-            >
-              Mentions Légales
-            </button>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                onNavigate('terms');
-              }}
-              className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors w-full text-left"
-            >
-              Conditions
-            </button>
-            <div className="flex pt-2">
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  onStart();
-                }}
-                style={{ backgroundColor: "#ea580c" }}
-                className="flex gap-1 items-center justify-center ml-4 py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Commencer
-                <LogInIcon className="w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
       </header>
+
+      {/* ── Mobile Drawer (Off-Canvas) ── */}
+      <MobileDrawer
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        navLinks={navLinks}
+        onNavigate={(href) => onNavigate(href as any)}
+        onCtaClick={() => {
+          if (onStart) onStart();
+        }}
+        ctaText="Commencer"
+      />
 
       <main className="bg-white min-h-screen flex flex-col pt-20 text-slate-900">
       {/* HERO */}

@@ -32,6 +32,7 @@ import AboutView from './views/AboutView';
 import LegalView from './views/LegalView';
 import TermsView from './views/TermsView';
 import MyCampaigns from './views/MyCampaigns';
+import ScrollToTop from './components/ScrollToTop';
 import "./styles/index.css";
 import { useAuthRedirect } from './hooks/useAuthRedirect';
 
@@ -301,7 +302,7 @@ const App: React.FC = () => {
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: user.email,
-        options: { emailRedirectTo: `${window.location.origin}/#/app` }
+        options: { emailRedirectTo: `${window.location.origin}/app` }
       });
       if (error) throw error;
     };
@@ -570,6 +571,7 @@ const App: React.FC = () => {
         {/* ── Cartes flottantes (position: fixed → toujours en bas à droite) ── */}
         <InstallPrompt />
         <PushNotificationBanner userId={user?.id ?? null} />
+        <ScrollToTop />
 
         {/* ────── Overlay de chargement ──────
           Superposé par-dessus le contenu existant (fixed) pour ne PAS démonter

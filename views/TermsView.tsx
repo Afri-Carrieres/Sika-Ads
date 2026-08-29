@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldAlert, ShieldCheck, X, AlertTriangle, Smartphone, Ban, CheckCircle, Lock, Info, ExternalLink } from 'lucide-react';
 import Footer from '../components/Footer';
+import SEOHead from '../components/SEOHead';
 
 interface TermsViewProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
@@ -10,6 +11,12 @@ interface TermsViewProps {
 const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
   return (
     <div className="bg-white min-h-screen pt-10 flex flex-col">
+      <SEOHead
+        title="Conditions Générales d'Utilisation & Charte Anti-Fraude | SikaAds"
+        description="Consultez les Conditions Générales d'Utilisation (CGU), les règles de rémunération et la politique anti-fraude de SikaAds Togo."
+        canonicalPath="/terms"
+        ogImage="https://www.sika-ads.com/anti_fraud.png"
+      />
        {/* Hero Section */}
        <section className="relative py-28 overflow-hidden bg-slate-950">
         <div className="absolute inset-0 opacity-30">

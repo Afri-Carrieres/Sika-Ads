@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import MobileDrawer from "@/components/MobileDrawer";
 
 
 // import mock_up from "./Mock-up.png";
@@ -64,17 +66,17 @@ function useInView(threshold = 0.2) {
 
 /* ─── data ─── */
 const benefits = [
-  { icon: Share2, title: "Publiez vos Statuts", desc: "Partagez des publicités sur votre WhatsApp et Facebook comme d'habitude. Aucun changement dans votre routine." },
-  { icon: DollarSign, title: "Gagnez à chaque Vue", desc: "Chaque vue sur votre statut vous rapporte de l'argent. Plus vos amis regardent, plus vous gagnez." },
-  { icon: ShieldCheck, title: "Paiement Sécurisé", desc: "Retrait rapide vers Mobile Money (Moov, Togocel). Vos gains sont protégés et toujours disponibles." },
-  { icon: Zap, title: "Aucune Compétence Requise", desc: "Interface simple et intuitive. Si vous savez publier un statut, vous savez utiliser SikaAds." },
+  { icon: Share2, title: "Partagez du contenu", desc: "Publiez les visuels et contenus des marques sur vos réseaux sociaux (WhatsApp, Facebook, Instagram) selon vos habitudes." },
+  { icon: DollarSign, title: "Gagnez de l'argent", desc: "Participez à des campagnes rémunérées et valorisez vos réseaux sociaux selon les conditions prévues." },
+  { icon: Users, title: "Développez votre audience", desc: "Construisez une communauté engagée qui vous suit, interagit avec vos publications et vous fait confiance." },
+  { icon: Zap, title: "Choisissez vos campagnes", desc: "Découvrez librement les opportunités qui correspondent à vos centres d'intérêt et à votre profil." },
 ];
 
 const steps = [
-  { num: "01", icon: Smartphone, title: "Créez votre compte", desc: "Inscrivez-vous en 2 minutes avec votre numéro de téléphone. Aucun document requis." },
-  { num: "02", icon: Share2, title: "Publiez les annonces", desc: "Choisissez les pubs qui vous correspondent et postez-les sur WhatsApp & Facebook." },
-  { num: "03", icon: Eye, title: "Vos contacts regardent", desc: "Vos amis et famille voient votre statut normalement. Chaque vue est comptabilisée." },
-  { num: "04", icon: Wallet, title: "Retirez vos gains", desc: "Transférez vos gains vers votre Mobile Money en quelques secondes." },
+  { num: "01", icon: Smartphone, title: "Créez votre compte", desc: "Inscrivez-vous sur Sika Ads en quelques instants et renseignez votre profil." },
+  { num: "02", icon: Eye, title: "Découvrez les campagnes", desc: "Trouvez les campagnes de marques qui correspondent à votre profil et vos réseaux." },
+  { num: "03", icon: Share2, title: "Partagez les contenus", desc: "Publiez les contenus de campagne sur vos réseaux sociaux selon les conditions prévues." },
+  { num: "04", icon: Wallet, title: "Recevez vos gains", desc: "Suivez vos campagnes et recevez votre rémunération selon les modalités prévues." },
 ];
 
 const testimonials = [
@@ -85,19 +87,19 @@ const testimonials = [
 
 const advertiserFeatures = [
   {
-    icon: MapPin,
-    title: "Audience Locale",
-    desc: "Touchez des centaines d'abonnés WhatsApp et Facebook authentiques à Lomé, Kara et Tsévié.",
+    icon: Eye,
+    title: "Plus de visibilité",
+    desc: "Faites découvrir votre marque à de nouvelles audiences ciblées et attentives.",
+  },
+  {
+    icon: Users,
+    title: "Des communautés ciblées",
+    desc: "Travaillez avec des créateurs authentiques et proches de leurs communautés.",
   },
   {
     icon: BarChart2,
-    title: "Tracking Précis",
-    desc: "Suivez vos clics et validations en temps réel depuis votre tableau de bord.",
-  },
-  {
-    icon: Banknote,
-    title: "Budget Maîtrisé",
-    desc: "Payez uniquement pour les résultats prouvés. Zéro gaspillage budgétaire.",
+    title: "Des campagnes simples",
+    desc: "Créez des campagnes adaptées à vos objectifs avec un suivi transparent des résultats.",
   },
 ];
 
@@ -141,11 +143,42 @@ const campaigns = [
 ];
 
 const faqs = [
-  { q: "Est-ce vraiment gratuit ?", a: "Oui, totalement gratuit. Vous n'avez rien à payer pour commencer à gagner. Nous sommes rémunérés par les annonceurs." },
-  { q: "Combien puis-je gagner par mois ?", a: "Les gains varient selon le nombre de contacts et la fréquence de publication. En moyenne, nos utilisateurs actifs gagnent entre 15 000 et 80 000 FCFA par mois." },
-  { q: "Quels réseaux sont supportés ?", a: "WhatsApp, Facebook, Instagram et TikTok sont actuellement supportés.." },
-  { q: "Comment se fait le retrait ?", a: "Nous supportons Moov Money, T-Money et les transferts bancaires. Le minimum de retrait est 2 000 FCFA." },
-  { q: "Mes contacts verront-ils que c'est une pub ?", a: "Les publicités ressemblent à des statuts normaux. Vous choisissez toujours ce que vous publiez." },
+  {
+    q: "Comment gagner de l'argent avec ses réseaux sociaux ?",
+    a: "Sika Ads vous permet de participer à des campagnes organisées par des marques partenaires. En publiant leurs visuels ou messages sur vos réseaux sociaux (WhatsApp, Facebook, Instagram), vous valorisez votre audience et percevez une rémunération selon les conditions de chaque campagne."
+  },
+  {
+    q: "Comment gagner de l'argent avec WhatsApp ?",
+    a: "Sélectionnez une campagne disponible sur Sika Ads, téléchargez l'affiche ou le texte prévu, puis publiez-le sur votre statut WhatsApp. Vous soumettez ensuite votre preuve de diffusion pour valider vos gains."
+  },
+  {
+    q: "Comment gagner de l'argent avec Facebook ?",
+    a: "Partagez les visuels et liens promotionnels des campagnes sur votre profil Facebook ou en story. Les modalités et conditions de validation peuvent varier selon la campagne."
+  },
+  {
+    q: "Comment gagner de l'argent avec Instagram ?",
+    a: "Publiez les visuels de campagne en story ou post Instagram en mentionnant les consignes du partenaire. Votre communauté découvre la marque et votre participation est validée."
+  },
+  {
+    q: "Comment fonctionne Sika Ads ?",
+    a: "Sika Ads connecte directement les marques et les créateurs de contenu. Les entreprises soumettent des campagnes avec un budget précis, et les utilisateurs inscrits diffusent ces annonces auprès de leurs proches et contacts."
+  },
+  {
+    q: "Comment devenir créateur sur Sika Ads ?",
+    a: "Il vous suffit de créer un compte gratuit en quelques clics avec votre numéro de téléphone, de compléter votre profil et d'accéder au catalogue des campagnes disponibles."
+  },
+  {
+    q: "Faut-il avoir beaucoup d'abonnés pour participer à une campagne ?",
+    a: "Non, pas nécessairement. Sika Ads s'appuie sur le nano-marketing : l'authenticité et la proximité avec vos contacts ont une grande valeur pour les marques. Tout utilisateur actif peut participer."
+  },
+  {
+    q: "Comment une marque peut-elle lancer une campagne ?",
+    a: "Rendez-vous dans la section Entreprises, créez votre campagne en définissant vos objectifs, votre budget et votre visuel. Nos ambassadeurs et créateurs la diffuseront ensuite sur leurs réseaux."
+  },
+  {
+    q: "Comment recevoir ses gains ?",
+    a: "Une fois votre diffusion vérifiée et validée, votre solde est automatiquement crédité. Vous pouvez demander un retrait vers votre compte Mobile Money (Moov Money, T-Money)."
+  },
 ];
 
 /* ─── components ─── */
@@ -165,19 +198,21 @@ function StatCard({ label, value, suffix = "", prefix = "" }: { label: string; v
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-border rounded-xl overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-5 text-left bg-card hover:bg-muted transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-expanded={open}
-      >
-        <span className="font-semibold text-foreground pr-4">{q}</span>
-        <ChevronDown
-          className={`shrink-0 w-5 h-5 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
-        <p className="px-6 pb-5 text-muted-foreground leading-relaxed">{a}</p>
+    <div className="border border-border rounded-xl overflow-hidden bg-card">
+      <h3 className="text-base font-semibold m-0">
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-full flex items-center justify-between px-6 py-5 text-left bg-card hover:bg-muted transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-expanded={open}
+        >
+          <span className="font-semibold text-foreground pr-4">{q}</span>
+          <ChevronDown
+            className={`shrink-0 w-5 h-5 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+      </h3>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-56 opacity-100" : "max-h-0 opacity-0"}`}>
+        <p className="px-6 pb-5 text-muted-foreground leading-relaxed text-sm">{a}</p>
       </div>
     </div>
   );
@@ -199,14 +234,13 @@ function CampaignCarousel() {
       }
     };
 
-    handleResize(); // Initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const max = Math.max(0, campaigns.length - visible);
 
-  // Keep index within correct bounds when 'visible' changes
   useEffect(() => {
     if (index > max) {
       setIndex(max);
@@ -221,22 +255,24 @@ function CampaignCarousel() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
           <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 tracking-widest uppercase" style={{ backgroundColor: "rgba(30,58,138,0.08)", color: "#1e3a8a" }}>
-            Exemples de campagnes
+            Exemples d'opportunités
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-4">
             Des marques qui{" "}
             <span style={{ color: "#ea580c" }}>paient vrai</span>
           </h2>
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto">
+            Découvrez les campagnes proposées par les marques et trouvez des opportunités adaptées à votre profil et à vos réseaux sociaux.
+          </p>
         </div>
 
         {/* carousel track */}
         <div className="relative">
-          {/* nav arrows */}
           <button
             onClick={prev}
             disabled={index === 0}
             aria-label="Campagne précédente"
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c]  border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c] border border-border transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
@@ -244,79 +280,66 @@ function CampaignCarousel() {
             onClick={next}
             disabled={index >= max}
             aria-label="Campagne suivante"
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c] border border-border bg-card transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg bg-[#ea580c] border border-border transition-all duration-200 hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
             <ChevronRight className="w-5 h-5 text-white" />
           </button>
 
-          <div className="overflow-hidden ">
-            <div
-              className="flex gap-5 transition-transform duration-400 ease-in-out md:flex"
-              style={{ transform: `translateX(calc(-${index} * (100% / ${visible} + 20px / ${visible})))` }}
-            >
-              {campaigns.map(({ id, category, categoryColor, title, image, gainVue, budget }) => (
-                <div
-                  key={id}
-                  className="shrink-0 rounded-2xl overflow-hidden border border-border bg-card hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                  style={{ width: `calc(${100 / visible}% - ${(visible - 1) * 20 / visible}px)` }}
-                >
-                  {/* image */}
-                  <div className="relative h-44 overflow-hidden bg-muted">
-                    <img
-                      src={image}
-                      alt={title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 60%)" }} />
-                    {/* category badge */}
+          <div
+            className="flex transition-transform duration-500 ease-out gap-6"
+            style={{
+              transform: `translateX(-${index * (100 / visible)}%)`,
+            }}
+          >
+            {campaigns.map((c) => (
+              <div
+                key={c.id}
+                className="shrink-0 bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 group"
+                style={{ width: `calc(${100 / visible}% - ${(visible - 1) * (24 / visible)}px)` }}
+              >
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src={c.image}
+                    alt={`Campagne de marque : ${c.title}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 left-3">
                     <span
-                      className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white"
-                      style={{ backgroundColor: categoryColor }}
+                      className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm"
+                      style={{ backgroundColor: c.categoryColor }}
                     >
-                      {category}
+                      {c.category}
                     </span>
-                    {/* play button */}
-                    <button
-                      aria-label={`Voir la campagne ${title}`}
-                      className="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                      style={{ backgroundColor: "#ea580c" }}
-                    >
-                      <Play className="w-4 h-4 text-white fill-white" />
-                    </button>
                   </div>
-
-                  {/* info */}
-                  <div className="px-5 py-4">
-                    <h3 className="font-semibold text-foreground text-sm leading-snug mb-4 line-clamp-2">{title}</h3>
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Gain / vue</p>
-                        <p className="text-2xl font-extrabold" style={{ color: "#1e3a8a" }}>
-                          {gainVue} <span className="text-base font-bold">FCFA</span>
-                        </p>
+                </div>
+                <div className="p-5">
+                  <h3 className="font-bold text-foreground text-lg mb-3 line-clamp-1">{c.title}</h3>
+                  <div className="flex items-center justify-between pt-3 border-t border-border">
+                    <div>
+                      <div className="text-xs text-muted-foreground">Rémunération estimée</div>
+                      <div className="text-base font-extrabold text-foreground" style={{ color: "#ea580c" }}>
+                        {c.gainVue} FCFA <span className="text-xs font-normal text-muted-foreground">/ vue</span>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Budget</p>
-                        <p className="text-sm font-semibold text-foreground tabular-nums">
-                          {budget.toLocaleString("fr-FR")} FCFA
-                        </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-muted-foreground">Budget campagne</div>
+                      <div className="text-sm font-bold text-foreground">
+                        {c.budget.toLocaleString("fr-FR")} F
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
-          {/* dots */}
           <div className="flex justify-center gap-2 mt-8">
             {Array.from({ length: max + 1 }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => setIndex(i)}
-                aria-label={`Aller à la page ${i + 1}`}
-                className="rounded-full transition-all duration-200 cursor-pointer"
+                aria-label={`Aller au groupe de campagnes ${i + 1}`}
+                className="rounded-full transition-all duration-300"
                 style={{
                   width: i === index ? "24px" : "8px",
                   height: "8px",
@@ -350,36 +373,49 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
   }, []);
 
   const scrollToSection = (href: string) => {
-    const sectionId = href.replace("#", "");
-    const el = document.getElementById(sectionId);
-
     setMenuOpen(false);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    const sectionId = href.replace("#", "");
+    
+    // Déclencher le défilement après la fermeture du tiroir mobile
+    setTimeout(() => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        const headerOffset = 70;
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }, 150);
   };
 
   const navLinks = [
-    // { href: "#accueil", label: "Accueil" },
     { href: "#avantages", label: "Avantages" },
     { href: "#comment", label: "Comment ça marche" },
+    { href: "#monetisation", label: "Monétisation" },
     { href: "#annonceurs", label: "Entreprises" },
     { href: "#temoignages", label: "Témoignages" },
     { href: "#faq", label: "FAQ" },
-    // { href: "#contact", label: "Contact" },
   ];
 
   return (
-    <div
-      className="min-h-screen bg-background text-foreground"
-      style={{ fontFamily: "'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif" }}
-    >
+    <div className="min-h-screen bg-background text-foreground">
+      <SEOHead
+        title="Gagnez de l'argent avec vos réseaux sociaux | Sika Ads"
+        description="Sika Ads connecte les marques et les créateurs. Gagnez de l'argent avec WhatsApp, Facebook et Instagram ou faites connaître vos produits auprès de nouvelles audiences."
+        canonicalPath="/"
+        ogImage="https://www.sika-ads.com/Web-Icon.png"
+      />
       {/* ── NAV ── */}
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
-          }`}
+        className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
+          scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+        }`}
       >
-        <div className="max-w-6xl mx-auto  sm:px-2 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           {/* Logo */}
           <a
             href="#accueil"
@@ -389,8 +425,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             }}
             className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-
+            <img className="w-36 sm:w-40 h-auto object-contain" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
           </a>
 
           {/* Desktop nav */}
@@ -419,55 +454,35 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 if (user) onStart?.(); else setView('login');
               }}
               style={{ backgroundColor: "#ea580c" }}
-              className="flex gap-1 items-center justify-center py-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex gap-1 items-center justify-center py-2 px-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Commencer
-              <LogInIcon className="w-8" />
+              <LogInIcon className="w-5 h-5 ml-1" />
             </button>
           </div>
 
           {/* Mobile menu button */}
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden w-11 h-11 flex items-center text-white justify-center rounded-xl hover:bg-muted transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            aria-label="Ouvrir le menu"
           >
-            {menuOpen ? <X className="w-5 h-5 text-[#ea580c]" /> : <Menu className="w-5 h-5 text-[#ea580c]" />}
+            <Menu className="w-6 h-6 text-[#ea580c]" />
           </button>
         </div>
-
-        {/* Mobile menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="bg-white border-t border-border px-4 py-4 flex flex-col gap-1 items-start">
-            {navLinks.map(({ href, label }) => (
-              <a
-                key={href}
-                href={href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(href);
-                }}
-                className="px-4 py-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-              >
-                {label}
-              </a>
-            ))}
-            <div className="flex ">
-            <button
-              onClick={() => {
-                if (user) onStart?.(); else setView('login');
-              }}
-              style={{ backgroundColor: "#ea580c" }}
-              className="flex gap-1 items-center justify-center ml-4 py-2 px-2 mx-auto sm:px-2 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Commencer
-              <LogInIcon className="w-8" />
-            </button>
-
-            </div>
-          </div>
-        </div>
       </header>
+
+      {/* ── Mobile Drawer (Off-Canvas) ── */}
+      <MobileDrawer
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        navLinks={navLinks}
+        onNavigate={(href) => scrollToSection(href)}
+        onCtaClick={() => {
+          if (user) onStart?.(); else setView('login');
+        }}
+        ctaText="Commencer"
+      />
 
       {/* ── HERO ── */}
       <section
@@ -478,7 +493,6 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
           minHeight: "100vh",
         }}
       >
-        {/* Background pattern */}
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: "radial-gradient(circle at 20% 50%, #ea580c 0%, transparent 50%), radial-gradient(circle at 80% 20%, #10b981 0%, transparent 50%)",
         }} />
@@ -490,24 +504,26 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left: copy */}
             <div className="text-center md:text-left">
-              {/* <div
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 border border-emerald-400/30"
-                style={{ backgroundColor: "rgba(16,185,129,0.15)", color: "#34d399" }}
-              >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Disponible au Togo · Paiement garanti
-              </div> */}
-
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
                 Gagnez de l'argent avec vos{" "}
-                <span style={{ color: "#ea580c" }}>Statuts</span>{" "}
-                <span className="text-white">WhatsApp</span>{" "}
-                &amp;{" "}
-                <span style={{ color: "#34d395" }}>Facebook</span>
+                <span style={{ color: "#ea580c" }}>réseaux sociaux</span>
               </h1>
 
+              {/* Badges plateformes */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-emerald-300 border border-emerald-400/30">
+                  WhatsApp
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-blue-300 border border-blue-400/30">
+                  Facebook
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-pink-300 border border-pink-400/30">
+                  Instagram
+                </span>
+              </div>
+
               <p className="text-lg text-blue-100 leading-relaxed mb-8 max-w-lg mx-auto md:mx-0">
-                Publiez des publicités sur vos statuts et soyez payé pour chaque vue. Simple, gratuit, et disponible sur Mobile Money.
+                Partagez des contenus de marques sur WhatsApp, Facebook et Instagram, développez votre audience et gagnez de l'argent grâce à Sika Ads.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -527,7 +543,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                   onClick={() => { if (user) onAdvertise?.(); else setView('login'); }}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold text-white border border-white/25 hover:bg-white/10 transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white whitespace-nowrap"
                 >
-                  Lancer une pub maintenant
+                  Je suis une marque
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -543,31 +559,14 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             {/* Right: phone mockup */}
             <div className="relative flex justify-center md:justify-end">
               <div className="relative w-[300px] md:w-[300px]">
-                {/* Glow */}
                 <div className="absolute -inset-8 rounded-full opacity-30 blur-3xl" style={{ backgroundColor: "#ea580c" }} />
-
-                {/* Phone frame */}
-                {/* "Ad" image */}
                 <div className="relative h-full overflow-hidden">
                   <img
                     src="./Mock-up.png"
-                    alt="Publicité partagée sur statut WhatsApp"
+                    alt="Application mobile Sika Ads permettant de suivre ses campagnes et gains"
                     className="w-[296px] h-full object-cover rounded-[50px] shadow-2xl"
                   />
-                  {/* <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)" }} />
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <div className="text-white text-xs font-semibold">Offre spéciale Lomé ✨</div>
-                    <div className="text-white/70 text-xs">Valide jusqu'au 15 juillet</div>
-                  </div> */}
                 </div>
-                {/* Floating badges */}
-                {/* <div
-                  className="absolute -left-8 top-20 px-3 py-2 rounded-xl shadow-xl text-xs font-bold text-white flex items-center gap-1.5"
-                  style={{ backgroundColor: "#10b981" }}
-                >
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  +12 500 F ce mois
-                </div> */}
                 <div
                   className="absolute -right-6 bottom-20 px-3 py-2 rounded-xl shadow-xl text-xs font-bold flex items-center gap-1.5"
                   style={{ backgroundColor: "#ea580c", color: "#fff" }}
@@ -579,25 +578,6 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             </div>
           </div>
         </div>
-
-        {/* Wave bottom */}
-        <div className="relative mt-16 md:mt-24">
-          <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block" preserveAspectRatio="none">
-            <path d="M0 80L60 69.3C120 59 240 37 360 32C480 27 600 37 720 42.7C840 48 960 48 1080 42.7C1200 37 1320 27 1380 21.3L1440 16V80H0Z" fill="#f8faff" />
-          </svg>
-        </div>
-      </section>
-
-      {/* ── STATS ── */}
-      <section style={{ backgroundColor: "#1e3a8a" }} className="py-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col justify-between gap-10 md:gap-17 l md:flex-row items-center">
-            <StatCard label="Utilisateurs actifs" value={1000} prefix="+" />
-            <StatCard label="Versé ce mois" value={400000} suffix=" FCFA" />
-            <StatCard label="Vues générées" value={30000} prefix="+" />
-            <StatCard label="Villes couvertes" value={24} />
-          </div>
-        </div>
       </section>
 
       {/* ── BENEFITS ── */}
@@ -605,14 +585,14 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style={{ backgroundColor: "rgba(30,58,138,0.08)", color: "#1e3a8a" }}>
-              Pourquoi SikaAds ?
+              Opportunités pour les créateurs
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-4">
-              Votre téléphone est votre<br />
-              <span style={{ color: "#ea580c" }}>nouveau bureau</span>
+              Votre téléphone peut devenir une<br />
+              <span style={{ color: "#ea580c" }}>source de revenus</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Transformez ce que vous faites déjà chaque jour en une source de revenus réelle.
+              Vous utilisez WhatsApp, Facebook ou Instagram au quotidien ? Sika Ads vous permet de transformer votre présence sur les réseaux sociaux en opportunités.
             </p>
           </div>
 
@@ -645,14 +625,14 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
         <div className="relative max-w-6xl mx-auto py-8 px-4 sm:px-6">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 border border-emerald-400/25" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#34d399" }}>
-              Processus simple
+              Fonctionnement simple
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
-              Commencez à gagner en{" "}
-              <span style={{ color: "#ea580c" }}>4 étapes</span>
+              Comment gagner de l'argent avec{" "}
+              <span style={{ color: "#ea580c" }}>Sika Ads ?</span>
             </h2>
             <p className="text-blue-200 text-lg max-w-xl mx-auto">
-              Pas besoin de formation. Pas de matériel spécial. Juste votre téléphone.
+              Inscrivez-vous, découvrez des campagnes, partagez les contenus et recevez vos gains.
             </p>
           </div>
 
@@ -685,35 +665,97 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             <div className="rounded-2xl overflow-hidden h-56 relative">
               <img
                 src="https://images.unsplash.com/photo-1768830444423-5e5c640c4c98?w=700&h=400&fit=crop&auto=format"
-                alt="Deux hommes regardant un smartphone ensemble"
+                alt="Créateurs de contenu échangeant autour d'un smartphone"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(15,27,53,0.7) 0%, transparent 60%)" }} />
               <div className="absolute bottom-5 left-5">
-                <div className="text-white font-bold text-lg">Partagez avec vos proches</div>
-                <div className="text-blue-200 text-sm">Chaque vue compte</div>
+                <div className="text-white font-bold text-lg">Partagez avec vos communautés</div>
+                <div className="text-blue-200 text-sm">Monétisez votre présence en ligne</div>
               </div>
             </div>
             <div className="rounded-2xl overflow-hidden h-56 relative">
               <img
                 src="https://images.unsplash.com/photo-1644043350898-2f4ff1e17912?w=700&h=400&fit=crop&auto=format"
-                alt="Un homme et une femme regardant un téléphone"
+                alt="Ambassadeur recevant un paiement Mobile Money sur son smartphone"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(15,27,53,0.7) 0%, transparent 60%)" }} />
               <div className="absolute bottom-5 left-5">
-                <div className="text-white font-bold text-lg">Retirez vos gains</div>
-                <div className="text-blue-200 text-sm">Moov & T-Money · Immédiat</div>
+                <div className="text-white font-bold text-lg">Recevez vos gains</div>
+                <div className="text-blue-200 text-sm">Moov & T-Money · Retrait rapide</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* wave */}
-        <div className="mt-16">
-          <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block" preserveAspectRatio="none">
-            <path d="M0 0L60 10.7C120 21 240 43 360 48C480 53 600 43 720 37.3C840 32 960 32 1080 37.3C1200 43 1320 53 1380 58.7L1440 64V80H0V0Z" fill="#f8faff" />
-          </svg>
+      </section>
+
+      {/* ── SECTION SEO ÉDITORIALE : MONÉTISATION DES RÉSEAUX SOCIAUX ── */}
+      <section id="monetisation" className="py-24 bg-background relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4 tracking-wider uppercase" style={{ backgroundColor: "rgba(30,58,138,0.08)", color: "#1e3a8a" }}>
+              Guide & Opportunités
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-4">
+              Comment gagner de l'argent avec{" "}
+              <span style={{ color: "#ea580c" }}>ses réseaux sociaux ?</span>
+            </h2>
+            <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
+              WhatsApp, Facebook et Instagram ne servent pas uniquement à échanger des messages. Découvrez comment valoriser votre présence quotidienne.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-card rounded-2xl p-8 border border-border hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(234,88,12,0.1)" }}>
+                  <Share2 className="w-6 h-6" style={{ color: "#ea580c" }} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-3">Une source d'opportunités</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Pour les créateurs et les utilisateurs actifs qui disposent d'un cercle de contacts ou d'une communauté, chaque publication partagée peut devenir un levier de valorisation direct.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                WhatsApp · Facebook · Instagram
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl p-8 border border-border hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(30,58,138,0.08)" }}>
+                  <TrendingUp className="w-6 h-6" style={{ color: "#1e3a8a" }} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-3">Partage de campagnes</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Sika Ads vous permet de participer à des campagnes de marques et de diffuser leurs contenus. Vous apportez une visibilité authentique aux entreprises tout en étant rémunéré.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Rémunération transparente
+              </div>
+            </div>
+
+            <div className="bg-card rounded-2xl p-8 border border-border hover:border-blue-200 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+              <div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(16,185,129,0.1)" }}>
+                  <Users className="w-6 h-6" style={{ color: "#10b981" }} />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-3">La force de la proximité</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Pas besoin d'être une célébrité. La confiance et la proximité naturelle que vous entretenez avec votre communauté représentent une réelle valeur pour les marques.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                Nano-marketing accessible à tous
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -736,13 +778,11 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             Boostez vos ventes grâce au{" "}
             <span style={{ color: "#a78bfa" }}>Nano-Marketing</span>
           </h2>
-          <p className="text-violet-200 text-lg max-w-2xl mx-auto mb-14 leading-relaxed">
-            La publicité traditionnelle coûte cher. Avec SikaAds, vos produits sont recommandés par des{" "}
-            <strong className="text-white font-semibold">centaines de jeunes togolais</strong>{" "}
-            à leurs amis proches. C'est la puissance du bouche-à-oreille digital.
+          <p className="text-violet-200 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            Faites connaître votre marque auprès de nouvelles audiences grâce aux créateurs et aux communautés présentes sur les réseaux sociaux.
           </p>
 
-          <div className="grid sm:grid-cols-3 gap-5 mb-12">
+          <div className="grid sm:grid-cols-3 gap-5 mb-10">
             {advertiserFeatures.map(({ icon: Icon, title, desc }) => (
               <div
                 key={title}
@@ -758,6 +798,16 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             ))}
           </div>
 
+          {/* Explication Nano-influenceurs */}
+          <div className="max-w-3xl mx-auto mb-10 p-6 rounded-2xl border text-left" style={{ backgroundColor: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }}>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Pourquoi travailler avec des nano-influenceurs ?
+            </h3>
+            <p className="text-violet-200 text-sm leading-relaxed">
+              Une grande audience ne signifie pas toujours une plus grande proximité. Les nano-influenceurs et petits créateurs peuvent avoir une relation étroite avec leur communauté et permettre aux marques de communiquer de manière plus directe et authentique.
+            </p>
+          </div>
+
           <button
             onClick={() => { if (user) onAdvertise?.(); else setView('login'); }}
             className="group inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl text-base font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white whitespace-nowrap"
@@ -768,15 +818,11 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
           </button>
         </div>
 
-        <div className="mt-16">
-          <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block" preserveAspectRatio="none">
-            <path d="M0 80L60 69.3C120 59 240 37 360 32C480 27 600 37 720 42.7C840 48 960 48 1080 42.7C1200 37 1320 27 1380 21.3L1440 16V80H0Z" fill="#f8faff" />
-          </svg>
-        </div>
       </section>
 
       {/* ── CAMPAIGN EXAMPLES ── */}
       <CampaignCarousel />
+
       {/* ── TESTIMONIALS ── */}
       <section id="temoignages" className="py-24 bg-background">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -835,9 +881,36 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
         </div>
       </section>
 
+      {/* ── SECTION INSTITUTIONNELLE : SIKA ADS ET L'AFRIQUE ── */}
+      <section className="py-20" style={{ backgroundColor: "#f8faff" }}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style={{ backgroundColor: "rgba(30,58,138,0.08)", color: "#1e3a8a" }}>
+            Notre Vision
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-6">
+            Une plateforme pensée pour les communautés africaines
+          </h2>
+          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-4">
+            Sika Ads est né au Togo avec l'ambition de faciliter les collaborations entre les marques et les créateurs de contenu en Afrique.
+          </p>
+          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
+            Notre objectif est simple : permettre aux créateurs de transformer leur présence sur les réseaux sociaux en opportunités et aider les entreprises à faire connaître leurs produits et services auprès de nouvelles communautés.
+          </p>
+          <div className="flex justify-center">
+            <button
+              onClick={() => setView('about')}
+              className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              En savoir plus sur Sika Ads
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* ── FAQ ── */}
       <section id="faq" className="py-24" style={{ backgroundColor: "#f0f4ff" }}>
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-4" style={{ backgroundColor: "rgba(30,58,138,0.08)", color: "#1e3a8a" }}>
               Questions fréquentes
@@ -868,11 +941,11 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             <Wallet className="w-8 h-8" style={{ color: "#ea580c" }} />
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-6 leading-tight">
-            Commencez à gagner<br />
-            <span style={{ color: "#ea580c" }}>dès aujourd'hui</span>
+            Commencez à gagner avec<br />
+            <span style={{ color: "#ea580c" }}>vos réseaux sociaux</span>
           </h2>
           <p className="text-blue-200 text-lg mb-10 max-w-xl mx-auto">
-            Rejoignez 2000 Togolais qui transforment leurs statuts en revenus réels. C'est gratuit, c'est simple, c'est maintenant.
+            Rejoignez Sika Ads, découvrez les opportunités disponibles et transformez votre présence sur les réseaux sociaux en nouvelles possibilités.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -884,8 +957,15 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 boxShadow: "0 8px 40px rgba(234,88,12,0.45)",
               }}
             >
-              Créer mon compte gratuit
+              Créer mon compte
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+            </button>
+            <button
+              onClick={() => { if (user) onAdvertise?.(); else setView('login'); }}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-base font-semibold text-white border border-white/25 hover:bg-white/10 transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              Lancer une campagne
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
