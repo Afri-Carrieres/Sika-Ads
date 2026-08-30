@@ -161,7 +161,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                         items={[
                           'prénom et nom ;',
                           'adresse email ;',
-                          'ville et tranche d\u2019âge renseignées lors de l\u2019inscription ;',
+                          'sexe, ville et tranche d\u2019âge renseignés lors de l\u2019inscription ;',
                           'numéro mobile money, utilisé pour le versement de vos gains ;',
                           'informations nécessaires à la création et à la gestion du compte.',
                         ]}
@@ -327,16 +327,18 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   <p className="text-slate-600 font-medium leading-relaxed">
                     Nous conservons les données uniquement pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, sauf lorsqu'une durée plus longue est nécessaire pour respecter une obligation légale ou résoudre un litige.
                   </p>
-                  <p className="text-slate-600 font-medium leading-relaxed">Les durées de conservation peuvent varier selon le type de données :</p>
+                  <p className="text-slate-600 font-medium leading-relaxed">Concrètement :</p>
                   <BulletList
                     items={[
-                      'données de compte ;',
-                      'données de campagne ;',
-                      'preuves de participation ;',
-                      'données de support ;',
-                      'données techniques.',
+                      'données de compte : conservées tant que votre compte est actif ;',
+                      'données de campagne, preuves de participation et historique des vues et des gains : conservées pour permettre la vérification des participations, la tenue des comptes et le traitement d\u2019éventuels litiges ;',
+                      'messages de support : conservés le temps de traiter votre demande ;',
+                      'données techniques liées aux campagnes (clics, journaux de suivi) : conservées pour mesurer et sécuriser les campagnes.',
                     ]}
                   />
+                  <p className="text-slate-600 font-medium leading-relaxed">
+                    En cas de suppression de votre compte, certaines de ces données peuvent être archivées le temps nécessaire aux finalités décrites ci-dessus et aux obligations légales applicables. Si vous souhaitez demander la suppression de vos données, contactez-nous à <a href="mailto:team@sika-ads.com" className="text-[#128785] font-bold underline">team@sika-ads.com</a>, sous réserve des obligations légales qui nous imposent de conserver certains éléments.
+                  </p>
                 </Card>
               </div>
 
@@ -431,7 +433,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                 <SectionHeading n={13} title="Données des mineurs" />
                 <Card>
                   <p className="text-slate-600 font-medium leading-relaxed">
-                    Sika Ads n'a pas vocation à collecter volontairement des données personnelles de personnes qui ne sont pas autorisées à utiliser le service.
+                    Sika Ads est réservé aux personnes âgées d'au moins 18 ans, conformément à nos Conditions d'utilisation. Le service n'a donc pas vocation à collecter des données personnelles de personnes mineures.
                   </p>
                   <p className="text-slate-600 font-medium leading-relaxed">
                     Si vous pensez qu'un mineur nous a transmis des données personnelles de manière inappropriée, contactez-nous afin que nous puissions examiner la situation.

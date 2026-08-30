@@ -50,7 +50,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
   const [momoNumber, setMomoNumber] = useState('');
 
   const cities = ['Lomé', 'Kara', 'Sokodé', 'Kpalimé', 'Atakpamé', 'Dapaong', 'Autre'];
-  const ageRanges = ['15-20', '21-30', '31-45', '45+'];
+  const ageRanges = ['18-20', '21-30', '31-45', '45+'];
 
   // Password strength checks (must match Supabase policy)
   const pwdChecks = {
@@ -459,6 +459,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                           <option value="">Choisir...</option>
                           {ageRanges.map(range => <option key={range} value={range}>{range} ans</option>)}
                         </select>
+                        <p className="text-[10px] font-bold text-gray-400 mt-2 ml-1">Vous devez avoir au moins 18 ans pour vous inscrire, conformément aux CGU.</p>
                       </div>
                     </label>
                   </div>

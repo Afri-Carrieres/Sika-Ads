@@ -73,6 +73,22 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                       </p>
                   </div>
 
+                  {/* Section: Éligibilité */}
+                  <div id="eligibilite" className="space-y-6 scroll-mt-28">
+                      <div className="flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">02</span>
+                          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Éligibilité des Ambassadeurs</h2>
+                      </div>
+                      <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-4">
+                          <p className="text-slate-600 leading-relaxed font-medium">
+                              Sika Ads est réservé aux personnes âgées d'au moins <strong>18 ans</strong>. En créant un compte, vous déclarez avoir 18 ans ou plus et fournir des informations exactes.
+                          </p>
+                          <p className="text-slate-600 leading-relaxed font-medium">
+                              Tout compte déclarant une personne mineure ou dont l'âge réel est inférieur à 18 ans peut être refusé ou supprimé, sans rémunération des participations correspondantes.
+                          </p>
+                      </div>
+                  </div>
+
                   {/* Section: Rémunération */}
                   <div id="remuneration" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">

@@ -418,7 +418,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest pt-2">Données traitées dans le cadre du fonctionnement de la plateforme</p>
                   <BulletList
                     items={[
-                      'Données de compte : nom et adresse email, utilisés pour l’inscription, la connexion et la vérification de l’email.',
+                      'Données de compte : nom, adresse email, sexe, ville et tranche d’âge, utilisés pour l’inscription, la connexion et la vérification de l’email.',
                       'Données de profil et de rémunération : numéro mobile money, utilisé pour le versement des gains prévus par les campagnes.',
                       "Données de participation : captures d'écran envoyées depuis le dashboard et nombre de vues transmis, utilisés pour la vérification des participations.",
                       'Données de campagne : informations fournies par les marques (nom, email, téléphone) et contenus des campagnes créées.',
