@@ -436,10 +436,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
-          {/* Right Column: Info Form */}
-          <div className="md:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <form onSubmit={handleSaveInfo} className={`${TILE} ${TILE_HOVER} lg:col-span-2 p-8 space-y-6`}>
               <div className="flex items-center gap-3 mb-2">
                 <div className={`${SECTION_ICON} bg-indigo-50 text-indigo-600`}>
@@ -499,32 +496,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               </div>
             </form>
 
-
-
-            {/* Danger Zone */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between p-6 bg-white rounded-3xl border border-gray-200">
-              <div className="flex items-start gap-3">
-                <div className="bg-red-50 p-2.5 rounded-xl text-red-500 shrink-0">
-                  <AlertTriangle size={18} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900">Suppression du compte</h3>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5 leading-relaxed">
-                    Cette action est irréversible : toutes vos données, y compris votre solde non retiré et vos historiques, seront définitivement effacées.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all"
-              >
-                Supprimer mon compte
-              </button>
-            </div>
-          </div>
-
-          {/* Password Form */}
-          <div className="md:col-span-1 space-y-8">
+          <div className="space-y-6">
             <form onSubmit={handleChangePassword} className={`${TILE} ${TILE_HOVER} p-8 space-y-4`}>
               <div className="flex items-center gap-3 mb-2">
                 <div className={`${SECTION_ICON} bg-emerald-50 text-emerald-600`}>
@@ -601,6 +573,27 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
             <PushNotificationSettingsCard userId={user?.id ?? null} />
           </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between p-6 bg-white rounded-3xl border border-gray-200">
+          <div className="flex items-start gap-3">
+            <div className="bg-red-50 p-2.5 rounded-xl text-red-500 shrink-0">
+              <AlertTriangle size={18} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Suppression du compte</h3>
+              <p className="text-xs text-gray-500 font-medium mt-0.5 leading-relaxed">
+                Cette action est irréversible : toutes vos données, y compris votre solde non retiré et vos historiques, seront définitivement effacées.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all"
+          >
+            Supprimer mon compte
+          </button>
         </div>
       </div>
 
