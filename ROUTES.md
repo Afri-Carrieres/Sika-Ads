@@ -10,6 +10,7 @@
 | `register` | [views/RegistrationForm.tsx](views/RegistrationForm.tsx) | Inscription | Non-authentifiés |
 | `advertise` | [views/CreateCampaign.tsx](views/CreateCampaign.tsx) | Créer campagne | Tout le monde |
 | `advertise-success` | [views/SuccessCampaign.tsx](views/SuccessCampaign.tsx) | Confirmation | Après création |
+| `contact` | [views/ContactView.tsx](views/ContactView.tsx) | Page Contact (formulaire multistep, route `/contact`) | Tout le monde |
 
 ### Vue Authentifiée
 | Route | Fichier | Description | Accessible |
