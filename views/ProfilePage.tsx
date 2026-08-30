@@ -11,6 +11,7 @@ const FIELD = 'w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 pl-12 fo
 const LABEL = 'text-[11px] font-semibold text-gray-500 ml-1 mb-2 block';
 const SECTION_ICON = 'p-2.5 rounded-xl';
 const PRIMARY_BTN = 'px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
+const EMERALD_BTN = 'px-6 py-3.5 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 
 const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ userId }) => {
   const { permission, isSubscribed, isLoading, requestPermission, unsubscribe } = usePushNotifications({ userId });
@@ -590,7 +591,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className={`${PRIMARY_BTN} bg-emerald-600 shadow-emerald-100 hover:bg-emerald-700`}
+                  className={EMERALD_BTN}
                 >
                   {isChangingPassword ? <Loader2 className="animate-spin" size={20} /> : <Lock size={20} />}
                   Modifier
