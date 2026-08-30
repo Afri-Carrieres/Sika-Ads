@@ -29,7 +29,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Brand Column */}
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center cursor-pointer group" onClick={() => navigateToLandingSection('accueil')}>
-              <img className="w-40 sm:w-68 lg:w-80" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+              <img className="w-32 sm:w-44 lg:w-52" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-slate-400/80">
               La plateforme qui connecte les créateurs de contenu aux marques en Afrique. Monétisez vos réseaux sociaux et aidez les entreprises à se faire connaître.
@@ -78,7 +78,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
                   <MapPin size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-medium text-slate-300">Lomé-Togo, Quartier Hédranawoé</span>
+                <span className="font-medium text-slate-300">Hédzranawoé, Lomé-Togo</span>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
@@ -90,7 +90,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0 border border-indigo-500/20">
                   <Mail size={16} className="text-[#128785]" />
                 </div>
-                <span className="font-medium text-slate-300 break-all sm:break-normal">contact@sikaads.tg</span>
+                <a href="mailto:team@sika-ads.com" className="font-medium text-slate-300 hover:text-indigo-400 transition-colors break-all sm:break-normal">team@sika-ads.com</a>
               </li>
             </ul>
           </div>
