@@ -439,63 +439,59 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
           {/* Right Column: Info Form */}
           <div className="md:col-span-2 space-y-8">
-            <form onSubmit={handleSaveInfo} className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 space-y-6">
+            <form onSubmit={handleSaveInfo} className={`${TILE} ${TILE_HOVER} lg:col-span-2 p-8 space-y-6`}>
               <div className="flex items-center gap-3 mb-2">
-                <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+                <div className={`${SECTION_ICON} bg-indigo-50 text-indigo-600`}>
                   <UserIcon size={20} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">Informations Personnelles</h3>
+                <h3 className="text-lg font-bold text-gray-900">Informations personnelles</h3>
               </div>
 
               <div className="space-y-4">
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nom Complet</span>
+                  <span className={LABEL}>Nom complet</span>
                   <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className={FIELD}
                       placeholder="Votre nom"
                     />
                   </div>
                 </label>
 
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email (Non modifiable)</span>
+                  <span className={LABEL}>Adresse email (non modifiable)</span>
                   <div className="relative opacity-60">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="email"
                       value={user?.email || ''}
                       disabled
-                      className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-bold text-gray-500 cursor-not-allowed"
+                      className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-semibold text-gray-500 cursor-not-allowed"
                     />
                   </div>
                 </label>
 
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Numéro de Téléphone (Mobile Money)</span>
+                  <span className={LABEL}>Numéro de téléphone (Mobile Money)</span>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="text"
                       value={momoNumber}
                       onChange={(e) => setMomoNumber(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
-                      // placeholder="+228 90 00 00 00"
+                      className={FIELD}
+                      placeholder="+228 90 00 00 00"
                     />
                   </div>
                 </label>
               </div>
 
-              <div className="pt-4 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
+              <div className="pt-2 flex justify-end">
+                <button type="submit" disabled={isSaving} className={PRIMARY_BTN}>
                   {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                   Enregistrer
                 </button>
