@@ -413,7 +413,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-xl font-black text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
                 <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
-                  {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Membre'}
+                  {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Ambassadeur'}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
