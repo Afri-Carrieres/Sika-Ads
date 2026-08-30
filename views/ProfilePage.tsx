@@ -352,7 +352,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6">
-      <div className="max-w-full mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -382,59 +382,60 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
-          {/* Left Column: Avatar */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col items-center text-center">
-              <div className="relative group">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-50 shadow-inner bg-gray-100 flex items-center justify-center">
+        {/* Hero */}
+        <div className={`${TILE} ${TILE_HOVER} p-8 relative overflow-hidden`}>
+          <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-gradient-to-br from-indigo-100/70 to-teal-100/40 blur-3xl pointer-events-none" aria-hidden />
+          <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
+            <div className="relative group shrink-0">
+              <div className={`w-24 h-24 rounded-full p-[3px] bg-gradient-to-br from-indigo-500 to-teal-400 ${isUploading ? 'opacity-70' : ''}`}>
+                <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
                   {photoURL ? (
                     <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-4xl font-black text-blue-700 select-none">
-                      {displayName ? displayName.charAt(0).toUpperCase() : <UserIcon size={48} />}
+                    <span className="text-3xl font-black text-blue-700 select-none">
+                      {displayName ? displayName.charAt(0).toUpperCase() : <UserIcon size={40} />}
                     </span>
                   )}
                 </div>
-
-                {/* Upload Overlay Button */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="absolute bottom-1 right-1 p-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-all disabled:opacity-70"
-                >
-                  {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
-                </button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
               </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="absolute bottom-0.5 right-0.5 p-2.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-all disabled:opacity-70"
+                aria-label="Changer la photo de profil"
+              >
+                {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+              </button>
+              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+            </div>
 
-              <h2 className="mt-4 text-lg font-bold text-gray-900">{displayName || 'Utilisateur'}</h2>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">{user?.email}</p>
-
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-black text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
+                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
+                  {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Membre'}
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Compte actif
+                </span>
+              </div>
+              <p className="text-sm text-gray-500 font-medium mt-1 truncate">{user?.email}</p>
               {photoURL && (
                 <button
                   onClick={handleDeleteAvatar}
                   disabled={isUploading}
-                  className="mt-6 flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50 px-4 py-2 rounded-xl transition-all"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-red-500 hover:text-red-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all disabled:opacity-50"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={13} />
                   Supprimer la photo
                 </button>
               )}
             </div>
-
-             {/* Notification Web Push Settings */}
-            <PushNotificationSettingsCard userId={user?.id ?? null} />
-
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Right Column: Info Form */}
           <div className="md:col-span-2 space-y-8">
