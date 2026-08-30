@@ -12,7 +12,6 @@ interface LayoutProps {
   currentTab: string;
   setTab: (tab: string) => void;
   onRoleSwitch: () => void;
-  onNavigateToProfile: () => void;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onRoleSwitch }) => {

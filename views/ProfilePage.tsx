@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, ArrowLeft, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
+import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { User, UserRole } from '../types';
@@ -87,11 +87,7 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
   );
 };
 
-interface ProfilePageProps {
-  onBack: () => void;
-}
-
-const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
+const ProfilePage: React.FC = () => {
   const {userData} = useUserData();
   const [user, setUser] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -357,17 +353,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
       <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="p-2 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Mon Profil</h1>
-            <p className="text-sm text-gray-500 font-medium">Gérez vos informations personnelles et votre compte.</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Mon Profil</h1>
+          <p className="text-sm text-gray-500 font-medium">Gérez vos informations personnelles et votre compte.</p>
         </div>
 
         {/* Success Toast */}

@@ -44,7 +44,7 @@ import { initializeDatabase } from './services/initDb';
 import { cleanupNonAdminUsers } from './services/cleanupUsers';
 import { Clock, Loader2 } from 'lucide-react';
 
-type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'profile' | 'reset-password';
+type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'reset-password';
 
 // Helper to parse current path and return view + tab
 const parsePathname = (pathname: string): { view: AppView; tab: string } => {
@@ -61,7 +61,11 @@ const parsePathname = (pathname: string): { view: AppView; tab: string } => {
     return { view: 'app', tab: parts.slice(1).join('/') || 'dashboard' };
   }
 
-  if (['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'profile', 'reset-password'].includes(firstPart)) {
+  if (firstPart === 'profile') {
+    return { view: 'app', tab: 'profile' };
+  }
+
+  if (['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'reset-password'].includes(firstPart)) {
     return { view: firstPart, tab: 'dashboard' };
   }
 
@@ -193,7 +197,7 @@ const App: React.FC = () => {
       // cleanupNonAdminUsers();
 
       if (user && !user.email_confirmed_at && view !== 'verification-pending') {
-        if (view === 'app' || view === 'profile' || view === 'advertise') {
+        if (view === 'app' || view === 'advertise') {
           setView('verification-pending');
         }
         return;
@@ -210,7 +214,7 @@ const App: React.FC = () => {
         }
       }
 
-      if (!user && (view === 'app' || view === 'profile' || view === 'verification-pending' || view === 'advertise')) {
+      if (!user && (view === 'app' || view === 'verification-pending' || view === 'advertise')) {
         if (view === 'advertise') {
           setRedirectAfterLogin('advertise');
         }
@@ -305,6 +309,7 @@ const App: React.FC = () => {
         case 'wallet': return <WalletView onWithdrawalRequested={(a, p) => console.log('Withdrawal requested', a, p)} />;
         case 'create-campaign': return <CreateCampaign onSuccess={handleCampaignFormSuccess} onCancel={() => setTab('dashboard')} />;
         case 'my-campaigns': return <MyCampaigns onRetryPayment={(id, amount) => { setPendingCampaignId(id); setPendingAmount(amount); setShowPayment(true); }} onNavigateToCreate={() => setTab('create-campaign')} />;
+        case 'profile': return <ProfilePage />;
         default: return <AmbassadorDashboard userData={userData} onNavigateToWallet={() => setTab('wallet')} />;
       }
     };
@@ -589,15 +594,12 @@ const App: React.FC = () => {
             onNavigate={(v) => setView(v as any)}
             onStart={() => user ? setView('app') : setView('register')}
           />
-        ) : view === 'profile' ? (
-          <ProfilePage onBack={() => setView('app')} />
         ) : (
           <Layout
             role={currentTab.startsWith('admin') ? (isAdmin ? UserRole.ADMIN : UserRole.MODERATOR) : UserRole.AMBASSADOR}
             currentTab={currentTab}
             setTab={setTab}
             onRoleSwitch={handleRoleSwitch}
-            onNavigateToProfile={() => setView('profile')}
           >
             {renderContent()}
           </Layout>

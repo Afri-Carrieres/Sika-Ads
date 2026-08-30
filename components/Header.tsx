@@ -5,9 +5,9 @@ import { Megaphone, Home, LayoutDashboard, ShieldCheck, Menu, X, LogIn, User as 
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface HeaderProps {
-  view: 'landing' | 'app' | 'advertise' | 'login' | 'profile' | 'about' | 'legal' | 'terms';
+  view: 'landing' | 'app' | 'advertise' | 'login' | 'about' | 'legal' | 'terms';
   role: UserRole;
-  setView: (view: 'landing' | 'app' | 'login' | 'profile' | 'advertise' | 'about' | 'legal' | 'terms' | 'contact') => void;
+  setView: (view: 'landing' | 'app' | 'login' | 'advertise' | 'about' | 'legal' | 'terms' | 'contact') => void;
   setRole: (role: UserRole) => void;
   user: SupabaseUser | null;
 }
