@@ -502,21 +502,21 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
 
             {/* Danger Zone */}
-            <div className="bg-red-50/50 p-8 rounded-[2rem] border-2 border-red-100 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="bg-red-100 p-2.5 rounded-xl text-red-600">
-                  <AlertTriangle size={20} />
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between p-6 bg-white rounded-3xl border border-gray-200">
+              <div className="flex items-start gap-3">
+                <div className="bg-red-50 p-2.5 rounded-xl text-red-500 shrink-0">
+                  <AlertTriangle size={18} />
                 </div>
-                <h3 className="text-lg font-bold text-red-700">Zone de Danger</h3>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Suppression du compte</h3>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5 leading-relaxed">
+                    Cette action est irréversible : toutes vos données, y compris votre solde non retiré et vos historiques, seront définitivement effacées.
+                  </p>
+                </div>
               </div>
-
-              <p className="text-sm text-red-900/60 font-medium leading-relaxed">
-                La suppression de votre compte est irréversible. Toutes vos données, y compris votre solde non retiré, vos historiques et vos statistiques seront définitivement effacées.
-              </p>
-
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="px-6 py-3 bg-white border border-red-200 text-red-600 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm"
+                className="shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all"
               >
                 Supprimer mon compte
               </button>
@@ -606,14 +606,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-start mb-6">
               <div className="bg-red-100 w-12 h-12 rounded-2xl flex items-center justify-center text-red-600">
                 <Trash2 size={24} />
               </div>
-              <button onClick={() => setShowDeleteModal(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600">
-                <X size={24} />
+              <button onClick={() => setShowDeleteModal(false)} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-all">
+                <X size={18} />
               </button>
             </div>
 
@@ -627,13 +627,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               value={deleteConfirmation}
               onChange={(e) => setDeleteConfirmation(e.target.value)}
               placeholder="SUPPRIMER"
-              className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 mb-6 font-bold text-center focus:border-red-500 focus:ring-0 outline-none uppercase tracking-widest"
+              className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-4 mb-6 font-bold text-center focus:border-red-500 focus:ring-0 outline-none transition-colors"
             />
 
             <button
               onClick={handleDeleteAccount}
               disabled={deleteConfirmation !== 'SUPPRIMER' || isDeleting}
-              className="w-full py-4 bg-red-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full py-4 bg-red-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
             >
               {isDeleting ? <Loader2 className="animate-spin" size={20} /> : "Confirmer la suppression"}
             </button>
