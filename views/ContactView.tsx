@@ -10,22 +10,19 @@ import {
   Compass,
   Handshake,
   Loader2,
-  LogInIcon,
   Mail,
   MapPin,
-  Menu,
   Pencil,
   Send,
 } from 'lucide-react';
 import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
-import MobileDrawer from '../components/MobileDrawer';
+import MarketingHeader, { MarketingView } from '../components/MarketingHeader';
+import PageHero from '../components/PageHero';
 import { supabase } from '../supabase';
 
-export type ContactViewName = 'landing' | 'about' | 'legal' | 'terms' | 'contact';
-
 interface ContactViewProps {
-  onNavigate: (view: ContactViewName) => void;
+  onNavigate: (view: MarketingView) => void;
   onStart?: () => void;
 }
 
@@ -92,8 +89,6 @@ const typeLabel = (t: ContactType | '') => CONTACT_TYPES.find((c) => c.id === t)
 const subjectLabel = (s: ContactSubject | '') => SUBJECTS.find((c) => c.id === s)?.label || '—';
 
 const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>({
     type: '',
@@ -108,12 +103,6 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
   const [submitError, setSubmitError] = useState<string>('');
   const honeypotRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Move focus to the step heading on step change (a11y)
   useEffect(() => {
@@ -187,12 +176,6 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
     setStatus('idle');
   };
 
-  const navLinks = [
-    { href: 'landing', label: 'Accueil' },
-    { href: 'legal', label: 'Mentions Légales' },
-    { href: 'terms', label: 'Conditions & CGU' },
-  ];
-
   const stepTitles: Record<number, string> = {
     1: 'Parlez-nous de vous',
     2: 'Quel est le sujet de votre demande ?',
@@ -209,95 +192,20 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
         type="website"
       />
 
-      {/* ── NAV (mirrors AboutView) ── */}
-      <header
-        className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
-          scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white/80 backdrop-blur-md'
-        }`}
-      >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-          <button
-            onClick={() => onNavigate('landing')}
-            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg"
-          >
-            <img className="w-36 sm:w-40 h-auto object-contain" src="/Header-LogoSika-Ads.png" alt="Logo Sika Ads" />
-          </button>
-
-          <nav className="hidden md:flex items-center gap-8" aria-label="Navigation principale">
-            <button
-              onClick={() => onNavigate('landing')}
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors duration-200"
-            >
-              Accueil
-            </button>
-            <button
-              onClick={() => onNavigate('legal')}
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors duration-200"
-            >
-              Mentions Légales
-            </button>
-            <button
-              onClick={() => onNavigate('terms')}
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors duration-200"
-            >
-              Conditions
-            </button>
-            <span aria-current="page" className="text-sm font-bold text-[#128785]">
-              Contact
-            </span>
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={onStart}
-              style={{ backgroundColor: '#ea580c' }}
-              className="flex gap-1 items-center justify-center py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
-            >
-              Commencer
-              <LogInIcon className="w-4" />
-            </button>
-          </div>
-
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
-            aria-label="Ouvrir le menu"
-          >
-            <Menu className="w-6 h-6 text-[#ea580c]" />
-          </button>
-        </div>
-      </header>
-
-      <MobileDrawer
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        navLinks={navLinks}
-        onNavigate={(href) => onNavigate(href as ContactViewName)}
-        onCtaClick={() => {
-          if (onStart) onStart();
-        }}
-        ctaText="Commencer"
-      />
+      <MarketingHeader onNavigate={onNavigate} onStart={onStart} active="contact" />
 
       <main className="flex flex-col flex-1">
-        {/* ── HERO ── */}
-        <section className="relative py-24 sm:py-28 overflow-hidden bg-slate-950">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[140px] pointer-events-none" />
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="max-w-3xl">
-              <span className="inline-block px-4 py-2 rounded-full bg-[#128785]/10 border border-[#128785]/25 text-[#2dd4bf] text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                Contactez-nous
-              </span>
-              <h1 className="font-heading text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-                Parlons de votre projet
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2dd4bf] to-indigo-400">.</span>
-              </h1>
-              <p className="text-lg text-slate-400 leading-relaxed max-w-2xl font-medium">
-                Une question, une idée, un problème ou une opportunité ? Envoyez-nous un message et notre équipe vous répondra.
-              </p>
-            </div>
-          </div>
-        </section>
+        <PageHero
+          badge="Contactez-nous"
+          title={
+            <>
+              Parlons de votre projet
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2dd4bf] to-indigo-400">.</span>
+            </>
+          }
+          subtitle="Une question, une idée, un problème ou une opportunité ? Envoyez-nous un message et notre équipe vous répondra."
+          accent="teal"
+        />
 
         {/* ── CONTACT: INFO + MULTISTEP FORM ── */}
         <section className="py-16 sm:py-20 bg-white">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -16,15 +16,12 @@ import {
   DollarSign, 
   Sparkles,
   CheckCircle,
-  Menu,
-  X,
-  LogInIcon,
   HelpCircle,
   ArrowUpRight
 } from 'lucide-react';
 import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
-import MobileDrawer from '../components/MobileDrawer';
+import MarketingHeader from '../components/MarketingHeader';
 
 interface AboutViewProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
@@ -32,23 +29,6 @@ interface AboutViewProps {
 }
 
 const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = [
-    { href: 'landing', label: 'Accueil' },
-    { href: 'legal', label: 'Mentions Légales' },
-    { href: 'terms', label: 'Conditions & CGU' },
-  ];
-
   const goToAdvertisers = () => {
     onNavigate('landing');
     setTimeout(() => {
@@ -65,82 +45,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigate, onStart }) => {
         canonicalPath="/about"
         ogImage="https://www.sika-ads.com/about_hero.png"
       />
-      {/* ── NAV ── */}
-      <header
-        className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-white/80 backdrop-blur-md"
-        }`}
-      >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
-          {/* Logo */}
-          <button
-            onClick={() => onNavigate('landing')}
-            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
-          >
-            <img className="w-36 sm:w-40 h-auto object-contain" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-          </button>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => onNavigate('landing')}
-              className={`text-sm font-medium transition-colors duration-200 ${
-                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
-              }`}
-            >
-              Accueil
-            </button>
-            <button
-              onClick={() => onNavigate('legal')}
-              className={`text-sm font-medium transition-colors duration-200 ${
-                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
-              }`}
-            >
-              Mentions Légales
-            </button>
-            <button
-              onClick={() => onNavigate('terms')}
-              className={`text-sm font-medium transition-colors duration-200 ${
-                scrolled ? "text-foreground/70 hover:text-foreground" : "text-slate-700 hover:text-slate-900"
-              }`}
-            >
-              Conditions
-            </button>
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={onStart}
-              style={{ backgroundColor: "#ea580c" }}
-              className="flex gap-1 items-center justify-center py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              Commencer
-              <LogInIcon className="w-4" />
-            </button>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
-            aria-label="Ouvrir le menu"
-          >
-            <Menu className="w-6 h-6 text-[#ea580c]" />
-          </button>
-        </div>
-      </header>
-
-      {/* ── Mobile Drawer (Off-Canvas) ── */}
-      <MobileDrawer
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        navLinks={navLinks}
-        onNavigate={(href) => onNavigate(href as any)}
-        onCtaClick={() => {
-          if (onStart) onStart();
-        }}
-        ctaText="Commencer"
-      />
+      <MarketingHeader onNavigate={(v) => onNavigate(v as any)} onStart={onStart} active="about" />
 
       <main className="bg-white min-h-screen flex flex-col pt-20 text-slate-900">
       {/* HERO */}
