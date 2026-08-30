@@ -11,6 +11,7 @@
 | `advertise` | [views/CreateCampaign.tsx](views/CreateCampaign.tsx) | Créer campagne | Tout le monde |
 | `advertise-success` | [views/SuccessCampaign.tsx](views/SuccessCampaign.tsx) | Confirmation | Après création |
 | `contact` | [views/ContactView.tsx](views/ContactView.tsx) | Page Contact (formulaire multistep, route `/contact`) | Tout le monde |
+| `privacy` | [views/PrivacyView.tsx](views/PrivacyView.tsx) | Politique de confidentialité (route `/privacy`) | Tout le monde |
 
 ### Vue Authentifiée
 | Route | Fichier | Description | Accessible |

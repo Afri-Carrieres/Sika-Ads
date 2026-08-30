@@ -430,6 +430,8 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
                     <ShieldCheck size={18} className="text-[#128785] shrink-0 mt-0.5" />
                     <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                      Le détail complet de la collecte, de l'utilisation et de la protection de ces données est décrit dans notre{' '}
+                      <button onClick={() => onNavigate('privacy')} className="text-indigo-600 font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded">politique de confidentialité</button>.
                       Pour toute question relative à vos données personnelles, contactez-nous à{' '}
                       <a href="mailto:team@sika-ads.com" className="text-[#128785] font-bold underline">team@sika-ads.com</a>{' '}
                       ou via le <button onClick={() => onNavigate('contact')} className="text-indigo-600 font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded">formulaire de contact</button>.

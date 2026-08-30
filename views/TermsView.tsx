@@ -6,7 +6,7 @@ import MarketingHeader from '../components/MarketingHeader';
 import PageHero from '../components/PageHero';
 
 interface TermsViewProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy') => void;
   onStart: () => void;
 }
 

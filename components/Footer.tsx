@@ -2,7 +2,7 @@ import React from 'react';
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 interface FooterProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy') => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -65,7 +65,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <ul className="space-y-3 sm:space-y-4 text-sm font-medium">
               <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Mentions Légales</button></li>
               <li><button onClick={() => onNavigate('terms')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">CGU & Anti-Fraude</button></li>
-              <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Confidentialité</button></li>
+              <li><button onClick={() => onNavigate('privacy')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Confidentialité</button></li>
               <li><button onClick={() => onNavigate('contact')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Support Client</button></li>
             </ul>
           </div>

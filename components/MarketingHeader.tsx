@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { LogInIcon, Menu } from 'lucide-react';
 import MobileDrawer from './MobileDrawer';
 
-export type MarketingView = 'landing' | 'about' | 'legal' | 'terms' | 'contact';
+export type MarketingView = 'landing' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy';
 
 interface MarketingHeaderProps {
   onNavigate: (view: MarketingView) => void;
