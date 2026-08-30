@@ -38,7 +38,6 @@ import ScrollToTop from './components/ScrollToTop';
 import "./styles/index.css";
 import { useAuthRedirect } from './hooks/useAuthRedirect';
 
-import { MOCK_PROOFS } from './constants';
 import { useUserData } from './hooks/useUserData';
 import { deleteAllCampaigns } from './services/resetCampaigns';
 import { initializeDatabase } from './services/initDb';
@@ -76,7 +75,7 @@ const App: React.FC = () => {
   const [view, setViewInternal] = useState<AppView>(parsePathname(location.pathname).view);
   const [currentTab, setCurrentTabInternal] = useState<string>(parsePathname(location.pathname).tab);
 
-  const [proofs, setProofs] = useState<(Proof & { campaignTitle: string; userName: string })[]>(MOCK_PROOFS);
+  const [proofs, setProofs] = useState<(Proof & { campaignTitle: string; userName: string })[]>([]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
   const [pendingAmount, setPendingAmount] = useState<number>(0);
@@ -91,6 +90,11 @@ const App: React.FC = () => {
     const { view: newView, tab: newTab } = parsePathname(location.pathname);
     setViewInternal(newView);
     setCurrentTabInternal(newTab);
+    // Retient le dernier onglet de l'espace membre pour y revenir après
+    // une sortie (profil, landing, login) ou une reconnexion.
+    if (newView === 'app' && localStorage.getItem('sikaads_last_tab') !== newTab) {
+      localStorage.setItem('sikaads_last_tab', newTab);
+    }
     // Toute navigation de page amène l'utilisateur en haut de la page
     // (les scrolls vers sections locales sont déclenchés après, via setTimeout).
     window.scrollTo({ top: 0 });
@@ -106,7 +110,12 @@ const App: React.FC = () => {
       // Supabase émet USER_UPDATED avec email_confirmed_at renseigné.
       // On redirige alors automatiquement vers le dashboard.
       if ((event === 'USER_UPDATED' || event === 'SIGNED_IN') && session?.user?.email_confirmed_at) {
-        navigate('/app');
+        // Ne PAS écraser la route si l'utilisateur est déjà dans l'espace membre
+        // (ex : retour sur /app/marketplace après restauration de la session).
+        const p = window.location.pathname;
+        if (p.startsWith('/app') || p.startsWith('/profile')) return;
+        const lastTab = localStorage.getItem('sikaads_last_tab') || 'dashboard';
+        navigate(`/app/${lastTab}`);
       }
     });
     return () => subscription.unsubscribe();
@@ -163,7 +172,8 @@ const App: React.FC = () => {
       if (v === 'landing') {
         navigate('/');
       } else if (v === 'app') {
-        navigate(`/app/${currentTab}`);
+        const lastTab = localStorage.getItem('sikaads_last_tab') || 'dashboard';
+        navigate(`/app/${lastTab}`);
       } else {
         navigate(`/${v}`);
       }
@@ -337,7 +347,12 @@ const App: React.FC = () => {
     const showLoadingOverlay = loading && view !== 'landing' && view !== 'reset-password';
 
     if (view === 'login') return <LoginView onSuccess={() => setView(redirectAfterLogin || 'app')} onGoBack={() => setView('landing')} onGoToRegister={() => setView('register')} />
-    if (view === 'register') return <RegistrationForm onComplete={() => setView('verification-pending')} onCancel={() => setView('landing')} onGoToLogin={() => setView('login')} />;
+    if (view === 'register') return <RegistrationForm onComplete={(dest) => {
+      if (dest === 'verification') { setView('verification-pending'); return; }
+      // Nouveau compte : atterrir sur le dashboard, pas sur le dernier onglet d'une session précédente
+      localStorage.setItem('sikaads_last_tab', 'dashboard');
+      setView(redirectAfterLogin || 'app');
+    }} onCancel={() => setView('landing')} onGoToLogin={() => setView('login')} />;
     if (view === 'verification-pending') return <VerificationPending email={user?.email} onGoToLogin={handleGoToLogin} onResend={handleResendVerification} />;
     if (view === 'reset-password') return <ResetPasswordView onSuccess={() => setView('login')} onBackToLogin={() => setView('login')} />;
     // Handler appelé après validation du formulaire campagne (avant paiement)

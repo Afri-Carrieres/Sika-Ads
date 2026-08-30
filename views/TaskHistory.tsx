@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Proof, Notification, AIAnalysis, Campaign } from '../types';
 import { Upload, CheckCircle2, XCircle, Clock, Trash2, Eye, X, Image as ImageIcon, FileText, AlertCircle, Loader2, BrainCircuit, ShieldCheck, ShieldAlert, ChevronDown, Info, Search, Sparkles } from 'lucide-react';
 import { supabase } from '../supabase';
-import { MOCK_CAMPAIGNS, MOCK_PROOFS } from '../constants';
 import { validateProofWithAI } from '../services/geminiService';
 import { determineAutoAction, AI_VALIDATION_CONFIG } from '../config/aiValidationThresholds';
 import Pagination from '../components/Pagination';
@@ -134,11 +133,6 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
         }
 
         const combinedProofs = [...validProofs];
-        MOCK_PROOFS.forEach(mock => {
-          if (!combinedProofs.find(p => p.id === mock.id) && new Date(mock.submittedAt) >= cutoff) {
-            combinedProofs.push(mock);
-          }
-        });
 
         combinedProofs.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
         setProofs(combinedProofs);

@@ -6,13 +6,13 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  ShieldCheck,
   History,
   Info
 } from 'lucide-react';
 
 import { useUserData } from '../hooks/useUserData';
 import { requestWithdrawal } from '../services/withdrawals';
+import { supabase } from '../supabase';
 
 interface WalletViewProps {
   onWithdrawalRequested?: (amount: number, provider: string) => void;
@@ -26,8 +26,33 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
   const MIN_WITHDRAWAL = 2000;
+
+  const loadWithdrawals = async () => {
+    if (!user?.id) return;
+    try {
+      const { data, error } = await supabase
+        .from('withdrawals')
+        .select('*')
+        .eq('userId', user.id)
+        .order('createdAt', { ascending: false })
+        .limit(5);
+      if (error) {
+        console.warn('WalletView withdrawals fetch error:', error);
+      } else if (data) {
+        setWithdrawals(data);
+      }
+    } catch (err) {
+      console.warn('WalletView withdrawals fetch error:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadWithdrawals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Set default values when userData is loaded
   useEffect(() => {
@@ -78,6 +103,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
         onWithdrawalRequested(numericAmount, provider);
 
       setShowSuccess(true);
+      loadWithdrawals();
     } catch (error: any) {
       console.error(error);
       const msg = String(error?.message || '');
@@ -173,20 +199,32 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
               Historique récent
             </h4>
             <div className="space-y-4">
-              {[1, 2].map(i => (
-                <div key={i} className="flex items-center justify-between py-1">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-50 p-2.5 rounded-xl text-green-600">
-                      <ShieldCheck size={18} />
+              {withdrawals.length === 0 && (
+                <p className="text-xs text-gray-400 font-medium text-center py-2">Aucun retrait pour le moment.</p>
+              )}
+              {withdrawals.slice(0, 3).map((w: any) => {
+                const status = String(w.status || '').toLowerCase();
+                const isCompleted = status === 'completed';
+                const isFailed = status === 'failed';
+                const statusLabel = isCompleted ? 'Validé' : isFailed ? 'Échoué' : 'En attente';
+                const amountText = `${(Number(w.amount) || 0).toLocaleString('fr-FR')} F`;
+                return (
+                  <div key={w.id} className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-3">
+                      <div className={`${isCompleted ? 'bg-green-50 text-green-600' : isFailed ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-500'} p-2.5 rounded-xl`}>
+                        {isCompleted ? <CheckCircle2 size={18} /> : <Clock size={18} />}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-900">Retrait {w.provider || 'Mobile Money'}</p>
+                        <p className="text-[10px] text-gray-400 font-medium">
+                          {new Date(w.createdAt || w.date || Date.now()).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} · {statusLabel}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-bold text-gray-900">Gain de Campagne</p>
-                      <p className="text-[10px] text-gray-400 font-medium">Aujourd'hui, 14:20</p>
-                    </div>
+                    <span className={`text-xs font-black ${isCompleted ? 'text-green-600' : isFailed ? 'text-red-500' : 'text-orange-500'}`}>{amountText}</span>
                   </div>
-                  <span className="text-xs font-black text-green-600">+150 F</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

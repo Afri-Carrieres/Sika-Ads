@@ -22,7 +22,7 @@ import {
 
 
 interface RegistrationFormProps {
-  onComplete: () => void;
+  onComplete: (destination?: 'verification' | 'dashboard') => void;
   onCancel: () => void;
   onGoToLogin: () => void;
 }
@@ -103,13 +103,15 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
         const user = data.user;
 
-        // ✅ Quand "Enable email confirmations" est activé dans Supabase,
-        // signUp() retourne intentionnellement { user: null, session: null }.
-        // L'utilisateur EST créé dans auth.users mais le SDK ne le renvoie pas
-        // tant que l'email n'est pas vérifié. Ce n'est PAS une erreur.
+        // ── Cas où signUp() ne renvoie pas d'utilisateur ──
+        // Si "Confirm emails" est ACTIVÉ dans Supabase, signUp() retourne
+        // intentionnellement { user: null, session: null } : l'utilisateur est
+        // créé dans auth.users mais pas encore vérifié → VerificationPending.
+        // Avec "Confirm emails" DÉSACTIVÉ, user est renvoyé immédiatement et
+        // ce branchement n'est pas atteint.
         if (!user) {
           // Email de confirmation envoyé → rediriger vers VerificationPending
-          onComplete();
+          onComplete('verification');
           return;
         }
 
@@ -149,8 +151,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
           console.warn("Verification email via Edge Function failed:", apiErr);
         }
 
-        // Redirect to verification pending page
-        onComplete();
+        // Redirect into the app (compte déjà vérifié, confirmations désactivées)
+        onComplete('dashboard');
       } catch (err: any) {
         console.error("Registration error:", err);
         // Translate Supabase weak password error to French

@@ -15,7 +15,7 @@ interface LayoutProps {
   onNavigateToProfile: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onRoleSwitch, onNavigateToProfile }) => {
+const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onRoleSwitch }) => {
   const { userData } = useUserData();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -100,34 +100,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide">
           {navItems.map((item) => {
             const isActive = currentTab === item.id;
-            // Map tab id to route
-            let to = '/app';
-            switch (item.id) {
-              case 'dashboard': to = '/app?tab=dashboard'; break;
-              case 'marketplace': to = '/app?tab=marketplace'; break;
-              case 'tasks': to = '/app?tab=tasks'; break;
-              case 'notes': to = '/app?tab=notes'; break;
-              case 'wallet': to = '/app?tab=wallet'; break;
-              case 'profile': to = '/app?tab=profile'; break;
-              case 'create-campaign': to = '/app?tab=create-campaign'; break;
-              case 'my-campaigns': to = '/app?tab=my-campaigns'; break;
-              case 'admin-dashboard': to = '/app?tab=admin-dashboard'; break;
-              case 'admin-campaigns': to = '/app?tab=admin-campaigns'; break;
-              case 'admin-validation': to = '/app?tab=admin-validation'; break;
-              case 'admin-withdrawals': to = '/app?tab=admin-withdrawals'; break;
-              case 'admin-campaign-payments': to = '/app?tab=admin-campaign-payments'; break;
-              case 'admin-create-vip': to = '/app?tab=admin-create-vip'; break;
-              case 'admin-payouts': to = '/app?tab=admin-payouts'; break;
-              case 'admin-users': to = '/app?tab=admin-users'; break;
-              case 'admin-team': to = '/app?tab=admin-team'; break;
-              case 'admin-gombo-status': to = '/app?tab=admin-gombo-status'; break;
-              default: to = '/app';
-            }
+            // Map tab id to route (chemin propre, cohérent avec setTab()/parsePathname)
+            const to = item.id === 'profile' ? '/profile' : `/app/${item.id}`;
             return (
               <Link
                 key={item.id}
                 to={to}
-                onClick={() => item.id === 'profile' ? onNavigateToProfile() : setTab(item.id)}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
                   ${isActive
@@ -207,39 +185,13 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
           <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-280px)]">
             {navItems.map((item) => {
               const isActive = currentTab === item.id;
-              let to = '/app';
-              switch (item.id) {
-                case 'dashboard': to = '/app?tab=dashboard'; break;
-                case 'marketplace': to = '/app?tab=marketplace'; break;
-                case 'tasks': to = '/app?tab=tasks'; break;
-                case 'notes': to = '/app?tab=notes'; break;
-                case 'wallet': to = '/app?tab=wallet'; break;
-                case 'profile': to = '/app?tab=profile'; break;
-                case 'create-campaign': to = '/app?tab=create-campaign'; break;
-                case 'admin-dashboard': to = '/app?tab=admin-dashboard'; break;
-                case 'admin-campaigns': to = '/app?tab=admin-campaigns'; break;
-                case 'admin-validation': to = '/app?tab=admin-validation'; break;
-                case 'admin-withdrawals': to = '/app?tab=admin-withdrawals'; break;
-                case 'admin-campaign-payments': to = '/app?tab=admin-campaign-payments'; break;
-                case 'admin-create-vip': to = '/app?tab=admin-create-vip'; break;
-                case 'admin-payouts': to = '/app?tab=admin-payouts'; break;
-                case 'admin-users': to = '/app?tab=admin-users'; break;
-                case 'admin-team': to = '/app?tab=admin-team'; break;
-                case 'admin-gombo-status': to = '/app?tab=admin-gombo-status'; break;
-                default: to = '/app';
-              }
+              // Map tab id to route (chemin propre, cohérent avec setTab()/parsePathname)
+              const to = item.id === 'profile' ? '/profile' : `/app/${item.id}`;
               return (
                 <Link
                   key={item.id}
                   to={to}
-                  onClick={() => {
-                    if (item.id === 'profile') {
-                      onNavigateToProfile();
-                    } else {
-                      setTab(item.id);
-                    }
-                    setIsMobileMenuOpen(false);
-                  }}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={`
                     w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
                     ${isActive
