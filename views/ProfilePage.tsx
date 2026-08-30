@@ -402,7 +402,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="absolute bottom-0.5 right-0.5 p-2.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-all disabled:opacity-70"
+                className="absolute bottom-0.5 right-0.5 p-3.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-all disabled:opacity-70"
                 aria-label="Changer la photo de profil"
               >
                 {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
@@ -552,7 +552,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className={FIELD}
-                      placeholder="Repetez le nouveau mot de passe"
+                      placeholder="Répétez le nouveau mot de passe"
                       autoComplete="new-password"
                     />
                   </div>
