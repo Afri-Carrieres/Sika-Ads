@@ -38,6 +38,7 @@ const FIELD = 'w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 pl-12 fo
 const LABEL = 'text-[11px] font-semibold text-gray-500 ml-1 mb-2 block';
 const SECTION_ICON = 'p-2.5 rounded-xl';
 const PRIMARY_BTN = 'px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
+const EMERALD_BTN = 'px-6 py-3.5 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 ```
 
 - [ ] **Step 2: Ajouter le state et le helper d'erreur** (à côté de `successMessage`, ~ligne 102)
@@ -152,7 +153,7 @@ git commit -m "style(profile): tokens, toasts erreur, skeleton"
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-xl font-black text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
         <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
-          {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Membre'}
+          {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Ambassadeur'}
         </span>
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -344,7 +345,7 @@ git commit -m "style(profile): tuile infos personnelles"
     <button
       type="submit"
       disabled={isChangingPassword}
-      className={`${PRIMARY_BTN} bg-emerald-600 shadow-emerald-100 hover:bg-emerald-700`}
+      className={EMERALD_BTN}
     >
       {isChangingPassword ? <Loader2 className="animate-spin" size={20} /> : <Lock size={20} />}
       Modifier
