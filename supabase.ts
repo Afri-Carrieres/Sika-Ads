@@ -14,6 +14,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
         getSession: async () => ({ data: { session: null } }),
         onAuthStateChange: (_callback: any) => ({ data: { subscription: { unsubscribe: () => {} } } }),
         signInWithPassword: async () => ({ data: null, error: new Error('Supabase not configured') }),
+        signUp: async () => ({ data: null, error: new Error('Supabase not configured. Copy .env.example to .env.local with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then restart the dev server.') }),
+        signInWithOAuth: async () => ({ data: null, error: new Error('Supabase not configured. Check .env.local (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY) and restart the dev server.') }),
         signOut: async () => ({ data: null, error: null }),
         resetPasswordForEmail: async () => ({ data: null, error: new Error('Supabase not configured') }),
         setSession: async () => ({ data: null, error: new Error('Supabase not configured') }),
