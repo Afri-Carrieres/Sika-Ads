@@ -18,7 +18,7 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
 
   if (permission === 'unsupported') {
     return (
-      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center justify-between">
+      <div className={`${TILE} p-6 flex items-center justify-between`}>
         <div className="flex items-center gap-3">
           <div className="bg-gray-100 p-2.5 rounded-xl text-gray-400">
             <BellOff size={20} />
@@ -33,7 +33,7 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
   }
 
   return (
-    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-4">
+    <div className={`${TILE} p-6 space-y-4`}>
       <div className="flex items-center gap-3">
         <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
           <Bell size={20} />
@@ -599,7 +599,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
               </div>
             </form>
 
-           
+            <PushNotificationSettingsCard userId={user?.id ?? null} />
           </div>
         </div>
       </div>
