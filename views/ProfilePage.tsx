@@ -524,16 +524,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
           {/* Password Form */}
           <div className="md:col-span-1 space-y-8">
-            <form onSubmit={handleChangePassword} className="bg-white p-8 rounded-[2rem] shadow-sm border flex flex-col items-center text-start border-gray-100 space-y-4">
+            <form onSubmit={handleChangePassword} className={`${TILE} ${TILE_HOVER} p-8 space-y-4`}>
               <div className="flex items-center gap-3 mb-2">
-                <div className="bg-emerald-50 p-2.5 rounded-xl text-emerald-600">
+                <div className={`${SECTION_ICON} bg-emerald-50 text-emerald-600`}>
                   <ShieldCheck size={20} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">Securite du compte</h3>
+                <h3 className="text-lg font-bold text-gray-900">Sécurité du compte</h3>
               </div>
 
-               {passwordError && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 text-red-700 rounded-2xl border border-red-100">
+              {passwordError && (
+                <div className="flex items-center gap-2 p-3.5 bg-red-50 text-red-700 rounded-2xl border border-red-100">
                   <AlertCircle size={18} className="shrink-0" />
                   <p className="text-xs font-bold">{passwordError}</p>
                 </div>
@@ -541,14 +541,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
               <div className="space-y-4">
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe actuel</span>
+                  <span className={LABEL}>Mot de passe actuel</span>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className={FIELD}
                       placeholder="Votre mot de passe actuel"
                       autoComplete="current-password"
                     />
@@ -556,29 +556,29 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                 </label>
 
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nouveau mot de passe</span>
+                  <span className={LABEL}>Nouveau mot de passe</span>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
-                      placeholder="Minimum 6 caracteres"
+                      className={FIELD}
+                      placeholder="Minimum 6 caractères"
                       autoComplete="new-password"
                     />
                   </div>
                 </label>
 
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Confirmer le nouveau mot de passe</span>
+                  <span className={LABEL}>Confirmer le nouveau mot de passe</span>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className={FIELD}
                       placeholder="Repetez le nouveau mot de passe"
                       autoComplete="new-password"
                     />
@@ -586,11 +586,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
                 </label>
               </div>
 
-              <div className="pt-4 flex justify-end">
+              <div className="pt-2 flex justify-end">
                 <button
                   type="submit"
                   disabled={isChangingPassword}
-                  className="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className={`${PRIMARY_BTN} bg-emerald-600 shadow-emerald-100 hover:bg-emerald-700`}
                 >
                   {isChangingPassword ? <Loader2 className="animate-spin" size={20} /> : <Lock size={20} />}
                   Modifier
