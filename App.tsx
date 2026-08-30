@@ -31,6 +31,7 @@ import ResetPasswordView from './views/ResetPasswordView';
 import AboutView from './views/AboutView';
 import LegalView from './views/LegalView';
 import TermsView from './views/TermsView';
+import ContactView from './views/ContactView';
 import MyCampaigns from './views/MyCampaigns';
 import ScrollToTop from './components/ScrollToTop';
 import "./styles/index.css";
@@ -43,7 +44,7 @@ import { initializeDatabase } from './services/initDb';
 import { cleanupNonAdminUsers } from './services/cleanupUsers';
 import { Clock, Loader2 } from 'lucide-react';
 
-type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'profile' | 'reset-password';
+type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'profile' | 'reset-password';
 
 // Helper to parse current path and return view + tab
 const parsePathname = (pathname: string): { view: AppView; tab: string } => {
@@ -60,7 +61,7 @@ const parsePathname = (pathname: string): { view: AppView; tab: string } => {
     return { view: 'app', tab: parts.slice(1).join('/') || 'dashboard' };
   }
 
-  if (['about', 'legal', 'terms', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'profile', 'reset-password'].includes(firstPart)) {
+  if (['about', 'legal', 'terms', 'contact', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'profile', 'reset-password'].includes(firstPart)) {
     return { view: firstPart, tab: 'dashboard' };
   }
 
@@ -551,6 +552,11 @@ const App: React.FC = () => {
           <LegalView onNavigate={(v) => setView(v as any)} />
         ) : view === 'terms' ? (
           <TermsView
+            onNavigate={(v) => setView(v as any)}
+            onStart={() => user ? setView('app') : setView('register')}
+          />
+        ) : view === 'contact' ? (
+          <ContactView
             onNavigate={(v) => setView(v as any)}
             onStart={() => user ? setView('app') : setView('register')}
           />
