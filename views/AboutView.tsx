@@ -27,7 +27,7 @@ import SEOHead from '../components/SEOHead';
 import MobileDrawer from '../components/MobileDrawer';
 
 interface AboutViewProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
   onStart?: () => void;
 }
 

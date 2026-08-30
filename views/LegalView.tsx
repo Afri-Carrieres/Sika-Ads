@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
 
 interface LegalViewProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
 }
 
 const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {

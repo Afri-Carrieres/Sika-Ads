@@ -2,7 +2,7 @@ import React from 'react';
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 interface FooterProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
@@ -55,6 +55,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li><button onClick={() => onNavigate('about')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">À Propos</button></li>
               <li><button onClick={() => navigateToLandingSection('comment')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Comment ça marche</button></li>
               <li><button onClick={() => navigateToLandingSection('annonceurs')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Pour les entreprises</button></li>
+              <li><button onClick={() => onNavigate('contact')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Contact</button></li>
             </ul>
           </div>
 
@@ -65,7 +66,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Mentions Légales</button></li>
               <li><button onClick={() => onNavigate('terms')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">CGU & Anti-Fraude</button></li>
               <li><button onClick={() => onNavigate('legal')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Confidentialité</button></li>
-              <li><button onClick={() => navigateToLandingSection('contact')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Support Client</button></li>
+              <li><button onClick={() => onNavigate('contact')} className="hover:text-indigo-400 transition-colors flex items-center gap-2">Support Client</button></li>
             </ul>
           </div>
 

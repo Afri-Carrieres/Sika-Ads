@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
 
 interface TermsViewProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms') => void;
+  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
   onStart: () => void;
 }
 

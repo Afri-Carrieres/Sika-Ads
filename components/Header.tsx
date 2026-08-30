@@ -7,7 +7,7 @@ import { User as SupabaseUser } from '@supabase/supabase-js';
 interface HeaderProps {
   view: 'landing' | 'app' | 'advertise' | 'login' | 'profile' | 'about' | 'legal' | 'terms';
   role: UserRole;
-  setView: (view: 'landing' | 'app' | 'login' | 'profile' | 'advertise' | 'about' | 'legal' | 'terms') => void;
+  setView: (view: 'landing' | 'app' | 'login' | 'profile' | 'advertise' | 'about' | 'legal' | 'terms' | 'contact') => void;
   setRole: (role: UserRole) => void;
   user: SupabaseUser | null;
 }
@@ -65,12 +65,8 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else if (id === 'contact') {
-      if (view !== 'landing') setView('landing');
+      setView('contact');
       setActiveSection('contact');
-      setTimeout(() => {
-        const el = document.getElementById('contact');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
     } else if (id === 'advertise') {
       if (view !== 'landing') setView('landing');
       setActiveSection('advertise');
