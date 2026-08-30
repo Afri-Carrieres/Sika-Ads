@@ -1,116 +1,72 @@
-import React, { useState } from 'react';
-import { FileText, ShieldCheck, Mail, MapPin, Building, Globe, Zap, Info, ChevronRight, Lock, Shield, Database, Eye, AlertCircle, CheckCircle2, ArrowLeft, MessageCircle, User, Icon } from 'lucide-react';
+import React from 'react';
+import { Mail, MessageCircle, Globe, Lock, Shield, AlertCircle } from 'lucide-react';
 import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
+import MarketingHeader, { MarketingView } from '../components/MarketingHeader';
+import PageHero from '../components/PageHero';
 
 interface LegalViewProps {
-  onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
+  onNavigate: (view: MarketingView) => void;
+  onStart?: () => void;
 }
 
-const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
-  const [expandedSection, setExpandedSection] = useState<string | null>('publisher');
-
+const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
+    <div className="bg-white min-h-screen pt-10 flex flex-col">
       <SEOHead
         title="Mentions Légales & Confidentialité | SikaAds Togo"
         description="Mentions légales, politique de confidentialité des données personnelles et conditions d'hébergement de SikaAds."
         canonicalPath="/legal"
       />
-      {/* Breadcrumb Navigation */}
-      <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-2 text-sm font-bold">
-            <button onClick={() => onNavigate('landing')} className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-              <ArrowLeft size={16} /> Accueil
-            </button>
-            <ChevronRight size={16} className="text-slate-300" />
-            <span className="text-slate-600">Mentions Légales</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-500 rounded-full blur-3xl" />
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-2xl">
-            <span className="inline-block px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[10px] font-black uppercase tracking-[0.2em] mb-6 backdrop-blur-sm">
-              ⚖️ Transparence & Droits
-            </span>
-            <h1 className="text-5xl md:text-6xl font-black text-white leading-tight mb-6">
-              Mentions Légales
-            </h1>
-            <p className="text-lg text-blue-100 font-medium leading-relaxed">
-                Toutes les informations légales, administratives et de conformité relatives à SikaAds Togo.
-            </p>
-            <p className="text-blue-200/70 text-sm font-bold mt-4">Dernière mise à jour : Avril 2026</p>
-          </div>
-        </div>
-      </section>
+      <MarketingHeader onNavigate={onNavigate} onStart={onStart} active="legal" />
 
-      {/* Table of Contents */}
-      <section className="py-12 bg-white border-b border-slate-100 sticky top-16 z-20 md:block hidden">
-        <div className="container mx-auto px-6">
-          <div className="flex overflow-x-auto gap-2 pb-2">
-            {[
-              { id: 'publisher', label: 'Éditeur', icon: User },
-              { id: 'hosting', label: 'Hébergement', icon: Globe },
-              { id: 'data', label: 'Données', icon: Database },
-              { id: 'cookies', label: 'Cookies', icon: AlertCircle },
-              { id: 'rights', label: 'Droits', icon: Shield },
-              { id: 'liability', label: 'Responsabilité', icon: Zap },
-              { id: 'changes', label: 'Modifications', icon: FileText },
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => setExpandedSection(item.id)}
-                className={`px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-all ${
-                  expandedSection === item.id
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {item.icon && <item.icon size={16} className="inline-block ml-1" />}
-                &nbsp;&nbsp;
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PageHero
+        badge="Transparence & Droits"
+        title="Mentions Légales"
+        subtitle="Toutes les informations légales, administratives et de conformité relatives à SikaAds Togo."
+        accent="indigo"
+      >
+        <p className="text-blue-200/70 text-sm font-bold mt-4">Dernière mise à jour : Avril 2026</p>
+      </PageHero>
 
-      {/* Content Section */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <div className="space-y-8">
-            {/* Publisher Information */}
-            <div
-              id="publisher"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-indigo-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'publisher' ? null : 'publisher')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                    <Building size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Éditeur de la Plateforme</h3>
+      {/* Main Content */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Sidebar Navigation (Sticky) */}
+            <div className="lg:col-span-1 border-r border-slate-100 pr-8 hidden lg:block">
+              <div className="sticky top-28 space-y-6">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
+                <ul className="space-y-4 text-sm font-bold text-slate-600">
+                  <li><a href="#publisher" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">1. Éditeur de la plateforme</a></li>
+                  <li><a href="#hosting" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">2. Hébergement technique</a></li>
+                  <li><a href="#data" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">3. Protection des données</a></li>
+                  <li><a href="#cookies" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">4. Cookies & Technologies</a></li>
+                  <li><a href="#rights" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">5. Propriété intellectuelle</a></li>
+                  <li><a href="#liability" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">6. Limitation de responsabilité</a></li>
+                  <li><a href="#changes" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">7. Modifications de CGU</a></li>
+                </ul>
+                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mt-10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
+                  <p className="text-xs text-slate-600 mb-4 font-medium italic leading-relaxed">Une clause vous semble obscure ? Notre équipe est là pour vous éclairer.</p>
+                  <button onClick={() => onNavigate('contact')} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg">Contacter le support →</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Sections */}
+            <div className="lg:col-span-2 space-y-16">
+              {/* 01 Publisher */}
+              <div id="publisher" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">01</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Éditeur de la Plateforme</h2>
                     <p className="text-sm text-slate-500 font-bold">Identité légale et responsabilités</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-indigo-600 transition-transform ${expandedSection === 'publisher' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'publisher' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                   <div className="grid md:grid-cols-2 gap-8">
                     <div>
                       <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">👤 Dénomination Sociale</h4>
@@ -123,7 +79,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                     </div>
                     <div>
                       <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">📍 Siège Social</h4>
-                      <p className="text-slate-900 font-bold bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                      <p className="text-slate-900 font-bold bg-white p-3 rounded-lg border border-indigo-200">
                         Lomé, Quartier Agoè, Boulevard Eyadema, Togo
                       </p>
                     </div>
@@ -136,41 +92,27 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                   <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 flex gap-3">
                     <AlertCircle size={20} className="text-blue-600 shrink-0 mt-0.5" />
                     <p className="text-sm text-blue-900 font-medium">
-                      <strong>Directeur de la Publication:</strong> Koffi Jean-Pierre<br/>
+                      <strong>Directeur de la Publication:</strong> Koffi Jean-Pierre<br />
                       <strong>Contact Administratif:</strong> admin@sikaads.tg
                     </p>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Hosting Information */}
-            <div
-              id="hosting"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-green-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'hosting' ? null : 'hosting')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600 font-bold">
-                    <Globe size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Hébergement Technique</h3>
+              {/* 02 Hosting */}
+              <div id="hosting" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">02</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Hébergement Technique</h2>
                     <p className="text-sm text-slate-500 font-bold">Infrastructure et serveurs</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-green-600 transition-transform ${expandedSection === 'hosting' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'hosting' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-lg border border-green-200">
+                    <div className="bg-white p-6 rounded-lg border border-green-200">
                       <div className="flex items-center gap-2 mb-4">
-                        <Zap size={20} className="text-green-600" />
+                        <Globe size={20} className="text-green-600" />
                         <h4 className="text-sm font-black text-green-900">Hébergeur Cloud Principal</h4>
                       </div>
                       <p className="text-lg font-bold text-slate-900 mb-2">Amazon Web Services (AWS)</p>
@@ -180,9 +122,9 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                         <li>✓ Certifications: ISO 27001, SOC 2</li>
                       </ul>
                     </div>
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border border-blue-200">
+                    <div className="bg-white p-6 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2 mb-4">
-                        <Database size={20} className="text-blue-600" />
+                        <Lock size={20} className="text-blue-600" />
                         <h4 className="text-sm font-black text-blue-900">Bases de Données</h4>
                       </div>
                       <p className="text-lg font-bold text-slate-900 mb-2">Google Cloud Firestore</p>
@@ -194,49 +136,35 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Data Protection */}
-            <div
-              id="data"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-purple-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'data' ? null : 'data')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
-                    <Lock size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Protection des Données</h3>
+              {/* 03 Data */}
+              <div id="data" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">03</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Protection des Données</h2>
                     <p className="text-sm text-slate-500 font-bold">Conformité légale et sécurité</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-purple-600 transition-transform ${expandedSection === 'data' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'data' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                   <div className="space-y-4">
                     <div className="flex gap-4">
-                      <CheckCircle2 size={20} className="text-purple-600 mt-1 shrink-0" />
+                      <Shield size={20} className="text-purple-600 mt-1 shrink-0" />
                       <div>
                         <h4 className="font-bold text-slate-900 mb-1">Loi Togolaise n°2019-014</h4>
                         <p className="text-sm text-slate-600">Protection des données à caractère personnel</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <CheckCircle2 size={20} className="text-purple-600 mt-1 shrink-0" />
+                      <Shield size={20} className="text-purple-600 mt-1 shrink-0" />
                       <div>
                         <h4 className="font-bold text-slate-900 mb-1">Chiffrement des Données</h4>
                         <p className="text-sm text-slate-600">Protocole SSL/TLS 1.3 pour toutes les connexions</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <CheckCircle2 size={20} className="text-purple-600 mt-1 shrink-0" />
+                      <Shield size={20} className="text-purple-600 mt-1 shrink-0" />
                       <div>
                         <h4 className="font-bold text-slate-900 mb-1">Audit de Sécurité</h4>
                         <p className="text-sm text-slate-600">Audits mensuels effectués par des tiers indépendants</p>
@@ -249,32 +177,18 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                     </p>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Cookies & Tracking */}
-            <div
-              id="cookies"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-orange-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'cookies' ? null : 'cookies')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
-                    <Eye size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Cookies & Technologies</h3>
+              {/* 04 Cookies */}
+              <div id="cookies" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">04</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Cookies & Technologies</h2>
                     <p className="text-sm text-slate-500 font-bold">Suivi et consentement</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-orange-600 transition-transform ${expandedSection === 'cookies' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'cookies' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
                       <h4 className="font-bold text-slate-900 mb-2">🔒 Cookies Essentiels</h4>
@@ -289,73 +203,43 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                     Vous pouvez désactiver les cookies non essentiels à tout moment via les paramètres de votre navigateur.
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Content Rights */}
-            <div
-              id="rights"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-pink-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'rights' ? null : 'rights')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
-                    <FileText size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Propriété Intellectuelle</h3>
+              {/* 05 Rights */}
+              <div id="rights" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">05</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Propriété Intellectuelle</h2>
                     <p className="text-sm text-slate-500 font-bold">Droits et restrictions</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-pink-600 transition-transform ${expandedSection === 'rights' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'rights' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
-                  <div className="space-y-4">
-                    <p className="text-slate-700 font-medium">
-                      Tous les contenus présents sur SikaAds Togo (texte, images, logos, vidéos) sont la propriété exclusive de SikaAds Togo ou de ses partenaires licenciés.
-                    </p>
-                    <div className="bg-pink-50 p-4 rounded-lg border border-pink-200 space-y-2">
-                      <h4 className="font-bold text-slate-900">Interdictions</h4>
-                      <ul className="text-sm text-slate-600 space-y-1">
-                        <li>❌ Reproduction sans autorisation explicite</li>
-                        <li>❌ Distribution ou revente de contenus</li>
-                        <li>❌ Utilisation commerciale sans licence</li>
-                        <li>❌ Reverse engineering ou décompilation</li>
-                      </ul>
-                    </div>
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-4">
+                  <p className="text-slate-700 font-medium">
+                    Tous les contenus présents sur SikaAds Togo (texte, images, logos, vidéos) sont la propriété exclusive de SikaAds Togo ou de ses partenaires licenciés.
+                  </p>
+                  <div className="bg-pink-50 p-4 rounded-lg border border-pink-200 space-y-2">
+                    <h4 className="font-bold text-slate-900">Interdictions</h4>
+                    <ul className="text-sm text-slate-600 space-y-1">
+                      <li>❌ Reproduction sans autorisation explicite</li>
+                      <li>❌ Distribution ou revente de contenus</li>
+                      <li>❌ Utilisation commerciale sans licence</li>
+                      <li>❌ Reverse engineering ou décompilation</li>
+                    </ul>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Liability */}
-            <div
-              id="liability"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-red-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'liability' ? null : 'liability')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center text-red-600 font-bold">
-                    <Shield size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Limitation de Responsabilité</h3>
+              {/* 06 Liability */}
+              <div id="liability" className="space-y-6 scroll-mt-28">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">06</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Limitation de Responsabilité</h2>
                     <p className="text-sm text-slate-500 font-bold">Clauses d'exemption</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-red-600 transition-transform ${expandedSection === 'liability' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'liability' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                   <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                     <p className="text-sm text-red-900 font-medium leading-relaxed">
                       SikaAds Togo ne peut être tenue responsable de:
@@ -371,43 +255,29 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate }) => {
                     <strong>Limitation:</strong> Notre responsabilité est limitée au montant total des frais payés par l'utilisateur au cours des 12 derniers mois.
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Modifications */}
-            <div
-              id="changes"
-              className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden hover:border-cyan-400 transition-all duration-300 shadow-sm hover:shadow-lg"
-            >
-              <button
-                onClick={() => setExpandedSection(expandedSection === 'changes' ? null : 'changes')}
-                className="w-full p-6 md:p-8 flex items-center justify-between hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 font-bold">
-                    <AlertCircle size={24} />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-slate-900">Modifications de CGU</h3>
+              {/* 07 Changes */}
+              <div id="changes" className="space-y-6 scroll-mt-28 pb-10">
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">07</span>
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Modifications de CGU</h2>
                     <p className="text-sm text-slate-500 font-bold">Mise à jour et notification</p>
                   </div>
                 </div>
-                <ChevronRight size={24} className={`text-cyan-600 transition-transform ${expandedSection === 'changes' ? 'rotate-90' : ''}`} />
-              </button>
-              
-              {expandedSection === 'changes' && (
-                <div className="px-6 md:px-8 pb-6 md:pb-8 border-t border-slate-100 space-y-6">
+                <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                   <p className="text-slate-700 font-medium">
                     SikaAds Togo se réserve le droit de modifier ces mentions légales à tout moment. Les modifications seront notifiées aux utilisateurs via email ou sur le site.
                   </p>
                   <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-200">
                     <p className="text-sm text-cyan-900 font-medium">
-                      Dernière mise à jour: <strong>Avril 2026</strong><br/>
+                      Dernière mise à jour: <strong>Avril 2026</strong><br />
                       En continuant à utiliser le site, vous acceptez les conditions en vigueur.
                     </p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

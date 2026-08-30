@@ -549,7 +549,10 @@ const App: React.FC = () => {
             onStart={() => user ? setView('app') : setView('register')}
           />
         ) : view === 'legal' ? (
-          <LegalView onNavigate={(v) => setView(v as any)} />
+          <LegalView
+            onNavigate={(v) => setView(v as any)}
+            onStart={() => user ? setView('app') : setView('register')}
+          />
         ) : view === 'terms' ? (
           <TermsView
             onNavigate={(v) => setView(v as any)}
