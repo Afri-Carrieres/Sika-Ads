@@ -3,6 +3,14 @@ import { supabase } from '../supabase';
 import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, ArrowLeft, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { User, UserRole } from '../types';
+
+const TILE = 'bg-white rounded-3xl border border-gray-100 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)]';
+const TILE_HOVER = 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_16px_40px_rgba(15,23,42,0.08)]';
+const FIELD = 'w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white outline-none font-semibold text-gray-900 transition-all';
+const LABEL = 'text-[11px] font-semibold text-gray-500 ml-1 mb-2 block';
+const SECTION_ICON = 'p-2.5 rounded-xl';
+const PRIMARY_BTN = 'px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 
 const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ userId }) => {
   const { permission, isSubscribed, isLoading, requestPermission, unsubscribe } = usePushNotifications({ userId });
@@ -100,6 +108,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
   // Danger Zone States
@@ -167,7 +176,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
       showSuccess("Photo de profil mise à jour !");
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      alert("Erreur lors du téléchargement de l'image.");
+      showError("Erreur lors du téléchargement de l'image.");
     } finally {
       setIsUploading(false);
     }
@@ -228,7 +237,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
       showSuccess("Informations enregistrées avec succès !");
     } catch (error) {
       console.error("Error saving info:", error);
-      alert("Une erreur est survenue lors de la sauvegarde.");
+      showError("Une erreur est survenue lors de la sauvegarde.");
     } finally {
       setIsSaving(false);
     }
@@ -293,6 +302,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
+  const showError = (msg: string) => {
+    setErrorMessage(msg);
+    setTimeout(() => setErrorMessage(''), 4000);
+  };
+
   // --- ACCOUNT DELETION ---
 
   const handleDeleteAccount = async () => {
@@ -320,8 +334,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-indigo-600" size={32} />
+      <div className="min-h-screen py-12 px-4 sm:px-6 animate-pulse">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="h-9 w-56 bg-gray-200 rounded-xl" />
+          <div className="h-44 bg-white rounded-3xl border border-gray-100" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="h-80 lg:col-span-2 bg-white rounded-3xl border border-gray-100" />
+            <div className="space-y-6">
+              <div className="h-72 bg-white rounded-3xl border border-gray-100" />
+              <div className="h-36 bg-white rounded-3xl border border-gray-100" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -346,9 +370,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
 
         {/* Success Toast */}
         {successMessage && (
-          <div className="fixed top-24 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-right duration-300">
+          <div className="fixed top-24 right-4 z-50 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-right duration-300">
             <CheckCircle2 size={20} />
             <span className="font-bold text-sm">{successMessage}</span>
+          </div>
+        )}
+        {errorMessage && (
+          <div className="fixed top-24 right-4 z-50 bg-red-600 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-right duration-300">
+            <AlertCircle size={20} />
+            <span className="font-bold text-sm">{errorMessage}</span>
           </div>
         )}
 
