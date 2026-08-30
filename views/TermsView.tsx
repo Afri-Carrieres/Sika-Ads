@@ -2,6 +2,8 @@ import React from 'react';
 import { ShieldAlert, ShieldCheck, X, AlertTriangle, Smartphone, Ban, CheckCircle, Lock, Info, ExternalLink } from 'lucide-react';
 import Footer from '../components/Footer';
 import SEOHead from '../components/SEOHead';
+import MarketingHeader from '../components/MarketingHeader';
+import PageHero from '../components/PageHero';
 
 interface TermsViewProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact') => void;
@@ -17,30 +19,21 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
         canonicalPath="/terms"
         ogImage="https://www.sika-ads.com/anti_fraud.png"
       />
-       {/* Hero Section */}
-       <section className="relative py-28 overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 opacity-30">
-          <img src="/anti_fraud.png" alt="Anti-Fraud" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-950 via-indigo-950/70 to-transparent" />
-        </div>
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <span className="inline-block px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 animate-pulse">
-              Confiance & Sécurité
+      <MarketingHeader onNavigate={onNavigate} onStart={onStart} active="terms" />
+
+      <PageHero
+        badge="Confiance & Sécurité"
+        title={
+          <>
+            CGU & Protection <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-indigo-400">
+              Anti-Fraude.
             </span>
-            <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-8">
-              CGU & Protection <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-indigo-400">
-                Anti-Fraude.
-              </span>
-            </h1>
-            <p className="text-lg text-slate-400 leading-relaxed max-w-2xl font-medium">
-              Nous construisons un écosystème sain et honnête. En rejoignant SikaAds, vous vous engagez à respecter des règles strictes pour garantir la valeur apportée aux annonceurs.
-            </p>
-          </div>
-        </div>
-      </section>
+          </>
+        }
+        subtitle="Nous construisons un écosystème sain et honnête. En rejoignant SikaAds, vous vous engagez à respecter des règles strictes pour garantir la valeur apportée aux annonceurs."
+        accent="red"
+      />
 
       {/* Main Content */}
       <section className="py-20 bg-white">
@@ -61,7 +54,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                       <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mt-10">
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
                           <p className="text-xs text-slate-600 mb-4 font-medium italic leading-relaxed">Une clause vous semble obscure ? Nos conseillers sont là pour vous éclairer.</p>
-                          <button className="text-[10px] font-black uppercase text-indigo-600 flex items-center gap-2">Contact Support <ExternalLink size={12} /></button>
+                          <button onClick={() => onNavigate('contact')} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg">Contact Support <ExternalLink size={12} /></button>
                       </div>
                   </div>
               </div>
