@@ -38,6 +38,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
         from: fromStub,
         channel: channelStub,
         removeChannel: (_c: any) => {},
+        functions: {
+            invoke: async () => ({ data: null, error: new Error('Supabase not configured') }),
+        },
         storage: {
             from: () => ({ getPublicUrl: () => ({ publicURL: '' }) }),
         },
