@@ -90,6 +90,9 @@ const App: React.FC = () => {
     const { view: newView, tab: newTab } = parsePathname(location.pathname);
     setViewInternal(newView);
     setCurrentTabInternal(newTab);
+    // Toute navigation de page amène l'utilisateur en haut de la page
+    // (les scrolls vers sections locales sont déclenchés après, via setTimeout).
+    window.scrollTo({ top: 0 });
   }, [location.pathname]);
 
   // Auth state change handler
@@ -163,6 +166,8 @@ const App: React.FC = () => {
       } else {
         navigate(`/${v}`);
       }
+      // Aussi si la route ne change pas (ex: clic sur « Mentions » depuis /legal).
+      window.scrollTo({ top: 0 });
     };
 
     // Wrapper for setTab to update app path
