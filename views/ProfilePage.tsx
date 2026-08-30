@@ -12,6 +12,7 @@ const LABEL = 'text-[11px] font-semibold text-gray-500 ml-1 mb-2 block';
 const SECTION_ICON = 'p-2.5 rounded-xl';
 const PRIMARY_BTN = 'px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 const EMERALD_BTN = 'px-6 py-3.5 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
+const DISABLED_FIELD = 'w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-semibold text-gray-500 cursor-not-allowed';
 
 const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ userId }) => {
   const { permission, isSubscribed, isLoading, requestPermission, unsubscribe } = usePushNotifications({ userId });
@@ -437,64 +438,64 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            <form onSubmit={handleSaveInfo} className={`${TILE} ${TILE_HOVER} lg:col-span-2 p-8 space-y-6`}>
-              <div className="flex items-center gap-3 mb-2">
-                <div className={`${SECTION_ICON} bg-indigo-50 text-indigo-600`}>
-                  <UserIcon size={20} />
+          <form onSubmit={handleSaveInfo} className={`${TILE} ${TILE_HOVER} lg:col-span-2 p-8 space-y-6`}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className={`${SECTION_ICON} bg-indigo-50 text-indigo-600`}>
+                <UserIcon size={20} />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Informations personnelles</h3>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block">
+                <span className={LABEL}>Nom complet</span>
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className={FIELD}
+                    placeholder="Votre nom"
+                  />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">Informations personnelles</h3>
-              </div>
+              </label>
 
-              <div className="space-y-4">
-                <label className="block">
-                  <span className={LABEL}>Nom complet</span>
-                  <div className="relative">
-                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type="text"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      className={FIELD}
-                      placeholder="Votre nom"
-                    />
-                  </div>
-                </label>
+              <label className="block">
+                <span className={LABEL}>Adresse email (non modifiable)</span>
+                <div className="relative opacity-60">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className={DISABLED_FIELD}
+                  />
+                </div>
+              </label>
 
-                <label className="block">
-                  <span className={LABEL}>Adresse email (non modifiable)</span>
-                  <div className="relative opacity-60">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type="email"
-                      value={user?.email || ''}
-                      disabled
-                      className="w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-semibold text-gray-500 cursor-not-allowed"
-                    />
-                  </div>
-                </label>
+              <label className="block">
+                <span className={LABEL}>Numéro de téléphone (Mobile Money)</span>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    value={momoNumber}
+                    onChange={(e) => setMomoNumber(e.target.value)}
+                    className={FIELD}
+                    placeholder="+228 90 00 00 00"
+                  />
+                </div>
+              </label>
+            </div>
 
-                <label className="block">
-                  <span className={LABEL}>Numéro de téléphone (Mobile Money)</span>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type="text"
-                      value={momoNumber}
-                      onChange={(e) => setMomoNumber(e.target.value)}
-                      className={FIELD}
-                      placeholder="+228 90 00 00 00"
-                    />
-                  </div>
-                </label>
-              </div>
-
-              <div className="pt-2 flex justify-end">
-                <button type="submit" disabled={isSaving} className={PRIMARY_BTN}>
-                  {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                  Enregistrer
-                </button>
-              </div>
-            </form>
+            <div className="pt-2 flex justify-end">
+              <button type="submit" disabled={isSaving} className={PRIMARY_BTN}>
+                {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                Enregistrer
+              </button>
+            </div>
+          </form>
 
           <div className="space-y-6">
             <form onSubmit={handleChangePassword} className={`${TILE} ${TILE_HOVER} p-8 space-y-4`}>
@@ -626,7 +627,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBack }) => {
             <button
               onClick={handleDeleteAccount}
               disabled={deleteConfirmation !== 'SUPPRIMER' || isDeleting}
-              className="w-full py-4 bg-red-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
             >
               {isDeleting ? <Loader2 className="animate-spin" size={20} /> : "Confirmer la suppression"}
             </button>
