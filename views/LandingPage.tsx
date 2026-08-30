@@ -66,23 +66,23 @@ function useInView(threshold = 0.2) {
 
 /* ─── data ─── */
 const benefits = [
-  { icon: Share2, title: "Partagez du contenu", desc: "Publiez les visuels et contenus des marques sur vos réseaux sociaux (WhatsApp, Facebook, Instagram) selon vos habitudes." },
-  { icon: DollarSign, title: "Gagnez de l'argent", desc: "Participez à des campagnes rémunérées et valorisez vos réseaux sociaux selon les conditions prévues." },
-  { icon: Users, title: "Développez votre audience", desc: "Construisez une communauté engagée qui vous suit, interagit avec vos publications et vous fait confiance." },
-  { icon: Zap, title: "Choisissez vos campagnes", desc: "Découvrez librement les opportunités qui correspondent à vos centres d'intérêt et à votre profil." },
+  { icon: Share2, title: "Partagez en story", desc: "Partagez les contenus des campagnes sur votre statut WhatsApp ou vos stories Instagram et Facebook." },
+  { icon: Smartphone, title: "Envoyez vos preuves", desc: "Envoyez une capture d'écran montrant le nombre de vues depuis votre dashboard." },
+  { icon: ShieldCheck, title: "Faites valider vos vues", desc: "Les vues sont vérifiées avant la validation de votre participation." },
+  { icon: DollarSign, title: "Recevez vos gains", desc: "Lorsque vos vues sont authentiques et validées, recevez votre gain selon les conditions de la campagne." },
 ];
 
 const steps = [
-  { num: "01", icon: Smartphone, title: "Créez votre compte", desc: "Inscrivez-vous sur Sika Ads en quelques instants et renseignez votre profil." },
-  { num: "02", icon: Eye, title: "Découvrez les campagnes", desc: "Trouvez les campagnes de marques qui correspondent à votre profil et vos réseaux." },
-  { num: "03", icon: Share2, title: "Partagez les contenus", desc: "Publiez les contenus de campagne sur vos réseaux sociaux selon les conditions prévues." },
-  { num: "04", icon: Wallet, title: "Recevez vos gains", desc: "Suivez vos campagnes et recevez votre rémunération selon les modalités prévues." },
+  { num: "01", icon: Smartphone, title: "Créez votre compte", desc: "Inscrivez-vous sur Sika Ads et renseignez votre profil." },
+  { num: "02", icon: Eye, title: "Choisissez une campagne", desc: "Découvrez les campagnes disponibles et choisissez celles qui correspondent à votre profil." },
+  { num: "03", icon: Share2, title: "Partagez en story", desc: "Partagez le contenu sur votre statut WhatsApp ou votre story Instagram et Facebook." },
+  { num: "04", icon: CheckCircle, title: "Envoyez vos vues", desc: "Capturez votre écran avec le nombre de vues visible et envoyez la preuve depuis votre dashboard pour validation." },
 ];
 
 const testimonials = [
-  { name: "Kofi Mensah", role: "Commerçant, Lomé", avatar: "KM", rating: 5, text: "En 3 semaines, j'ai gagné 45 000 FCFA juste en publiant des statuts. C'est incroyable et tellement simple !" },
-  { name: "Ama Sodzi", role: "Étudiante, Kpalimé", avatar: "AS", rating: 5, text: "Je post déjà des statuts tous les jours. SikaAds m'a permis de transformer ça en revenu réel. Merci !" },
-  { name: "Yao Agbeko", role: "Artisan, Tsévié", avatar: "YA", rating: 5, text: "Le retrait sur Moov Money est immédiat. J'ai reçu 28 000 FCFA ce mois. Je recommande à tout le monde." },
+  { name: "Kofi Mensah", role: "Commerçant, Lomé", avatar: "KM", rating: 5, text: "En 3 semaines, j'ai gagné 45 000 FCFA en partageant des campagnes sur mon statut WhatsApp. Mes vues ont été validées rapidement !" },
+  { name: "Ama Sodzi", role: "Étudiante, Kpalimé", avatar: "AS", rating: 5, text: "Je partage déjà des stories et statuts tous les jours. SikaAds m'a permis de valoriser mes vues réelles en revenu complémentaire." },
+  { name: "Yao Agbeko", role: "Artisan, Tsévié", avatar: "YA", rating: 5, text: "Dès que mes vues sont vérifiées et validées, je reçois mon gain. Le retrait sur Moov Money est immédiat." },
 ];
 
 const advertiserFeatures = [
@@ -144,40 +144,40 @@ const campaigns = [
 
 const faqs = [
   {
-    q: "Comment gagner de l'argent avec ses réseaux sociaux ?",
-    a: "Sika Ads vous permet de participer à des campagnes organisées par des marques partenaires. En publiant leurs visuels ou messages sur vos réseaux sociaux (WhatsApp, Facebook, Instagram), vous valorisez votre audience et percevez une rémunération selon les conditions de chaque campagne."
-  },
-  {
-    q: "Comment gagner de l'argent avec WhatsApp ?",
-    a: "Sélectionnez une campagne disponible sur Sika Ads, téléchargez l'affiche ou le texte prévu, puis publiez-le sur votre statut WhatsApp. Vous soumettez ensuite votre preuve de diffusion pour valider vos gains."
-  },
-  {
-    q: "Comment gagner de l'argent avec Facebook ?",
-    a: "Partagez les visuels et liens promotionnels des campagnes sur votre profil Facebook ou en story. Les modalités et conditions de validation peuvent varier selon la campagne."
-  },
-  {
-    q: "Comment gagner de l'argent avec Instagram ?",
-    a: "Publiez les visuels de campagne en story ou post Instagram en mentionnant les consignes du partenaire. Votre communauté découvre la marque et votre participation est validée."
+    q: "Sur quels réseaux sociaux puis-je partager une campagne ?",
+    a: "Les campagnes Sika Ads sont partagées UNIQUEMENT sur les statuts WhatsApp ainsi que dans les stories Instagram et Facebook, selon les conditions de chaque campagne. Il ne s'agit pas de publications dans le feed ou sur votre profil."
   },
   {
     q: "Comment fonctionne Sika Ads ?",
-    a: "Sika Ads connecte directement les marques et les créateurs de contenu. Les entreprises soumettent des campagnes avec un budget précis, et les utilisateurs inscrits diffusent ces annonces auprès de leurs proches et contacts."
+    a: "Vous choisissez une campagne, partagez son contenu sur votre statut WhatsApp ou vos stories Instagram/Facebook, puis envoyez une capture d'écran montrant vos vues depuis votre dashboard. Sika Ads vérifie vos vues, et si elles sont authentiques et validées, votre gain est crédité."
   },
   {
-    q: "Comment devenir créateur sur Sika Ads ?",
-    a: "Il vous suffit de créer un compte gratuit en quelques clics avec votre numéro de téléphone, de compléter votre profil et d'accéder au catalogue des campagnes disponibles."
+    q: "Comment mes vues sont-elles vérifiées ?",
+    a: "Après avoir partagé le contenu, vous devez envoyer une capture d'écran montrant le nombre de vues visible depuis votre dashboard. Les vues sont ensuite vérifiées et authentifiées avant validation."
+  },
+  {
+    q: "Quand est-ce que je reçois mon gain ?",
+    a: "Le gain est accordé lorsque les vues sont authentiques et validées, conformément aux conditions de la campagne. Le gain n'est pas automatique : il nécessite l'envoi et la validation de votre preuve."
+  },
+  {
+    q: "Comment gagner de l'argent avec son statut WhatsApp ?",
+    a: "Sélectionnez une campagne disponible sur Sika Ads, téléchargez le visuel prévu, puis partagez-le sur votre statut WhatsApp. Ensuite, envoyez une capture d'écran avec vos vues visibles depuis votre dashboard pour vérification et validation."
+  },
+  {
+    q: "Comment gagner de l'argent avec les stories Instagram & Facebook ?",
+    a: "Partagez les visuels de campagne dans votre story Instagram ou votre story Facebook selon les consignes du partenaire. Prenez une capture d'écran de vos vues et soumettez la preuve sur votre dashboard pour validation."
   },
   {
     q: "Faut-il avoir beaucoup d'abonnés pour participer à une campagne ?",
-    a: "Non, pas nécessairement. Sika Ads s'appuie sur le nano-marketing : l'authenticité et la proximité avec vos contacts ont une grande valeur pour les marques. Tout utilisateur actif peut participer."
+    a: "Non, pas nécessairement. Sika Ads s'appuie sur le nano-marketing : l'authenticité et la proximité avec vos contacts et spectateurs de story ont une réelle valeur. Tout utilisateur actif peut participer."
   },
   {
     q: "Comment une marque peut-elle lancer une campagne ?",
-    a: "Rendez-vous dans la section Entreprises, créez votre campagne en définissant vos objectifs, votre budget et votre visuel. Nos ambassadeurs et créateurs la diffuseront ensuite sur leurs réseaux."
+    a: "Rendez-vous dans la section Entreprises, créez votre campagne en définissant vos objectifs, votre budget et votre visuel. Nos créateurs et ambassadeurs la diffuseront ensuite sur leurs statuts WhatsApp et stories."
   },
   {
     q: "Comment recevoir ses gains ?",
-    a: "Une fois votre diffusion vérifiée et validée, votre solde est automatiquement crédité. Vous pouvez demander un retrait vers votre compte Mobile Money (Moov Money, T-Money)."
+    a: "Une fois votre capture d'écran vérifiée et vos vues authentiques validées, votre solde est automatiquement crédité. Vous pouvez demander un retrait vers votre compte Mobile Money (Moov Money, T-Money)."
   },
 ];
 
@@ -404,8 +404,8 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEOHead
-        title="Gagnez de l'argent avec vos réseaux sociaux | Sika Ads"
-        description="Sika Ads connecte les marques et les créateurs. Gagnez de l'argent avec WhatsApp, Facebook et Instagram ou faites connaître vos produits auprès de nouvelles audiences."
+        title="Gagnez de l'argent avec votre statut WhatsApp & vos stories | Sika Ads"
+        description="Partagez les contenus des marques sur votre statut WhatsApp ou vos stories Instagram et Facebook, envoyez la preuve de vos vues depuis votre dashboard et gagnez de l'argent après validation."
         canonicalPath="/"
         ogImage="https://www.sika-ads.com/Web-Icon.png"
       />
@@ -512,18 +512,18 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               {/* Badges plateformes */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6">
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-emerald-300 border border-emerald-400/30">
-                  WhatsApp
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-blue-300 border border-blue-400/30">
-                  Facebook
+                  Statut WhatsApp
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-pink-300 border border-pink-400/30">
-                  Instagram
+                  Story Instagram
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-blue-300 border border-blue-400/30">
+                  Story Facebook
                 </span>
               </div>
 
               <p className="text-lg text-blue-100 leading-relaxed mb-8 max-w-lg mx-auto md:mx-0">
-                Partagez des contenus de marques sur WhatsApp, Facebook et Instagram, développez votre audience et gagnez de l'argent grâce à Sika Ads.
+                Partagez les contenus des marques sur votre statut WhatsApp ou vos stories Instagram et Facebook, envoyez la preuve de vos vues depuis votre dashboard et gagnez de l'argent après validation.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -592,7 +592,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               <span style={{ color: "#ea580c" }}>source de revenus</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Vous utilisez WhatsApp, Facebook ou Instagram au quotidien ? Sika Ads vous permet de transformer votre présence sur les réseaux sociaux en opportunités.
+              Vous partagez déjà des statuts WhatsApp ou des stories Instagram et Facebook au quotidien ? Sika Ads vous permet de valoriser vos vues et de monétiser votre audience en toute simplicité.
             </p>
           </div>
 
@@ -632,7 +632,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               <span style={{ color: "#ea580c" }}>Sika Ads ?</span>
             </h2>
             <p className="text-blue-200 text-lg max-w-xl mx-auto">
-              Inscrivez-vous, découvrez des campagnes, partagez les contenus et recevez vos gains.
+              Inscrivez-vous, choisissez une campagne, partagez en story ou statut, envoyez vos preuves de vues et recevez votre gain après validation.
             </p>
           </div>
 
@@ -660,8 +660,62 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             ))}
           </div>
 
+          {/* ── Visual Process Flow ── */}
+          <div className="mt-14 max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+            <div className="text-center mb-6">
+              <span className="text-xs uppercase tracking-widest text-[#ea580c] font-bold">
+                Le parcours créateur en résumé
+              </span>
+              <h3 className="text-lg sm:text-xl font-bold text-white mt-1">
+                Un processus transparent, de la story au gain validé
+              </h3>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 text-center">
+              <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center mb-2">
+                  <Share2 className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-white">1. Partage en story</div>
+                <div className="text-[11px] text-blue-200 mt-1">WhatsApp · Insta · FB</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-300 flex items-center justify-center mb-2">
+                  <Smartphone className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-white">2. Capture d'écran</div>
+                <div className="text-[11px] text-blue-200 mt-1">Vues visibles</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-300 flex items-center justify-center mb-2">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-white">3. Envoi Dashboard</div>
+                <div className="text-[11px] text-blue-200 mt-1">Soumission preuve</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center mb-2">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-white">4. Vérification</div>
+                <div className="text-[11px] text-blue-200 mt-1">Vues authentifiées</div>
+              </div>
+              <div className="col-span-2 md:col-span-1 bg-[#ea580c]/15 rounded-xl p-3 border border-[#ea580c]/30 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#ea580c]/30 text-white flex items-center justify-center mb-2">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-white">5. Validation & Gain</div>
+                <div className="text-[11px] text-orange-200 mt-1">Paiement Mobile Money</div>
+              </div>
+            </div>
+
+            <p className="text-center text-xs text-blue-200 mt-6 italic">
+              * Après vérification, les vues authentiques et validées donnent droit au gain prévu selon les conditions de chaque campagne.
+            </p>
+          </div>
+
           {/* image row */}
-          <div className="mt-20 grid md:grid-cols-2 gap-6">
+          <div className="mt-14 grid md:grid-cols-2 gap-6">
             <div className="rounded-2xl overflow-hidden h-56 relative">
               <img
                 src="https://images.unsplash.com/photo-1768830444423-5e5c640c4c98?w=700&h=400&fit=crop&auto=format"
@@ -670,8 +724,8 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(15,27,53,0.7) 0%, transparent 60%)" }} />
               <div className="absolute bottom-5 left-5">
-                <div className="text-white font-bold text-lg">Partagez avec vos communautés</div>
-                <div className="text-blue-200 text-sm">Monétisez votre présence en ligne</div>
+                <div className="text-white font-bold text-lg">Partagez en story & statut</div>
+                <div className="text-blue-200 text-sm">Monétisez vos vues réelles</div>
               </div>
             </div>
             <div className="rounded-2xl overflow-hidden h-56 relative">
@@ -682,7 +736,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               />
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(15,27,53,0.7) 0%, transparent 60%)" }} />
               <div className="absolute bottom-5 left-5">
-                <div className="text-white font-bold text-lg">Recevez vos gains</div>
+                <div className="text-white font-bold text-lg">Recevez vos gains validés</div>
                 <div className="text-blue-200 text-sm">Moov & T-Money · Retrait rapide</div>
               </div>
             </div>
@@ -700,10 +754,10 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-4">
               Comment gagner de l'argent avec{" "}
-              <span style={{ color: "#ea580c" }}>ses réseaux sociaux ?</span>
+              <span style={{ color: "#ea580c" }}>ses statuts et stories ?</span>
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg leading-relaxed">
-              WhatsApp, Facebook et Instagram ne servent pas uniquement à échanger des messages. Découvrez comment valoriser votre présence quotidienne.
+              WhatsApp, Facebook et Instagram ne servent pas uniquement à échanger des messages. Découvrez comment valoriser vos statuts et vos stories.
             </p>
           </div>
 
@@ -715,12 +769,12 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-3">Une source d'opportunités</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Pour les créateurs et les utilisateurs actifs qui disposent d'un cercle de contacts ou d'une communauté, chaque publication partagée peut devenir un levier de valorisation direct.
+                  Pour les créateurs et utilisateurs actifs qui disposent d'un cercle de contacts ou d'abonnés, chaque statut WhatsApp ou story Instagram/Facebook peut devenir un levier de valorisation direct après validation de vos vues.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                WhatsApp · Facebook · Instagram
+                Statuts WhatsApp · Stories Facebook · Stories Instagram
               </div>
             </div>
 
@@ -729,14 +783,14 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(30,58,138,0.08)" }}>
                   <TrendingUp className="w-6 h-6" style={{ color: "#1e3a8a" }} />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-3">Partage de campagnes</h3>
+                <h3 className="text-xl font-bold text-foreground mb-3">Partage de campagnes en story</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Sika Ads vous permet de participer à des campagnes de marques et de diffuser leurs contenus. Vous apportez une visibilité authentique aux entreprises tout en étant rémunéré.
+                  Sika Ads vous permet de choisir des campagnes de marques et de diffuser leurs contenus en story ou statut. Vous apportez une visibilité authentique aux entreprises et gagnez de l'argent après vérification de vos vues.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                Rémunération transparente
+                Validation rigoureuse des vues
               </div>
             </div>
 
@@ -747,7 +801,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-3">La force de la proximité</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Pas besoin d'être une célébrité. La confiance et la proximité naturelle que vous entretenez avec votre communauté représentent une réelle valeur pour les marques.
+                  Pas besoin d'être une célébrité. La confiance et l'attention naturelle de vos contacts sur vos statuts WhatsApp et stories représentent une réelle valeur pour les marques.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs font-semibold text-[#1e3a8a]">
@@ -779,7 +833,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             <span style={{ color: "#a78bfa" }}>Nano-Marketing</span>
           </h2>
           <p className="text-violet-200 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-            Faites connaître votre marque auprès de nouvelles audiences grâce aux créateurs et aux communautés présentes sur les réseaux sociaux.
+            Faites connaître votre marque auprès de nouvelles audiences grâce aux statuts WhatsApp et aux stories Instagram et Facebook partagés par des créateurs authentiques.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-5 mb-10">
@@ -804,7 +858,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
               Pourquoi travailler avec des nano-influenceurs ?
             </h3>
             <p className="text-violet-200 text-sm leading-relaxed">
-              Une grande audience ne signifie pas toujours une plus grande proximité. Les nano-influenceurs et petits créateurs peuvent avoir une relation étroite avec leur communauté et permettre aux marques de communiquer de manière plus directe et authentique.
+              Une grande audience ne signifie pas toujours une plus grande proximité. Les nano-influenceurs et petits créateurs entretiennent une relation étroite avec leur communauté sur WhatsApp, Instagram et Facebook, permettant aux marques de communiquer de manière directe et authentique.
             </p>
           </div>
 
@@ -894,7 +948,7 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
             Sika Ads est né au Togo avec l'ambition de faciliter les collaborations entre les marques et les créateurs de contenu en Afrique.
           </p>
           <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-            Notre objectif est simple : permettre aux créateurs de transformer leur présence sur les réseaux sociaux en opportunités et aider les entreprises à faire connaître leurs produits et services auprès de nouvelles communautés.
+            Notre objectif est simple : permettre aux créateurs de transformer leurs statuts WhatsApp et stories Instagram/Facebook en opportunités réelles et aider les entreprises à faire connaître leurs produits auprès de nouvelles communautés.
           </p>
           <div className="flex justify-center">
             <button
@@ -942,10 +996,10 @@ export default function LandingPage({ user, onStart, onAdvertise, setView }: Lan
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-6 leading-tight">
             Commencez à gagner avec<br />
-            <span style={{ color: "#ea580c" }}>vos réseaux sociaux</span>
+            <span style={{ color: "#ea580c" }}>vos statuts et stories</span>
           </h2>
           <p className="text-blue-200 text-lg mb-10 max-w-xl mx-auto">
-            Rejoignez Sika Ads, découvrez les opportunités disponibles et transformez votre présence sur les réseaux sociaux en nouvelles possibilités.
+            Rejoignez Sika Ads, partagez des campagnes sur votre statut WhatsApp ou vos stories Instagram et Facebook, faites valider vos vues et recevez vos gains.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

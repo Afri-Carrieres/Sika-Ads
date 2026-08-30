@@ -22,7 +22,7 @@ export default defineConfig({
       manifest: {
         name: 'SikaAds Togo',
         short_name: 'SikaAds',
-        description: 'Gagnez de l\'argent avec vos Statuts WhatsApp & Facebook',
+        description: 'Gagnez de l\'argent avec vos Statuts WhatsApp & Stories Instagram/Facebook',
         theme_color: '#22c55e',
         background_color: '#ffffff',
         display: 'standalone',

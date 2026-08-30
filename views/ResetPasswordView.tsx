@@ -162,19 +162,24 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
       <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
         <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
           <div>
-            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[320px] object-contain" />
+            <div className="flex justify-start place-items-start">
+              <button onClick={onBackToLogin} className="inline-flex items-center gap-3" aria-label="Retour à la connexion">
+                <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-44 h-auto object-contain" />
+              </button>
+            </div>
             <div className="mt-8 max-w-xl">
-              <h1 className="text-4xl font-black leading-[1.02] tracking-tight xl:text-5xl">
-                Réinitialisez votre accès <span className="text-[#128785]">en toute sécurité.</span>
+              <h1 className="text-4xl font-black leading-[1.08] tracking-tight xl:text-[2.6rem] font-display">
+                Réinitialisez votre accès<br />
+                <span className="text-[#128785]">en toute sécurité.</span>
               </h1>
-              <p className="mt-6 max-w-md text-base font-medium leading-8 text-slate-300">
+              <p className="mt-4 max-w-md text-base font-medium leading-relaxed text-slate-300">
                 Choisissez un nouveau mot de passe pour reprendre l’accès à vos campagnes, preuves et gains SikaAds.
               </p>
             </div>
           </div>
 
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-            <span>© 2026 SikaAds Togo</span>
+            <span>© 2026 SikaAds</span>
           </div>
         </aside>
 
@@ -184,7 +189,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
               <ArrowLeft size={17} />
               Retour
             </button>
-            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain lg:hidden" />
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-36 h-auto object-contain lg:hidden" />
           </div>
 
           <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">

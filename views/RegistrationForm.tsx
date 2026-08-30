@@ -210,13 +210,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
       <div className="hidden flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-6 text-white lg:flex xl:px-14">
 
         {/* Logo */}
-        {/* <div className="relative flex items-center"> */}
-          <div className="flex justify-start place-items-start">
-             <button onClick={onCancel} className="inline-flex items-center" aria-label="Retour à l'accueil">
-              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[300px] object-contain" />
-            </button>
-           </div>
-        {/* </div> */}
+        <div className="flex justify-start place-items-start">
+          <button onClick={onCancel} className="inline-flex items-center" aria-label="Retour à l'accueil">
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-44 h-auto object-contain" />
+          </button>
+        </div>
 
         {/* Headline + steps */}
         <div className="relative min-w-x">
@@ -263,8 +261,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
           </div>
         </div>
 
-        <div className=" mt-2 relative text-white/50 text-xs font-bold">
-          <span>© 2026 SikaAds Togo</span>
+        <div className="mt-2 relative text-white/50 text-xs font-bold">
+          <span>© 2026 SikaAds</span>
           {/* <span className="uppercase tracking-widest">Togo</span> */}
         </div>
       </div>
@@ -281,8 +279,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
             Accueil
           </button>
           <div className="flex lg:hidden items-center gap-2">
-           <button onClick={onCancel} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
-              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain" />
+            <button onClick={onCancel} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
+              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-36 h-auto object-contain" />
             </button>
           </div>
           <div className="hidden lg:block" />

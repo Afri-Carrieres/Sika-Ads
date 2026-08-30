@@ -76,7 +76,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                           <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Objet de la Plateforme</h2>
                       </div>
                       <p className="text-slate-600 leading-relaxed font-medium">
-                          SikaAds Togo est une application de mise en relation entre des annonceurs (entreprises souhaitant promouvoir des produits/services) et des nano-influenceurs (\"Ambassadeurs\") qui acceptent de publier des contenus sur leurs canaux personnels en échange d'une rémunération prédéfinie.
+                        SikaAds Togo est une application de mise en relation entre des annonceurs (entreprises souhaitant promouvoir des produits/services) et des nano-influenceurs ("Ambassadeurs") qui partagent des contenus en statut WhatsApp ou en story Instagram et Facebook, et perçoivent une rémunération après vérification et validation de leurs vues.
                       </p>
                   </div>
 

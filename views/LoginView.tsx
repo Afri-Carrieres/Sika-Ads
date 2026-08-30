@@ -115,23 +115,23 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
       <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
         <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
           <div>
-           <div className="flex justify-start place-items-start">
-             <button onClick={onGoBack} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
-              <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-[400px] object-contain" />
-            </button>
-           </div>
+            <div className="flex justify-start place-items-start">
+              <button onClick={onGoBack} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
+                <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-44 h-auto object-contain" />
+              </button>
+            </div>
 
-            <div className="mt-4 max-w-xl">
-          
-              <h1 className="text-5xl font-black leading-[1.02] tracking-tight xl:text-4xl">
-                Monétisez vos statuts, <span className="text-[#128785]">pilotez vos gains.</span>
+            <div className="mt-8 max-w-xl">
+              <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-black text-white font-display">
+                Monétisez vos statuts,<br />
+                <span className="text-[#128785]">pilotez vos gains.</span>
               </h1>
-              <p className="mt-7 max-w-md text-base font-medium leading-8 text-slate-300">
+              <p className="mt-4 max-w-md text-base font-medium leading-relaxed text-slate-300">
                 Retrouvez vos campagnes, vos preuves et vos retraits dans un espace clair, rapide et sécurisé.
               </p>
             </div>
 
-            <div className="mt-12 space-y-6">
+            <div className="mt-10 space-y-6">
               {[
                 { icon: Megaphone, title: 'Campagnes disponibles', desc: 'Choisissez les annonces adaptées à votre audience.' },
                 { icon: TrendingUp, title: 'Suivi transparent', desc: 'Gardez un oeil sur les vues, preuves et validations.' },
@@ -151,7 +151,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
           </div>
 
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-            <span>© 2026 SikaAds Togo</span>
+            <span>© 2026 SikaAds</span>
             {/* <span>Plateforme sécurisée</span> */}
           </div>
         </aside>
@@ -162,7 +162,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
               <ArrowLeft size={17} />
               Accueil
             </button>
-            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-60 object-contain lg:hidden" />
+            <img src="/Header-LogoSika-Ads.png" alt="SikaAds" className="w-36 h-auto object-contain lg:hidden" />
           </div>
 
           <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">

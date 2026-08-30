@@ -1,7 +1,7 @@
 {
   "name": "SikaAds Togo - Gagnez de l'argent avec vos Statuts",
   "short_name": "SikaAds",
-  "description": "La première plateforme de nano-influence au Togo. Postez des publicités sur vos statuts WhatsApp & Facebook et recevez vos paiements par T-Money ou Flooz.",
+  "description": "La première plateforme de nano-influence au Togo. Partagez des visuels en statut WhatsApp ou stories Instagram et Facebook et recevez vos paiements après validation des vues.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

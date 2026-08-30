@@ -215,7 +215,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
               </div>
               <div className="flex-1">
                 <p className="text-sm font-black text-gray-900 leading-tight">C'est parti ! 🚀</p>
-                <p className="text-[10px] text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. N'oubliez pas de revenir poster votre preuve dans 24h !</p>
+                <p className="text-[10px] text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. N'oubliez pas de revenir envoyer votre preuve de vues dans 24h !</p>
               </div>
               <button onClick={() => setShowGlobalSuccess(false)} className="text-gray-300 hover:text-gray-500">
                 <X size={18} />

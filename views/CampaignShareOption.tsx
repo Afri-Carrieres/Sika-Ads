@@ -280,7 +280,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
           </div>
           <div className="flex-1">
             <p className="text-sm font-black text-gray-900">C'est parti !</p>
-            <p className="text-xs text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. Revenez poster votre preuve dans 24h.</p>
+            <p className="text-xs text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. Revenez envoyer votre preuve de vues dans 24h.</p>
           </div>
         </div>
       )}

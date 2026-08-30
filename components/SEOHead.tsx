@@ -9,8 +9,8 @@ interface SEOHeadProps {
   keywords?: string;
 }
 
-const DEFAULT_TITLE = "SikaAds Togo | Gagnez de l'argent avec vos Statuts WhatsApp & Facebook";
-const DEFAULT_DESCRIPTION = "SikaAds Togo connecte les annonceurs et les ambassadeurs pour publier des campagnes sur WhatsApp et Facebook, générer des vues et recevoir ses paiements rapidement.";
+const DEFAULT_TITLE = "Gagnez de l'argent avec votre statut WhatsApp & vos stories | Sika Ads";
+const DEFAULT_DESCRIPTION = "Partagez les contenus des marques sur votre statut WhatsApp ou vos stories Instagram et Facebook, envoyez la preuve de vos vues depuis votre dashboard et gagnez de l'argent après validation.";
 const DEFAULT_IMAGE = "https://www.sika-ads.com/Web-Icon.png";
 const DOMAIN = "https://www.sika-ads.com";
 
