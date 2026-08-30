@@ -6,6 +6,7 @@ import { supabase } from '../supabase';
 import { validateProofWithAI } from '../services/geminiService';
 import { determineAutoAction, AI_VALIDATION_CONFIG } from '../config/aiValidationThresholds';
 import Pagination from '../components/Pagination';
+import { useUserData } from '../hooks/useUserData';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -16,6 +17,8 @@ interface TaskHistoryProps {
 }
 
 const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotification }) => {
+  const { user } = useUserData();
+  
   // Modal States
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [proofToDelete, setProofToDelete] = useState<Proof | null>(null);
@@ -77,89 +80,81 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
 
   // Real-time listener for proofs from Supabase
   useEffect(() => {
-    let activeChannel: any;
+    if (!user) return;
+    const userId = user.id;
 
-    const setupListener = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
-      const userId = session.user.id;
+    const fetchProofs = async () => {
+      const { data, error } = await supabase
+        .from('proofs')
+        .select('*')
+        .eq('userId', userId)
+        .order('submittedAt', { ascending: false });
 
-      const fetchProofs = async () => {
-        const { data, error } = await supabase
-          .from('proofs')
-          .select('*')
-          .eq('userId', userId)
-          .order('submittedAt', { ascending: false });
+      if (error) {
+        console.warn("Error fetching proofs:", error.message);
+        return;
+      }
 
-        if (error) {
-          console.warn("Error fetching proofs:", error.message);
-          return;
-        }
+      // Map database snake_case fields to camelCase properties for component compatibility
+      const fetchedProofs = (data || []).map(p => ({
+        id: p.id,
+        userId: p.userId,
+        userName: p.userName,
+        campaignId: p.campaignId,
+        campaignName: p.campaignName,
+        fileName: p.fileName,
+        storagePath: p.storagePath,
+        downloadURL: p.downloadURL,
+        size: p.size,
+        type: p.type,
+        status: p.status,
+        aiValidation: p.aiValidation,
+        submittedAt: p.submittedAt || new Date().toISOString(),
+        rejectionReason: p.rejectionReason,
+        viewsCount: p.viewsCount,
+        aiAnalysis: p.aiAnalysis
+      })) as Proof[];
 
-        // Map database snake_case fields to camelCase properties for component compatibility
-        const fetchedProofs = (data || []).map(p => ({
-          id: p.id,
-          userId: p.userId,
-          userName: p.userName,
-          campaignId: p.campaignId,
-          campaignName: p.campaignName,
-          fileName: p.fileName,
-          storagePath: p.storagePath,
-          downloadURL: p.downloadURL,
-          size: p.size,
-          type: p.type,
-          status: p.status,
-          aiValidation: p.aiValidation,
-          submittedAt: p.submittedAt || new Date().toISOString(),
-          rejectionReason: p.rejectionReason,
-          viewsCount: p.viewsCount,
-          aiAnalysis: p.aiAnalysis
-        })) as Proof[];
+      const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const validProofs = fetchedProofs.filter(p => new Date(p.submittedAt) >= cutoff);
+      const expiredProofs = fetchedProofs.filter(p => new Date(p.submittedAt) < cutoff);
 
-        const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const validProofs = fetchedProofs.filter(p => new Date(p.submittedAt) >= cutoff);
-        const expiredProofs = fetchedProofs.filter(p => new Date(p.submittedAt) < cutoff);
-
-        // Nettoyer les expirés de la DB et Storage
-        for (const proof of expiredProofs) {
-          try {
-            if (proof.storagePath) {
-              await supabase.storage.from('proofs').remove([proof.storagePath]);
-            }
-            await supabase.from('proofs').delete().eq('id', proof.id);
-          } catch (err) {
-            console.error("Auto-cleanup user error:", err);
+      // Nettoyer les expirés de la DB et Storage
+      for (const proof of expiredProofs) {
+        try {
+          if (proof.storagePath) {
+            await supabase.storage.from('proofs').remove([proof.storagePath]);
           }
+          await supabase.from('proofs').delete().eq('id', proof.id);
+        } catch (err) {
+          console.error("Auto-cleanup user error:", err);
         }
+      }
 
-        const combinedProofs = [...validProofs];
+      const combinedProofs = [...validProofs];
 
-        combinedProofs.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
-        setProofs(combinedProofs);
-      };
-
-      await fetchProofs();
-
-      activeChannel = supabase
-        .channel(`public:proofs:userId=eq.${userId}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'proofs', filter: `userId=eq.${userId}` },
-          () => {
-            fetchProofs();
-          }
-        )
-        .subscribe();
+      combinedProofs.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+      setProofs(combinedProofs);
     };
 
-    setupListener();
+    fetchProofs();
+
+    // Create channel synchronously - all .on() calls must happen before .subscribe()
+    const channel = supabase
+      .channel(`public:proofs:userId=eq.${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'proofs', filter: `userId=eq.${userId}` },
+        () => {
+          fetchProofs();
+        }
+      )
+      .subscribe();
 
     return () => {
-      if (activeChannel) {
-        supabase.removeChannel(activeChannel);
-      }
+      supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user, setProofs]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
