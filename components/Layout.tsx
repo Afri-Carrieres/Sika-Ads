@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../types';
 import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check, BarChart2 } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
+import BottomNavigation from './BottomNavigation';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,6 +18,18 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onRoleSwitch }) => {
   const { userData } = useUserData();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const getNavItems = () => {
     // Navigation AMBASSADEUR
@@ -258,6 +271,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         w-auto
         md:ml-72 
         p-4 sm:p-6 md:p-8 lg:p-10
+        pb-24 md:pb-8
         transition-all duration-300 ease-in-out
         bg-[cbd3d8] backdrop-blur-sm rounded-2xl shadow-lg shadow-indigo-900/20
       ">
@@ -265,6 +279,14 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
           {children}
         </div>
       </main>
+
+      {/* BOTTOM NAVIGATION MOBILE */}
+      {role === UserRole.AMBASSADOR && (
+        <BottomNavigation 
+          currentTab={currentTab} 
+          onMenuClick={() => setIsMobileMenuOpen(true)} 
+        />
+      )}
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
