@@ -115,12 +115,8 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
       setError('Les mots de passe ne correspondent pas.');
       return;
     }
-    if (newPassword.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caracteres.');
-      return;
-    }
-    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
-      setError('Le mot de passe doit contenir une majuscule, une minuscule et un chiffre.');
+    if (newPassword.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères.');
       return;
     }
 

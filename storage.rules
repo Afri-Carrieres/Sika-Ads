@@ -29,8 +29,9 @@ service firebase.storage {
       allow write: if isSignedIn() && request.auth.uid == userId;
     }
 
+    // Règle par défaut : accès restreint pour le reste
     match /{allPaths=**} {
-      allow read, write: if false;
+      allow read, write: if isSignedIn();
     }
   }
 }

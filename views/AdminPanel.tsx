@@ -159,7 +159,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         return d && d < cutoff;
       });
 
-      await Promise.all(expired.map(async (proof) => {
+      // Auto cleanup expired
+      expired.forEach(async (proof) => {
         try {
           if (proof.storagePath) {
             await supabase.storage.from('proofs').remove([proof.storagePath]).catch(() => { });
@@ -168,7 +169,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         } catch (err) {
           console.error("Cleanup error:", err);
         }
-      }));
+      });
 
       setAllProofs(valid);
     }
@@ -485,46 +486,96 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
       const cpv = campaign.cpv ?? 5;
       const earnings = views * cpv;
+      const remainingBudget = campaign.remainingBudget ?? 0;
+      const viewsCurrent = campaign.viewsCurrent ?? 0;
 
-      const { data: rpcResult, error: rpcErr } = await supabase.rpc('validate_proof_and_credit', {
-        p_proof_id: validatingProof.id,
-        p_user_id: validatingProof.userId,
-        p_campaign_id: campaign.id,
-        p_views: views,
-      });
-
-      if (rpcErr) throw rpcErr;
-
-      if (!rpcResult?.success) {
-        if (rpcResult?.error === 'insufficient_budget') {
-          const maxViews = Number(rpcResult.max_views ?? 0);
-          showFeedback(`Budget insuffisant. Maximum ${maxViews.toLocaleString()} vues.`, "error");
-          setWasBudgetLimited(true);
-        } else {
-          showFeedback(`Erreur: ${rpcResult?.error || 'inconnue'}`, "error");
-        }
+      // Vérification du budget restant
+      if (earnings > remainingBudget) {
+        const maxViews = Math.floor(remainingBudget / cpv);
+        showFeedback(`Budget insuffisant. Il reste ${remainingBudget.toLocaleString()} FCFA, soit ${maxViews.toLocaleString()} vues maximum.`, "error");
+        setWasBudgetLimited(true);
         return;
       }
 
-      const actualEarnings = Number(rpcResult.earnings ?? earnings);
+      // Update proof
+      const { error: proofErr } = await supabase
+        .from('proofs')
+        .update({
+          status: 'validated',
+          viewsCount: views
+        })
+        .eq('id', validatingProof.id)
+        .eq('userId', validatingProof.userId);
+
+      if (proofErr) console.error("Erreur de mise à jour de la preuve:", proofErr);
+
+      // Get user profile to calculate increments and retrieve email
+      const { data: userProfile, error: fetchErr } = await supabase
+        .from('users')
+        .select('balance, totalEarned, email')
+        .eq('id', validatingProof.userId)
+        .single();
+
+      if (fetchErr) throw fetchErr;
+
+      const currentBalance = userProfile?.balance ?? 0;
+      const currentTotalEarned = userProfile?.totalEarned ?? 0;
+
+      // Update user balances
+      await supabase
+        .from('users')
+        .update({
+          balance: currentBalance + earnings,
+          totalEarned: currentTotalEarned + earnings
+        })
+        .eq('id', validatingProof.userId);
+
+      await supabase
+        .from('campaigns')
+        .update({
+          remainingBudget: remainingBudget - earnings,
+          viewsCurrent: viewsCurrent + views,
+        })
+        .eq('id', campaign.id);
+
+      // Notification personnalisée si le budget était limité
+      const notificationMessage = wasBudgetLimited
+        ? `Votre preuve a été validée, mais le budget restant de la campagne ne permettait pas de rémunérer la totalité de vos vues. +${earnings.toLocaleString()} FCFA ajoutés.`
+        : `Votre preuve a été validée. +${earnings.toLocaleString()} FCFA ajoutés à votre solde.`;
 
       await supabase
         .from('notifications')
         .insert({
           userId: validatingProof.userId,
           title: wasBudgetLimited ? 'Rémunération plafonnée' : 'Preuve validée !',
-          message: `Votre preuve a été validée. +${actualEarnings.toLocaleString()} FCFA ajoutés à votre solde.`,
+          message: notificationMessage,
           type: 'payout',
           read: false,
           createdAt: new Date().toISOString()
         });
+
+      // Envoi de l'email de confirmation de preuve validée à l'ambassadeur
+      // if (userProfile?.email) {
+      //   supabase.functions.invoke('send-email', {
+      //     body: {
+      //       to: userProfile.email,
+      //       type: 'validated',
+      //       data: {
+      //         userName: validatingProof.userName || 'Ambassadeur',
+      //         campaignTitle: campaign.title || validatingProof.campaignName || 'Campagne',
+      //         views,
+      //         earnings,
+      //       }
+      //     }
+      //   }).catch(err => console.error("Erreur d'envoi de l'email de validation de preuve:", err));
+      // }
 
       if (validatingProof?.userId) {
         supabase.functions.invoke('send-push-notification', {
           body: {
             userId: validatingProof.userId,
             title: 'Preuve validée ✅',
-            body: `+${actualEarnings} FCFA pour "${campaign.title || validatingProof.campaignName || 'votre campagne'}"`,
+            body: `+${earnings} FCFA pour "${campaign.title || validatingProof.campaignName || 'votre campagne'}"`,
             data: {
               type: 'proof_validated',
               url: '/#/app/wallet',
@@ -533,8 +584,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         }).catch(err => console.error("Erreur d'envoi de la notification de validation:", err));
       }
 
-      showFeedback(`Preuve validée ! +${actualEarnings.toLocaleString()} FCFA crédités.`);
+      showFeedback(`Preuve validée ! +${earnings.toLocaleString()} FCFA crédités.`);
       setValidatingProof(null);
+      // await deleteProof(validatingProof);
       setViewsInput('');
       setWasBudgetLimited(false);
 

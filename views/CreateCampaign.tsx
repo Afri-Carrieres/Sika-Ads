@@ -79,18 +79,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
     }
   };
 
-  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
+  // --- Handlers: Image ---
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         alert("L'image est trop lourde (Max 5MB)");
-        return;
-      }
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        alert("Format non autorise. Utilisez JPG, PNG ou WebP.");
-        e.target.value = '';
         return;
       }
       setImageFile(file);
@@ -172,7 +166,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
 
       const { error: uploadError } = await supabase.storage
         .from('campaign-visuals')
-        .upload(filePath, imageFile, { contentType: imageFile.type });
+        .upload(filePath, imageFile);
 
       if (uploadError) throw uploadError;
 
