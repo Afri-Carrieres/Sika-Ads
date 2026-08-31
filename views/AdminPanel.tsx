@@ -31,22 +31,45 @@ import Pagination from '../components/Pagination';
 
 const ITEMS_PER_PAGE = 6;
 
-const StatCard: React.FC<{ title: string; value: string; icon: any; color: string }> = ({ title, value, icon: Icon, color }) => {
+const StatCard: React.FC<{ 
+  title: string; 
+  value: string; 
+  icon: any; 
+  color: string;
+  subtitle?: string;
+  trend?: { value: number; positive: boolean };
+}> = ({ title, value, icon: Icon, color, subtitle, trend }) => {
   const colorMap: Record<string, string> = {
-    indigo: 'bg-indigo-100 text-indigo-600',
-    green: 'bg-green-100 text-green-600',
-    orange: 'bg-orange-100 text-orange-600',
-    blue: 'bg-blue-100 text-blue-600'
+    indigo: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+    green: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+    orange: 'bg-amber-50 text-amber-600 border-amber-100',
+    blue: 'bg-blue-50 text-blue-600 border-blue-100',
+    'emerald-700': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    'violet-700': 'bg-violet-50 text-violet-700 border-violet-100',
+    'amber-700': 'bg-amber-50 text-amber-700 border-amber-100',
   };
   return (
-    <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-all hover:-translate-y-1">
-      <div className={`${colorMap[color] || 'bg-gray-100 text-gray-600'} p-4 rounded-2xl shadow-inner`}>
-        <Icon size={24} />
+    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-500">{title}</span>
+        <div className={`${colorMap[color] || 'bg-gray-50 text-gray-600 border-gray-100'} w-10 h-10 rounded-lg flex items-center justify-center border`}>
+          <Icon size={20} />
+        </div>
       </div>
-      <div>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
-        <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
+      <div className="mt-3">
+        <span className="text-2xl font-bold text-gray-900">{value}</span>
       </div>
+      {(subtitle || trend) && (
+        <div className="mt-2 flex items-center gap-1.5 text-sm">
+          {trend && (
+            <span className={`font-medium flex items-center gap-0.5 ${trend.positive ? 'text-emerald-600' : 'text-red-600'}`}>
+              {trend.positive ? <ArrowUpRight size={14} /> : <ArrowRight size={14} className="rotate-90" />}
+              {Math.abs(trend.value).toFixed(1)}%
+            </span>
+          )}
+          {subtitle && <span className="text-gray-400">{subtitle}</span>}
+        </div>
+      )}
     </div>
   );
 };
@@ -1062,55 +1085,121 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           VIEW: OVERVIEW
       ══════════════════════════════════════════ */}
       {view === 'overview' && (
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard title="Total Inscrits" value={stats.totalInscrits.toLocaleString()} icon={Users} color="blue" />
-            <StatCard title="Preuves en attente" value={stats.pendingProofs.toString()} icon={Clock} color="orange" />
-            <StatCard title="Total Distribué" value={stats.totalDistribute.toLocaleString() + ' F'} icon={CheckCircle2} color="green" />
-            <StatCard title="Dette Ambassadeurs" value={stats.userDebt.toLocaleString() + ' F'} icon={Banknote} color="indigo" />
+        <div className="space-y-6">
+          {/* ══════════════════════════════════════════
+              SECTION 1: KPI PRINCIPAUX
+          ══════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <StatCard 
+              title="Total Inscrits" 
+              value={stats.totalInscrits.toLocaleString()} 
+              icon={Users} 
+              color="blue"
+              subtitle="ambassadeurs"
+            />
+            <StatCard 
+              title="Preuves en attente" 
+              value={stats.pendingProofs.toString()} 
+              icon={Clock} 
+              color="orange"
+              subtitle="à valider"
+            />
+            <StatCard 
+              title="Total Distribué" 
+              value={stats.totalDistribute.toLocaleString() + ' F'} 
+              icon={CheckCircle2} 
+              color="green"
+              subtitle="payé aux ambassadeurs"
+            />
+            <StatCard 
+              title="Dette Ambassadeurs" 
+              value={stats.userDebt.toLocaleString() + ' F'} 
+              icon={Banknote} 
+              color="indigo"
+              subtitle="solde en attente"
+            />
           </div>
 
-          {/* <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-sky-500 rounded-[2.5rem] p-8 text-white shadow-xl shadow-indigo-100">
+          {/* ══════════════════════════════════════════
+              SECTION 2: ANALYTICS CAMPAGNE
+          ══════════════════════════════════════════ */}
+          <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-sky-500 rounded-2xl p-6 text-white shadow-lg">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.25em]">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em]">
                   <Sparkles size={14} /> Analytics de campagne
                 </div>
-                <h3 className="text-2xl font-black mt-4">Vue d’ensemble exécutive des performances</h3>
-                <p className="text-sm text-indigo-50/90 mt-2 max-w-2xl">
-                  Suivi des partages, clics, conversion et campagnes les plus actives pour piloter les actions marketing avec une logique de data analyst.
+                <h3 className="text-xl font-bold mt-3">Performance globale des campagnes</h3>
+                <p className="text-sm text-indigo-100 mt-1 max-w-2xl">
+                  Suivi des partages, clics et conversion pour piloter les actions marketing.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3 min-w-[280px]">
-                <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
+                <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
                   <p className="text-[11px] uppercase tracking-widest text-indigo-100">Partages</p>
-                  <p className="text-2xl font-black mt-1">{campaignAnalytics.totalShares.toLocaleString()}</p>
+                  <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalShares.toLocaleString()}</p>
                 </div>
-                <div className="rounded-2xl bg-white/15 p-4 backdrop-blur">
+                <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
                   <p className="text-[11px] uppercase tracking-widest text-indigo-100">Clics</p>
-                  <p className="text-2xl font-black mt-1">{campaignAnalytics.totalClicks.toLocaleString()}</p>
+                  <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalClicks.toLocaleString()}</p>
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
 
-          <div className="flex flex-col  lg:flex-row  lg:justify-between gap-6">
+          {/* ══════════════════════════════════════════
+              SECTION 3: MÉTRIQUES CAMPAGNE
+          ══════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <StatCard 
+              title="Taux de conversion" 
+              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} 
+              icon={TrendingUp} 
+              color="emerald-700"
+              subtitle="clics/partages"
+            />
+            <StatCard 
+              title="Campagnes actives" 
+              value={campaignAnalytics.activeCampaigns.toString()} 
+              icon={Target} 
+              color="blue"
+              subtitle="en cours"
+            />
+            <StatCard 
+              title="Top campagne" 
+              value={campaignAnalytics.bestCampaign?.title || '—'} 
+              icon={ArrowUpRight} 
+              color="violet-700"
+              subtitle={campaignAnalytics.bestCampaign ? `${campaignAnalytics.bestCampaign.shares} partages` : undefined}
+            />
+            <StatCard 
+              title="Score d'engagement" 
+              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} 
+              icon={Activity} 
+              color="amber-700"
+              subtitle="performance"
+            />
+          </div>
 
-            <div className="bg-white rounded-[2.5rem] w-full shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Performance par campagne</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">Clics, partages et conversion par campagne</p>
+          {/* ══════════════════════════════════════════
+              SECTION 4: GRAPHIQUES DE PERFORMANCE
+          ══════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-900">Performance par campagne</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Clics, partages et conversion</p>
               </div>
               <div className="p-6 h-[320px]">
                 {campaignAnalytics.campaigns.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 font-bold text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée disponible</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={campaignAnalytics.campaigns.slice(0, 8)}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="title" tick={{ fontSize: 11 }} angle={-10} textAnchor="end" height={70} />
                       <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                       <Bar dataKey="clicks" name="Clics" fill="#6366f1" radius={[6, 6, 0, 0]} />
                       <Bar dataKey="shares" name="Partages" fill="#14b8a6" radius={[6, 6, 0, 0]} />
                     </BarChart>
@@ -1119,34 +1208,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-1 xl:grid-cols-1 gap-4">
-              <StatCard title="Taux de conversion" value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} icon={TrendingUp} color="emerald-700" />
-              <StatCard title="Campagnes actives" value={campaignAnalytics.activeCampaigns} icon={Target} color="blue" />
-              <StatCard title="Top campagne" value={campaignAnalytics.bestCampaign?.title || 'Aucune donnée'} icon={ArrowUpRight} color="violet-700" />
-              <StatCard title="Score d'engagement" value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} icon={Activity} color="amber-700" />
-            </div>
-
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-
-
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Campagnes (Statuts)</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">Nombre de campagnes par statut</p>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-900">Statuts des campagnes</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Répartition par statut</p>
               </div>
-              <div className="p-6 h-[280px]">
+              <div className="p-6 h-[320px]">
                 {campaignStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 font-bold text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée disponible</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={campaignStatusChart}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                       <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                       <Bar dataKey="value">
                         {campaignStatusChart.map((entry, index) => (
                           <Cell key={`cell-campaign-${index}`} fill={entry.color} />
@@ -1157,24 +1233,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 )}
               </div>
             </div>
+          </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Preuves (Répartition)</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">En attente, validées, rejetées</p>
+          {/* ══════════════════════════════════════════
+              SECTION 5: RÉPARTITIONS
+          ══════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-900">Répartition des preuves</h3>
+                <p className="text-xs text-gray-500 mt-0.5">En attente, validées, rejetées</p>
               </div>
               <div className="p-6 h-[280px]">
                 {proofStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 font-bold text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={proofStatusChart} dataKey="value" nameKey="name" innerRadius={70} outerRadius={100} paddingAngle={2}>
+                      <Pie data={proofStatusChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
                         {proofStatusChart.map((entry, index) => (
                           <Cell key={`cell-proof-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1182,23 +1263,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Répartition des partages</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">Par plateforme de diffusion</p>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-900">Répartition des partages</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Par plateforme</p>
               </div>
-              <div className="p-6 h-[320px]">
+              <div className="p-6 h-[280px]">
                 {campaignAnalytics.platformChart.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 font-bold text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={campaignAnalytics.platformChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} paddingAngle={2}>
+                      <Pie data={campaignAnalytics.platformChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
                         {campaignAnalytics.platformChart.map((entry, index) => (
                           <Cell key={`platform-cell-${index}`} fill={['#6366f1', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1206,89 +1287,105 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Retraits (Répartition)</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">En attente, validées, rejetées</p>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-900">Répartition des retraits</h3>
+                <p className="text-xs text-gray-500 mt-0.5">En attente, validés, rejetés</p>
               </div>
               <div className="p-6 h-[280px]">
                 {payoutStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 font-bold text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={payoutStatusChart} dataKey="value" nameKey="name" innerRadius={70} outerRadius={100} paddingAngle={2}>
+                      <Pie data={payoutStatusChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
                         {payoutStatusChart.map((entry, index) => (
                           <Cell key={`cell-withdraw-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
                 )}
               </div>
             </div>
+          </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-                <h3 className="font-black text-gray-900 tracking-tight">Retraits (14 derniers jours)</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">Demandé (pending) vs Payé (completed)</p>
-              </div>
-              <div className="p-6 h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={payoutTrend14d}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" height={36} />
-                    <Line type="monotone" dataKey="requested" name="Demandé" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                    <Line type="monotone" dataKey="paid" name="Payé" stroke="#10b981" strokeWidth={2} dot={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+          {/* ══════════════════════════════════════════
+              SECTION 6: TENDANCE DES RETRAITS
+          ══════════════════════════════════════════ */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Tendance des retraits</h3>
+              <p className="text-xs text-gray-500 mt-0.5">14 derniers jours — Demandé vs Payé</p>
+            </div>
+            <div className="p-6 h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={payoutTrend14d}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                  <Legend verticalAlign="bottom" height={36} />
+                  <Line type="monotone" dataKey="requested" name="Demandé" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="paid" name="Payé" stroke="#10b981" strokeWidth={2} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-
-
-
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div>
-                <h3 className="font-black text-gray-900 tracking-tight">Classement des campagnes</h3>
-                <p className="text-xs text-gray-500 font-medium mt-1">Les plus performantes selon l’engagement total</p>
-              </div>
+          {/* ══════════════════════════════════════════
+              SECTION 7: CLASSEMENT DES CAMPAGNES
+          ══════════════════════════════════════════ */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Classement des campagnes</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Les plus performantes selon l'engagement</p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/60 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-8 py-6">Campagne</th>
-                    <th className="px-8 py-6">Partages</th>
-                    <th className="px-8 py-6">Clics</th>
-                    <th className="px-8 py-6">Conversion</th>
-                    <th className="px-8 py-6">Status</th>
+                    <th className="px-6 py-3 text-left font-medium">Campagne</th>
+                    <th className="px-6 py-3 text-right font-medium">Partages</th>
+                    <th className="px-6 py-3 text-right font-medium">Clics</th>
+                    <th className="px-6 py-3 text-right font-medium">Conversion</th>
+                    <th className="px-6 py-3 text-left font-medium">Statut</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {campaignAnalytics.campaigns.map((campaign) => (
-                    <tr key={campaign.id} className="hover:bg-gray-50/40 transition-all">
-                      <td className="px-8 py-6">
+                <tbody className="divide-y divide-gray-100">
+                  {campaignAnalytics.campaigns.slice(0, 10).map((campaign) => (
+                    <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black">{campaign.title.charAt(0).toUpperCase()}</div>
+                          <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                            {campaign.title.charAt(0).toUpperCase()}
+                          </div>
                           <div>
-                            <p className="font-bold text-gray-900">{campaign.title}</p>
-                            <p className="text-[11px] text-gray-400">Budget: {campaign.budget.toLocaleString()} F</p>
+                            <p className="font-medium text-gray-900">{campaign.title}</p>
+                            <p className="text-xs text-gray-500">{campaign.budget.toLocaleString()} F</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6 text-gray-700 font-semibold">{campaign.shares}</td>
-                      <td className="px-8 py-6 text-gray-700 font-semibold">{campaign.clicks}</td>
-                      <td className="px-8 py-6 text-gray-700 font-semibold">{campaign.conversionRate.toFixed(1)}%</td>
-                      <td className="px-8 py-6">
-                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${campaign.status === 'active' ? 'bg-green-100 text-green-700' : campaign.status === 'paused' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}`}>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.shares}</td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.clicks}</td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.conversionRate.toFixed(1)}%</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          campaign.status === 'active' 
+                            ? 'bg-emerald-50 text-emerald-700' 
+                            : campaign.status === 'paused' 
+                              ? 'bg-amber-50 text-amber-700' 
+                              : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            campaign.status === 'active' 
+                              ? 'bg-emerald-500' 
+                              : campaign.status === 'paused' 
+                                ? 'bg-amber-500' 
+                                : 'bg-gray-400'
+                          }`}></span>
                           {campaign.status}
                         </span>
                       </td>
@@ -1298,18 +1395,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </table>
             </div>
           </div>
-
-          {/* <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="bg-indigo-50 p-6 rounded-3xl text-indigo-600 mb-6"><Activity size={48} /></div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">Centre de Contrôle Staff</h3>
-            <p className="text-gray-500 max-w-sm font-medium mb-8">Bonjour {currentAdminData?.name}. Gérez les flux de la plateforme avec diligence.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setView('validation')} className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-indigo-100 active:scale-95 transition-all">Validation</button>
-              {isSuperAdmin && <button onClick={() => setView('team')} className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest active:scale-95 transition-all">Gérer l'équipe</button>}
-            </div>
-          </div> */}
-
-
         </div>
       )}
 
