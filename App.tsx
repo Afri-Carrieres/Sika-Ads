@@ -620,7 +620,7 @@ const App: React.FC = () => {
           />
         ) : (
           <Layout
-            role={currentTab.startsWith('admin') ? (isAdmin ? UserRole.ADMIN : UserRole.MODERATOR) : UserRole.AMBASSADOR}
+            role={(currentTab.startsWith('admin') || (isStaff && currentTab === 'profile')) ? (isAdmin ? UserRole.ADMIN : UserRole.MODERATOR) : UserRole.AMBASSADOR}
             currentTab={currentTab}
             setTab={setTab}
             onRoleSwitch={handleRoleSwitch}
