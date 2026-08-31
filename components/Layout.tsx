@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../types';
-import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check, BarChart2 } from 'lucide-react';
+import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, StickyNote, Bell, ShieldCheck, Settings, Crown, CreditCard, User, PlusCircle, Menu, X, Check, BarChart2, ChevronDown } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
 import BottomNavigation from './BottomNavigation';
 import AdminBottomNavigation from './AdminBottomNavigation';
+import { getAdminNavigation, NavGroup, NavItem } from '../config/adminNavigation';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,11 +17,37 @@ interface LayoutProps {
   onRoleSwitch: () => void;
 }
 
+const AMBASSADOR_NAV_ITEMS = [
+  { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
+  { id: 'marketplace', label: 'Campagnes', icon: Megaphone },
+  { id: 'create-campaign', label: 'Créer une campagne', icon: PlusCircle },
+  { id: 'my-campaigns', label: 'Mes Campagnes', icon: BarChart2 },
+  { id: 'tasks', label: 'Mes Preuves', icon: CheckCircle2 },
+  { id: 'wallet', label: 'Portefeuille', icon: Wallet },
+  { id: 'profile', label: 'Mon Profil', icon: User },
+];
+
+const COLLAPSED_STORAGE_KEY = 'sikaads_admin_nav_collapsed';
+
+const loadCollapsedState = (): Record<string, boolean> => {
+  try {
+    const stored = localStorage.getItem(COLLAPSED_STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return {};
+};
+
+const saveCollapsedState = (state: Record<string, boolean>) => {
+  try {
+    localStorage.setItem(COLLAPSED_STORAGE_KEY, JSON.stringify(state));
+  } catch {}
+};
+
 const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onRoleSwitch }) => {
   const { userData } = useUserData();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(loadCollapsedState);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -32,48 +59,14 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
     };
   }, [isMobileMenuOpen]);
 
-  const getNavItems = () => {
-    // Navigation AMBASSADEUR
-    if (role === UserRole.AMBASSADOR) {
-      return [
-        { id: 'dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
-        { id: 'marketplace', label: 'Campagnes', icon: Megaphone },
-        { id: 'create-campaign', label: 'Créer une campagne', icon: PlusCircle },
-        { id: 'my-campaigns', label: 'Mes Campagnes', icon: BarChart2 },
-        { id: 'tasks', label: 'Mes Preuves', icon: CheckCircle2 },
-        // { id: 'notes', label: 'Stratégies', icon: StickyNote },
-        { id: 'wallet', label: 'Portefeuille', icon: Wallet },
-        { id: 'profile', label: 'Mon Profil', icon: User },
-      ];
-    }
+  const toggleGroup = useCallback((groupId: string) => {
+    setCollapsedGroups(prev => {
+      const next = { ...prev, [groupId]: !prev[groupId] };
+      saveCollapsedState(next);
+      return next;
+    });
+  }, []);
 
-    // Navigation STAFF (Commun)
-    const adminItems = [
-      { id: 'admin-dashboard', label: 'Vue d\'ensemble', icon: LayoutDashboard },
-      { id: 'admin-campaigns', label: 'Gestion Campagnes', icon: Megaphone },
-      // { id: 'create-campaign', label: 'Créer une campagne', icon: PlusCircle },
-      { id: 'admin-validation', label: 'Validations', icon: CheckCircle2 },
-      { id: 'admin-withdrawals', label: 'Retraits', icon: Wallet },
-    ];
-
-    // Navigation RESTREINTE (SUPER_ADMIN Uniquement)
-    if (userData?.role === UserRole.ADMIN) {
-      adminItems.push(
-        { id: 'admin-campaign-payments', label: 'Paiements Campagnes', icon: CreditCard },
-        { id: 'admin-create-vip', label: 'Création VIP', icon: Crown },
-        { id: 'admin-payouts', label: 'Finances', icon: CreditCard },
-        { id: 'admin-users', label: 'Utilisateurs', icon: Users },
-        { id: 'admin-team', label: 'Mon Équipe', icon: ShieldCheck },
-        { id: 'admin-gombo-status', label: 'Vérif GomboPlus', icon: Check },
-        { id: 'profile', label: 'Mon Profil', icon: User },
-      );
-    }
-
-    return adminItems;
-  };
-
-
-  const navItems = getNavItems();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -90,182 +83,309 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
     return 'Ambassadeur';
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 font-sans">
+  const isStaff = role === UserRole.ADMIN || role === UserRole.MODERATOR;
+  const adminNavGroups = isStaff ? getAdminNavigation(userData?.role as 'ADMIN' | 'MODERATOR' | null) : [];
 
-      {/* SIDEBAR DESKTOP (FIXED) */}
-      <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
+  const isItemActive = (itemId: string) => currentTab === itemId;
 
-        {/* 1. Header Sticky */}
-        <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
-          <div className="p-1  rounded-lg flex flex-col items-center">
-            <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-            {/* <h2 className="text-lg font-black tracking-tight leading-none text-white">
-              {userData?.role === UserRole.ADMIN ? 'SikaAds HQ' : 'Espace Membre'}
-            </h2> */}
-            <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
-              {getRoleLabel()}
-            </p>
-          </div>
-        </div>
+  const isGroupActive = (group: NavGroup) => group.items.some(item => isItemActive(item.id));
 
-        {/* 2. Scrollable Navigation Area */}
-        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide">
-          {navItems.map((item) => {
-            const isActive = currentTab === item.id;
-            // Map tab id to route (chemin propre, cohérent avec setTab()/parsePathname)
-            const to = item.id === 'profile' ? '/profile' : `/app/${item.id}`;
-            return (
-              <Link
-                key={item.id}
-                to={to}
-                className={`
-                  w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
-                  ${isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                  }
-                `}
-              >
-                <item.icon
-                  size={20}
-                  className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
-                  strokeWidth={isActive ? 2.5 : 2}
-                />
-                <span className={`text-sm font-bold tracking-wide ${isActive ? 'font-black' : 'font-medium'}`}>
-                  {item.label}
-                </span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+  const getItemRoute = (item: NavItem) => item.route;
 
-        {/* 3. Footer / User Info (Bottom Pinned) */}
-        <div className="p-4 border-t border-indigo-800/30 bg-[#0F172A] shrink-0 z-10">
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold border border-indigo-500/30 text-xs">
-              {userData?.name?.charAt(0) || 'U'}
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-bold text-white truncate max-w-[140px]">{userData?.name || 'Utilisateur'}</p>
-              <p className="text-[10px] text-slate-400 truncate max-w-[140px]">{userData?.email}</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-red-500/10 hover:border-red-500/30"
-          >
-            <LogOut size={14} />
-            Déconnexion
-          </button>
-        </div>
-      </aside>
-
-      {/* MOBILE SIDEBAR (DRAWER) */}
-      <div
-        className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+  const renderNavItem = (item: NavItem | typeof AMBASSADOR_NAV_ITEMS[number], isAmbassador: boolean) => {
+    const isActive = isItemActive(item.id);
+    const to = 'route' in item ? (item as NavItem).route : (item.id === 'profile' ? '/profile' : `/app/${item.id}`);
+    return (
+      <Link
+        key={item.id}
+        to={to}
+        className={`
+          w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+          ${isActive
+            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+            : 'text-slate-400 hover:bg-white/5 hover:text-white'
+          }
+        `}
       >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-          onClick={() => setIsMobileMenuOpen(false)}
+        <item.icon
+          size={20}
+          className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
+          strokeWidth={isActive ? 2.5 : 2}
         />
+        <span className={`text-sm tracking-wide ${isActive ? 'font-bold text-white' : 'font-medium'}`}>
+          {item.label}
+        </span>
+        {isActive && (
+          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        )}
+      </Link>
+    );
+  };
 
-        {/* Sidebar content */}
-        <aside
-          className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+  const renderGroupLabel = (group: NavGroup) => {
+    const groupIsActive = isGroupActive(group);
+    const isCollapsed = collapsedGroups[group.id] ?? !group.defaultOpen;
+
+    if (!group.collapsible) {
+      return (
+        <div className="pt-4 pb-2 px-4 first:pt-2">
+          <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${groupIsActive ? 'text-indigo-400' : 'text-slate-500'}`}>
+            {group.label}
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="pt-4 pb-1 px-1 first:pt-2">
+        <button
+          onClick={() => toggleGroup(group.id)}
+          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors duration-150 hover:bg-white/5 ${groupIsActive ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-300'}`}
+          aria-expanded={!isCollapsed}
+          aria-controls={`nav-group-${group.id}`}
         >
-          {/* Header */}
-          <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
-            <div className="flex flex-col items-center gap-3">
-              <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-              <p className="text-[10px] bg-indigo-600/30  p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
-                {getRoleLabel()}
-              </p>
-            </div>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-slate-400 hover:text-white transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em]">
+            {group.label}
+          </span>
+          <ChevronDown
+            size={14}
+            className={`transition-transform duration-200 ${isCollapsed ? '' : 'rotate-180'}`}
+          />
+        </button>
+      </div>
+    );
+  };
 
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-280px)]">
-            {navItems.map((item) => {
-              const isActive = currentTab === item.id;
-              // Map tab id to route (chemin propre, cohérent avec setTab()/parsePathname)
-              const to = item.id === 'profile' ? '/profile' : `/app/${item.id}`;
-              return (
+  const renderAdminNav = (onNavigate?: () => void) => {
+    return adminNavGroups.map((group) => {
+      const isCollapsed = group.collapsible ? (collapsedGroups[group.id] ?? !group.defaultOpen) : false;
+      return (
+        <div key={group.id}>
+          {renderGroupLabel(group)}
+          {(!group.collapsible || !isCollapsed) && (
+            <div
+              id={`nav-group-${group.id}`}
+              className="space-y-0.5 px-1"
+            >
+              {group.items.map((item) => (
                 <Link
                   key={item.id}
-                  to={to}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  to={getItemRoute(item)}
+                  onClick={onNavigate}
                   className={`
-                    w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
-                    ${isActive
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
+                    ${isItemActive(item.id)
                       ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
                       : 'text-slate-400 hover:bg-white/5 hover:text-white'
                     }
                   `}
                 >
                   <item.icon
-                    size={20}
-                    className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
-                    strokeWidth={isActive ? 2.5 : 2}
+                    size={18}
+                    className={`shrink-0 ${isItemActive(item.id) ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
+                    strokeWidth={isItemActive(item.id) ? 2.5 : 2}
                   />
-                  <span className={`text-sm font-bold tracking-wide ${isActive ? 'font-black' : 'font-medium'}`}>
+                  <span className={`text-[13px] tracking-wide ${isItemActive(item.id) ? 'font-bold text-white' : 'font-medium'}`}>
                     {item.label}
                   </span>
+                  {isItemActive(item.id) && (
+                    <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  )}
                 </Link>
-              );
-            })}
-          </nav>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    });
+  };
 
-          {/* Footer */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-800/30 bg-[#0F172A] shrink-0 z-10">
-            <div className="flex items-center gap-3 mb-4 px-2">
-              <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold border border-indigo-500/30 text-xs">
-                {userData?.name?.charAt(0) || 'U'}
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-sm font-bold text-white truncate max-w-[140px]">{userData?.name || 'Utilisateur'}</p>
-                <p className="text-[10px] text-slate-400 truncate max-w-[140px]">{userData?.email}</p>
+  const renderAmbassadorNav = (onNavigate?: () => void) => {
+    return AMBASSADOR_NAV_ITEMS.map((item) => {
+      const isActive = currentTab === item.id;
+      const to = item.id === 'profile' ? '/profile' : `/app/${item.id}`;
+      return (
+        <Link
+          key={item.id}
+          to={to}
+          onClick={onNavigate}
+          className={`
+            w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
+            ${isActive
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+              : 'text-slate-400 hover:bg-white/5 hover:text-white'
+            }
+          `}
+        >
+          <item.icon
+            size={20}
+            className={`shrink-0 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
+            strokeWidth={isActive ? 2.5 : 2}
+          />
+          <span className={`text-sm tracking-wide ${isActive ? 'font-bold text-white' : 'font-medium'}`}>
+            {item.label}
+          </span>
+          {isActive && (
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          )}
+        </Link>
+      );
+    });
+  };
+
+  const renderSidebarFooter = () => (
+    <div className="p-4 border-t border-indigo-800/30 bg-[#0F172A] shrink-0 z-10">
+      <div className="flex items-center gap-3 mb-4 px-2">
+        <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold border border-indigo-500/30 text-xs">
+          {userData?.name?.charAt(0) || 'U'}
+        </div>
+        <div className="overflow-hidden">
+          <p className="text-sm font-bold text-white truncate max-w-[140px]">{userData?.name || 'Utilisateur'}</p>
+          <p className="text-[10px] text-slate-400 truncate max-w-[140px]">{userData?.email}</p>
+        </div>
+      </div>
+      <button
+        onClick={handleLogout}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-red-500/10 hover:border-red-500/30"
+      >
+        <LogOut size={14} />
+        Déconnexion
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50/50 font-sans">
+
+      {isStaff ? (
+        <>
+          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
+
+            <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
+              <div className="p-1 rounded-lg flex flex-col items-center">
+                <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+                <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                  {getRoleLabel()}
+                </p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-red-500/10 hover:border-red-500/30"
-            >
-              <LogOut size={14} />
-              Déconnexion
-            </button>
-          </div>
-        </aside>
-      </div>
 
-      {/* MOBILE HEADER / NAV (Visible only on mobile) */}
+            <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide">
+              {renderAdminNav()}
+            </nav>
+
+            {renderSidebarFooter()}
+          </aside>
+
+          <div
+            className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          >
+            <div
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            <aside
+              className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
+              <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
+                <div className="flex flex-col items-center gap-1">
+                  <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+                  <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                    {getRoleLabel()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                  aria-label="Fermer le menu"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide h-[calc(100vh-220px)]">
+                {renderAdminNav(() => setIsMobileMenuOpen(false))}
+              </nav>
+
+              {renderSidebarFooter()}
+            </aside>
+          </div>
+        </>
+      ) : (
+        <>
+          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
+
+            <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
+              <div className="p-1 rounded-lg flex flex-col items-center">
+                <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+                <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                  {getRoleLabel()}
+                </p>
+              </div>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide">
+              {renderAmbassadorNav()}
+            </nav>
+
+            {renderSidebarFooter()}
+          </aside>
+
+          <div
+            className={`fixed inset-0 z-[60] md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          >
+            <div
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+
+            <aside
+              className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+            >
+              <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
+                <div className="flex flex-col items-center gap-3">
+                  <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+                  <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                    {getRoleLabel()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-slate-400 hover:text-white transition-colors"
+                  aria-label="Fermer le menu"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-280px)]">
+                {renderAmbassadorNav(() => setIsMobileMenuOpen(false))}
+              </nav>
+
+              {renderSidebarFooter()}
+            </aside>
+          </div>
+        </>
+      )}
+
       <div className="md:hidden sticky top-0 z-[40] bg-[#0F172A] text-white p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-2 -ml-2 text-indigo-400 hover:text-white transition-colors"
+            aria-label="Ouvrir le menu"
           >
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-2" onClick={() => navigate('/app')}>
-          <img className="w-40 " src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
+            <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
           </div>
         </div>
         <p className="text-[10px] font-black uppercase bg-white/10 px-2 py-1 rounded text-indigo-200">{getRoleLabel()}</p>
       </div>
 
 
-      {/* MAIN CONTENT AREA */}
       <main className="
         relative
         min-h-screen
@@ -281,7 +401,6 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         </div>
       </main>
 
-      {/* BOTTOM NAVIGATION MOBILE */}
       {role === UserRole.AMBASSADOR ? (
         <BottomNavigation 
           currentTab={currentTab} 
@@ -308,4 +427,3 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
 };
 
 export default Layout;
-
