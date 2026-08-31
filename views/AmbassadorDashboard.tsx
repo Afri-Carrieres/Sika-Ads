@@ -5,6 +5,7 @@ import { Wallet, MousePointerClick, TrendingUp, ArrowUpRight, Copy, Check, BellR
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from '../supabase';
 import NotificationBell from '../components/NotificationBell';
+import { usePushNotifications } from '../hooks/usePushNotifications';
 
 interface AmbassadorDashboardProps {
   onNavigateToWallet: () => void;
@@ -55,6 +56,11 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
   const [proofDocs, setProofDocs] = useState<any[]>([]);
   const [withdrawalDocs, setWithdrawalDocs] = useState<any[]>([]);
   const [shareCount, setShareCount] = useState<number>(0);
+
+  // Hook pour les notifications push
+  const { permission, isSubscribed, requestPermission } = usePushNotifications({
+    userId: userData?.id || null
+  });
 
   const displayUser = userData;
 
@@ -154,18 +160,19 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
     };
   }, [userData?.email]);
 
+  // Afficher le banner de demande de permission après 3 secondes si :
+  // - La permission n'a jamais été demandée (permission === 'default')
+  // - L'utilisateur n'est pas déjà abonné
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-        const timer = setTimeout(() => setShowPermissionPrompt(true), 2000);
-        return () => clearTimeout(timer);
+    if (permission === 'default' && !isSubscribed) {
+      const timer = setTimeout(() => setShowPermissionPrompt(true), 3000);
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [permission, isSubscribed]);
 
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      await Notification.requestPermission();
-      setShowPermissionPrompt(false);
-    }
+  const handleRequestNotificationPermission = async () => {
+    await requestPermission();
+    setShowPermissionPrompt(false);
   };
 
   const handleWalletNavigation = () => {
@@ -313,7 +320,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
               Plus tard
             </button>
             <button 
-              onClick={requestNotificationPermission}
+              onClick={handleRequestNotificationPermission}
               className="flex-1 md:flex-none px-8 py-3 bg-white text-indigo-600 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg hover:bg-indigo-50 transition-all active:scale-95 whitespace-nowrap"
             >
               Activer maintenant
