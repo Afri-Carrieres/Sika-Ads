@@ -6,6 +6,7 @@ import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, Users, LogOut, Sticky
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
 import BottomNavigation from './BottomNavigation';
+import AdminBottomNavigation from './AdminBottomNavigation';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -281,8 +282,13 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       </main>
 
       {/* BOTTOM NAVIGATION MOBILE */}
-      {role === UserRole.AMBASSADOR && (
+      {role === UserRole.AMBASSADOR ? (
         <BottomNavigation 
+          currentTab={currentTab} 
+          onMenuClick={() => setIsMobileMenuOpen(true)} 
+        />
+      ) : (
+        <AdminBottomNavigation 
           currentTab={currentTab} 
           onMenuClick={() => setIsMobileMenuOpen(true)} 
         />
