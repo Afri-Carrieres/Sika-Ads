@@ -114,6 +114,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   const [gomboRefInput, setGomboRefInput] = useState('');
   const [gomboCheckResult, setGomboCheckResult] = useState<any>(null);
   const [isCheckingGombo, setIsCheckingGombo] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null);
 
   // --- Financial & Operational Filters ---
   const [withdrawalSearch, setWithdrawalSearch] = useState('');
@@ -1371,79 +1372,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <div className="relative inline-block">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === camp.id ? null : camp.id)}
-                            className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-all"
-                          >
-                            Gérer
-                            <ChevronDown size={13} className={`transition-transform duration-200 ${openMenuId === camp.id ? 'rotate-180' : ''}`} />
-                          </button>
-
-                          {openMenuId === camp.id && (
-                            <>
-                              <div className="fixed inset-0 z-10" onClick={() => setOpenMenuId(null)} />
-                              <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 z-20 overflow-hidden py-1">
-                                <button
-                                  onClick={() => { setOpenMenuId(null); setEditingCampaign({ ...camp }); }}
-                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all font-medium"
-                                >
-                                  <span className="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                                    <Pencil size={13} className="text-indigo-600" />
-                                  </span>
-                                  Modifier
-                                </button>
-                                <button
-                                  onClick={async () => {
-                                    setOpenMenuId(null);
-                                    const newStatus = camp.status === 'active' ? 'paused' : 'active';
-                                    try {
-                                      await supabase
-                                        .from('campaigns')
-                                        .update({
-                                          status: newStatus,
-                                          updatedAt: new Date().toISOString()
-                                        })
-                                        .eq('id', camp.id);
-                                      showFeedback(`Campagne ${newStatus === 'active' ? 'activée' : 'mise en pause'} !`);
-                                    } catch (e: any) {
-                                      console.error(e);
-                                      showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
-                                    }
-                                  }}
-                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all font-medium"
-                                >
-                                  <span className="w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                                    {camp.status === 'active'
-                                      ? <Pause size={13} className="text-yellow-600" />
-                                      : <Play size={13} className="text-yellow-600" />
-                                    }
-                                  </span>
-                                  {camp.status === 'active' ? 'Mettre en pause' : 'Activer'}
-                                </button>
-                                <button
-                                  onClick={() => { setOpenMenuId(null); setStatsCampaign(camp); }}
-                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium"
-                                >
-                                  <span className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                    <BarChart2 size={13} className="text-blue-600" />
-                                  </span>
-                                  Voir statistiques
-                                </button>
-                                <div className="mx-4 my-1 border-t border-gray-100" />
-                                <button
-                                  onClick={() => { setOpenMenuId(null); setDeletingCampaign(camp); }}
-                                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
-                                >
-                                  <span className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                                    <Trash2 size={13} className="text-red-500" />
-                                  </span>
-                                  Supprimer
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
+                        <button
+                          onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            if (openMenuId === camp.id) {
+                              setOpenMenuId(null);
+                              setMenuPosition(null);
+                            } else {
+                              setOpenMenuId(camp.id);
+                              setMenuPosition({
+                                top: rect.bottom + window.scrollY + 8,
+                                right: window.innerWidth - rect.right
+                              });
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-all"
+                        >
+                          Gérer
+                          <ChevronDown size={13} className={`transition-transform duration-200 ${openMenuId === camp.id ? 'rotate-180' : ''}`} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -1458,6 +1405,79 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               itemsPerPage={ITEMS_PER_PAGE}
             />
           </div>
+
+          {/* Menu déroulant global pour les actions de campagne */}
+          {openMenuId && menuPosition && (() => {
+            const camp = allCampaigns.find(c => c.id === openMenuId);
+            if (!camp) return null;
+            return (
+              <>
+                <div className="fixed inset-0 z-[100]" onClick={() => { setOpenMenuId(null); setMenuPosition(null); }} />
+                <div
+                  className="fixed w-52 bg-white rounded-2xl shadow-xl border border-gray-100 z-[101] overflow-hidden py-1"
+                  style={{ top: `${menuPosition.top}px`, right: `${menuPosition.right}px` }}
+                >
+                  <button
+                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setEditingCampaign({ ...camp }); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all font-medium"
+                  >
+                    <span className="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                      <Pencil size={13} className="text-indigo-600" />
+                    </span>
+                    Modifier
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setOpenMenuId(null);
+                      setMenuPosition(null);
+                      const newStatus = camp.status === 'active' ? 'paused' : 'active';
+                      try {
+                        await supabase
+                          .from('campaigns')
+                          .update({
+                            status: newStatus,
+                            updatedAt: new Date().toISOString()
+                          })
+                          .eq('id', camp.id);
+                        showFeedback(`Campagne ${newStatus === 'active' ? 'activée' : 'mise en pause'} !`);
+                      } catch (e: any) {
+                        console.error(e);
+                        showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all font-medium"
+                  >
+                    <span className="w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                      {camp.status === 'active'
+                        ? <Pause size={13} className="text-yellow-600" />
+                        : <Play size={13} className="text-yellow-600" />
+                      }
+                    </span>
+                    {camp.status === 'active' ? 'Mettre en pause' : 'Activer'}
+                  </button>
+                  <button
+                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setStatsCampaign(camp); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium"
+                  >
+                    <span className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <BarChart2 size={13} className="text-blue-600" />
+                    </span>
+                    Voir statistiques
+                  </button>
+                  <div className="mx-4 my-1 border-t border-gray-100" />
+                  <button
+                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setDeletingCampaign(camp); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
+                  >
+                    <span className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                      <Trash2 size={13} className="text-red-500" />
+                    </span>
+                    Supprimer
+                  </button>
+                </div>
+              </>
+            );
+          })()}
 
           {/* Modal: Modifier */}
           {editingCampaign && (
