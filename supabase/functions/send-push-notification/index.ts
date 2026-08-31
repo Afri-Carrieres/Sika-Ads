@@ -5,7 +5,7 @@
 // SECRETS REQUIS (Supabase secrets):
 //   VAPID_PUBLIC_KEY
 //   VAPID_PRIVATE_KEY
-//   VAPID_SUBJECT (optionnel, ex: mailto:contact@sikaads.tg)
+//   VAPID_SUBJECT (optionnel, ex: mailto:contact@sika-ads.com)
 //
 // APPEL DEPUIS UNE AUTRE EDGE FUNCTION OU LE FRONT :
 //   await supabase.functions.invoke('send-push-notification', {
@@ -33,7 +33,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY');
 const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY');
-const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') || 'mailto:contact@sikaads.tg';
+const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') || 'mailto:contact@sika-ads.com';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

@@ -68,7 +68,7 @@ const ReferralNetwork: React.FC = () => {
     const shareData = {
       title: 'Rejoins SikaAds Togo',
       text: `Utilise mon code ${referralCode} pour gagner de l'argent avec tes statuts WhatsApp !`,
-      url: `https://sikaads.tg/ref/${referralCode}`
+      url: `https://www.sika-ads.com/ref/${referralCode}`
     };
 
     if (navigator.share) {
@@ -229,12 +229,12 @@ const ReferralNetwork: React.FC = () => {
                 <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
                   <input
                     readOnly
-                    value={`https://sikaads.tg/ref/${referralCode}`}
+                    value={`https://www.sika-ads.com/ref/${referralCode}`}
                     className="bg-transparent border-none outline-none text-xs font-medium text-gray-600 flex-1 w-full"
                   />
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://sikaads.tg/ref/${referralCode}`);
+                      navigator.clipboard.writeText(`https://www.sika-ads.com/ref/${referralCode}`);
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}

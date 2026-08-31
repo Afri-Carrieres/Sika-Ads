@@ -1,8 +1,6 @@
-// supabase.ts
-// Handles the Supabase connection (Service Role) and the `proofs` table update.
-
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { NormalizedAIResult } from './types.ts';
+import { determineAutoAction } from '../../config/aiValidationThresholds.ts';
 
 export function getSupabaseClient(): SupabaseClient {
   const url = Deno.env.get('SUPABASE_URL');
@@ -12,44 +10,37 @@ export function getSupabaseClient(): SupabaseClient {
     throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY secrets');
   }
 
-  // Service Role bypasses RLS: this function must run server-side only.
   return createClient(url, serviceRoleKey, {
     auth: { persistSession: false }
   });
 }
 
-/**
- * Derives the `status` column ('validated' | 'rejected') from the AI result.
- * A proof is only auto-validated when the AI thinks it's genuine AND
- * did not raise a fraud alert. Anything else falls back to 'rejected'
- * so a human can review it via `rejectionReason` / `aiAnalysis`.
- */
-function resolveStatus(result: NormalizedAIResult): 'validated' | 'rejected' {
-  return result.isValid && !result.fraudAlert ? 'validated' : 'rejected';
+function resolveStatus(action: 'approve' | 'reject' | 'manual_review'): 'validated' | 'rejected' | 'pending' {
+  if (action === 'approve') return 'validated';
+  if (action === 'reject') return 'rejected';
+  return 'pending';
 }
 
-/**
- * Persists the normalized AI result on the corresponding row of `proofs`.
- * Maps to the actual schema:
- *  - aiValidation      boolean  -> result.isValid
- *  - viewsCount        integer  -> result.viewsCount
- *  - aiAnalysis        jsonb    -> full normalized result (scores, fraud details, etc.)
- *  - status            text     -> derived 'validated' | 'rejected'
- *  - rejectionReason   text     -> result.reason, only set when rejected
- */
 export async function updateProof(
   supabase: SupabaseClient,
   proofId: string,
   result: NormalizedAIResult
 ): Promise<void> {
-  const status = resolveStatus(result);
+  const suggestedAction = determineAutoAction(result);
+  const status = resolveStatus(suggestedAction);
+
+  const enrichedAnalysis = {
+    ...result,
+    suggestedAction,
+    analysisTimestamp: new Date().toISOString()
+  };
 
   const { error } = await supabase
     .from('proofs')
     .update({
       aiValidation: result.isValid,
       viewsCount: result.viewsCount,
-      aiAnalysis: result,
+      aiAnalysis: enrichedAnalysis,
       status,
       rejectionReason: status === 'rejected' ? result.reason : null
     })
@@ -59,4 +50,6 @@ export async function updateProof(
     console.error('[supabase.ts] Failed to update proof', proofId, error);
     throw new Error(`Failed to update proof ${proofId}: ${error.message}`);
   }
+
+  result.suggestedAction = suggestedAction;
 }

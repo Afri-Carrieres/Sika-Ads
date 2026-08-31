@@ -421,7 +421,7 @@ serve(async (req: Request) => {
         <h2 style="margin:0 0 24px;font-size:22px;font-weight:bold;color:#111827;">${titles[typeKey]}</h2>
         <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>
         <div style="text-align:center;">
-          ${button('Ouvrir le panel admin', 'https://www.sika-ads.com/')}
+          ${button('Ouvrir le panel admin', 'https://www.sika-ads.com/admin/login')}
         </div>
       `);
     } else if (type === "campaign_failed") {

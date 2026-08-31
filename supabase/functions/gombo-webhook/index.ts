@@ -1,218 +1,134 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
+function isGomboSuccess(status: unknown, message?: unknown): boolean {
+  const s = (String(status || '') + ' ' + String(message || ''))
+    .toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return ['SUCCESS', 'COMPLETED', 'COMPLETE', 'SUCCESSFUL', 'APPROVED', 'VALIDATED', 'SUCCES']
+    .some((k) => s.includes(k));
+}
+
+function isGomboFailure(status: unknown, message?: unknown): boolean {
+  const s = (String(status || '') + ' ' + String(message || ''))
+    .toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return ['FAILED', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC']
+    .some((k) => s.includes(k));
+}
+
+async function verifyHmac(payload: string, signature: string | null): Promise<boolean> {
+  const secret = Deno.env.get('GOMBO_WEBHOOK_SECRET');
+  if (!secret || !signature) return false;
+
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const msgData = encoder.encode(payload);
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, msgData);
+  const expected = Array.from(new Uint8Array(sig))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if (expected.length !== signature.length) return false;
+
+  let result = 0;
+  for (let i = 0; i < expected.length; i++) {
+    result |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 serve(async (req: Request) => {
-    if (req.method === "OPTIONS") {
-        return new Response("ok", { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  const rawBody = await req.text();
+  const signature = req.headers.get('x-gombo-signature');
+
+  const webhookSecret = Deno.env.get('GOMBO_WEBHOOK_SECRET');
+  if (webhookSecret && signature) {
+    if (!await verifyHmac(rawBody, signature)) {
+      return new Response(JSON.stringify({ error: 'invalid_signature' }), {
+        status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return new Response(JSON.stringify({ error: 'invalid_json' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+  const { status, transaction_ref, reference, transaction_reference, status_message, message, error } = body;
+  const refToUse = (transaction_reference || transaction_ref || reference || (body as Record<string, unknown>).txn_ref || (body as Record<string, unknown>).ref) as string;
+  const statusToCheck = String(status || message || '').trim();
+  const messageToCheck = String(status_message || message || error || '').trim();
+
+  if (!refToUse) {
+    return new Response(JSON.stringify({ error: 'missing_reference' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+
+  if (isGomboSuccess(statusToCheck, messageToCheck)) {
+    const { data: campaigns } = await supabase
+      .from('campaigns').select('id').eq('paymentReference', refToUse).limit(1);
+
+    if (!campaigns || campaigns.length === 0) {
+      return new Response(JSON.stringify({ error: 'campaign_not_found' }), {
+        status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
 
-    try {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    await supabase.from('campaigns').update({
+      paymentStatus: 'paid',
+      campaignPaymentStatus: 'payment_received',
+      status: 'active',
+      paymentConfirmed: true,
+      paymentConfirmedAt: new Date().toISOString(),
+      paymentConfirmedBy: 'gombo_webhook_auto',
+    }).eq('id', campaigns[0].id);
 
-        if (req.method !== "POST") {
-            return new Response("Method not allowed", { status: 405 });
-        }
+    return new Response(JSON.stringify({ success: true, campaignId: campaigns[0].id }), {
+      status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
 
-        const body = await req.json();
-        console.log("📥 GomboPlus Webhook Received:", JSON.stringify(body));
+  if (isGomboFailure(statusToCheck, messageToCheck)) {
+    const { data: campaigns } = await supabase
+      .from('campaigns').select('id').eq('paymentReference', refToUse).limit(1);
 
-        // Extraction de la référence (gestion des différents formats possibles de Gombo)
-        const transactionRef = body.transaction_reference || body.transaction_ref || body.reference;
-        const statusMessage = String(body.status_message || body.status || body.message || "").toUpperCase();
-        const transactionType = String(body.transaction_type || "").toUpperCase();
-
-        if (!transactionRef) {
-            console.warn("⚠️ No reference found in webhook body (test ping)");
-            return new Response(JSON.stringify({ success: true, message: "Ping received" }), {
-                status: 200,
-                headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-        }
-
-        // ─── RÉCONCILIATION DES RÉFÉRENCES ──────────────────────────────────
-        // On nettoie la référence reçue pour enlever les préfixes opérateurs (GOMBOYAS-, GOMBOMOOV-, etc.)
-        const cleanRef = transactionRef.replace(/^GOMBO[A-Z]+-/i, "").trim();
-
-        console.log(`🔍 Webhook Logic:`);
-        console.log(`   - Brut: ${transactionRef}`);
-        console.log(`   - Nettoyé: ${cleanRef}`);
-        console.log(`   - Type: ${transactionType}`);
-        console.log(`   - Status: ${statusMessage}`);
-
-        // Helpers pour déterminer le succès ou l'échec (logique reprise de ta version Firebase)
-        const isSuccess = (msg: string) =>
-            ["SUCCESS", "COMPLETED", "COMPLETE", "SUCCESSFUL", "APPROVED", "SUCCES"].some(k => msg.includes(k));
-        const isFailure = (msg: string) =>
-            ["FAILED", "CANCELLED", "CANCELED", "ECHOUA", "ECHEC"].some(k => msg.includes(k));
-
-        // 1. Traitement pour les Campagnes (CASHIN)
-        if (transactionType === "CASHIN" || transactionRef.toUpperCase().includes("CMP-")) {
-            if (isSuccess(statusMessage)) {
-                console.log(`🔄 Attempting to activate campaign for ref: ${cleanRef}`);
-
-                // On cherche la campagne qui correspond soit à la référence brute, soit à la référence nettoyée
-                const { data, error } = await supabase
-                    .from("campaigns")
-                    .update({
-                        paymentStatus: "paid",
-                        campaignPaymentStatus: "payment_received",
-                        status: "active",
-                        paymentConfirmed: true,
-                        paymentConfirmedAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                    })
-                    .or(`paymentReference.eq."${transactionRef}",paymentReference.eq."${cleanRef}"`)
-                    .select(); // Crucial pour voir le résultat dans les logs
-
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    console.warn(`⚠️ Aucune campagne trouvée en base pour la référence: ${transactionRef}. Possible retard d'écriture (Race Condition).`);
-                } else {
-                    console.log(`✅ Campaign status updated to ACTIVE for ref: ${cleanRef}`, data);
-
-                    // Notification par email de l'annonceur
-                    const campaign = data[0];
-                    const recipientEmail = campaign.advertiserEmail || campaign.advertiser_email;
-                    if (recipientEmail) {
-                        const supabaseUrl = Deno.env.get("SUPABASE_URL");
-                        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-                        fetch(`${supabaseUrl}/functions/v1/send-email`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${supabaseServiceKey}`,
-                            },
-                            body: JSON.stringify({
-                                to: recipientEmail,
-                                type: "campaign_confirmed",
-                                data: {
-                                    advertiserName: campaign.advertiserName || campaign.advertiser_name || "Annonceur",
-                                    campaignTitle: campaign.title,
-                                    amount: campaign.totalBudget || campaign.total_budget || campaign.budget,
-                                    campaignId: campaign.id,
-                                },
-                            }),
-                        }).then(() => {
-                            console.log(`📧 Email de confirmation envoyé à ${recipientEmail}`);
-                        }).catch((emailErr) => {
-                            console.error("❌ Erreur lors de l'envoi de l'email depuis le webhook:", emailErr);
-                        });
-                    }
-                }
-            }
-            else if (isFailure(statusMessage)) {
-                console.log(`🔄 Attempting to mark campaign as FAILED for ref: ${cleanRef}`);
-                console.log(`   - Searching with transactionRef: "${transactionRef}"`);
-                console.log(`   - Searching with cleanRef: "${cleanRef}"`);
-
-                const { data, error } = await supabase
-                    .from("campaigns")
-                    .update({
-                        paymentStatus: "failed",
-                        campaignPaymentStatus: "payment_failed",
-                        paymentConfirmed: false, // Explicitement défini à false en cas d'échec
-                        updatedAt: new Date().toISOString(),
-                    })
-                    .or(`paymentReference.eq."${transactionRef}",paymentReference.eq."${cleanRef}"`)
-                    .select();
-
-                // Notification par email de l'annonceur
-                const campaign = data[0];
-                const recipientEmail = campaign.advertiserEmail || campaign.advertiser_email;
-                if (recipientEmail) {
-                    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-                    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-                    fetch(`${supabaseUrl}/functions/v1/send-email`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${supabaseServiceKey}`,
-                        },
-                        body: JSON.stringify({
-                            to: recipientEmail,
-                            type: "campaign_failed",
-                            data: {
-                                advertiserName: campaign.advertiserName || campaign.advertiser_name || "Annonceur",
-                                campaignTitle: campaign.title,
-                                amount: campaign.totalBudget || campaign.total_budget || campaign.budget,
-                                campaignId: campaign.id,
-                            },
-                        }),
-                    }).then(() => {
-                        console.log(`📧 Email de confirmation envoyé à ${recipientEmail}`);
-                    }).catch((emailErr) => {
-                        console.error("❌ Erreur lors de l'envoi de l'email depuis le webhook:", emailErr);
-                    });
-                }
-
-                if (error) {
-                    console.error(`❌ Error updating campaign status to FAILED for ref ${cleanRef}:`, error);
-                    throw error; // Re-throw pour s'assurer que le bloc catch externe est atteint
-                }
-                if (!data || data.length === 0) {
-                    console.warn(`⚠️ Aucune campagne trouvée en base pour la référence: ${transactionRef} (ou ${cleanRef}). Impossible de marquer comme FAILED.`);
-                } else {
-                    console.log(`❌ Campaign payment marked as FAILED for ref: ${cleanRef}`, data);
-                }
-            }
-        }
-
-        // 2. Traitement pour les Retraits (CASHOUT)
-        if (transactionType === "CASHOUT" || transactionRef.toUpperCase().includes("WD-") || transactionRef.toUpperCase().includes("WTH-")) {
-            const newStatus = isSuccess(statusMessage) ? "completed" : isFailure(statusMessage) ? "failed" : null;
-
-            if (newStatus) {
-                const { error } = await supabase
-                    .from("withdrawals")
-                    .update({
-                        status: newStatus,
-                        updatedAt: new Date().toISOString(),
-                    })
-                    .eq("transactionReference", transactionRef);
-
-                if (error) throw error;
-
-                // Si le retrait échoue, il faut recréditer l'utilisateur (logique similaire à Firebase)
-                if (newStatus === "failed") {
-                    const { data: withdrawal } = await supabase
-                        .from("withdrawals")
-                        .select("userId, amount")
-                        .eq("transactionReference", transactionRef)
-                        .single();
-
-                    if (withdrawal) {
-                        await supabase.rpc('increment_user_balance', {
-                            user_id: withdrawal.userId,
-                            amount_to_add: withdrawal.amount
-                        });
-                        console.log(`💰 Refunded ${withdrawal.amount} to user ${withdrawal.userId} due to failed withdrawal`);
-                    }
-                }
-
-                console.log(`✅ Withdrawal status updated to ${newStatus} for ref: ${transactionRef}`);
-            }
-        }
-
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-
-    } catch (err: any) {
-        console.error("❌ Webhook Error:", err.message);
-        return new Response(JSON.stringify({ error: err.message }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+    if (campaigns && campaigns.length > 0) {
+      await supabase.from('campaigns').update({
+        paymentStatus: 'failed',
+        campaignPaymentStatus: 'payment_failed',
+        paymentError: String(messageToCheck || statusToCheck || 'Unknown error'),
+      }).eq('id', campaigns[0].id);
     }
+
+    return new Response(JSON.stringify({ success: false, error: 'payment_failed' }), {
+      status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+
+  return new Response(JSON.stringify({ accepted: true, message: 'Status pending' }), {
+    status: 202, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+  });
 });

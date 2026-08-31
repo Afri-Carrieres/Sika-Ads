@@ -4,7 +4,6 @@ import { Proof, Notification, AIAnalysis, Campaign } from '../types';
 import { Upload, CheckCircle2, XCircle, Clock, Trash2, Eye, X, Image as ImageIcon, FileText, AlertCircle, Loader2, BrainCircuit, ShieldCheck, ShieldAlert, ChevronDown, Info, Search, Sparkles } from 'lucide-react';
 import { supabase } from '../supabase';
 import { validateProofWithAI } from '../services/geminiService';
-import { determineAutoAction, AI_VALIDATION_CONFIG } from '../config/aiValidationThresholds';
 import Pagination from '../components/Pagination';
 import { useUserData } from '../hooks/useUserData';
 
@@ -216,43 +215,16 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
       const base64 = await fileToBase64(file);
       const aiResult = await validateProofWithAI(base64, proofId);
 
-      // Déterminer l'action automatique basée sur l'analyse IA
-      const autoAction = determineAutoAction(aiResult);
-      let newStatus: 'pending' | 'validated' | 'rejected' = 'pending';
+      const action = aiResult.suggestedAction || 'manual_review';
+      console.log(`Background AI analysis completed. Action: ${action}`);
 
-      if (autoAction === 'approve') {
-        newStatus = 'validated';
-      } else if (autoAction === 'reject') {
-        newStatus = 'rejected';
-      }
-
-      // Horodatage de l'analyse
-      const enrichedAiAnalysis: AIAnalysis = {
-        ...aiResult,
-        suggestedAction: autoAction,
-        analysisTimestamp: new Date().toISOString()
-      };
-
-      const { error } = await supabase
-        .from('proofs')
-        .update({
-          aiAnalysis: enrichedAiAnalysis,
-          aiValidation: true,
-          status: newStatus
-        })
-        .eq('id', proofId);
-      if (error) throw error;
-
-      console.log(`Background AI analysis completed. Action: ${autoAction}, New Status: ${newStatus}`);
-
-      // Notifications enrichies basées sur l'action
-      if (autoAction === 'approve') {
+      if (action === 'approve') {
         addNotification({
           title: '✅ Preuve validée automatiquement',
-          message: AI_VALIDATION_CONFIG.notificationMessages.autoApproved.ambassador || 'Votre preuve a été validée avec succès! Vous recevrez vos revenus sous peu.',
+          message: 'Votre preuve a été validée avec succès! Vous recevrez vos revenus sous peu.',
           type: 'status'
         });
-      } else if (autoAction === 'reject') {
+      } else if (action === 'reject') {
         const fraudTypeLabel = aiResult.fraudType?.replace(/_/g, ' ') || 'fraude détectée';
         const confidencePercent = Math.round(aiResult.confidence || 0);
         addNotification({
@@ -261,14 +233,12 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
           type: 'status'
         });
       } else {
-        // Manual review
         addNotification({
           title: '⏳ Preuve en révision',
-          message: AI_VALIDATION_CONFIG.notificationMessages.manualReview.ambassador || 'Votre preuve est en cours de révision par notre équipe. Nous vous contacterons bientôt avec les résultats.',
+          message: 'Votre preuve est en cours de révision par notre équipe. Nous vous contacterons bientôt avec les résultats.',
           type: 'status'
         });
       }
-
     } catch (error) {
       console.error("Background AI Analysis failed:", error);
     }

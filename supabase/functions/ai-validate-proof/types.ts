@@ -18,7 +18,9 @@ export interface RawAIResult {
   fraudEvidenceDetails: string[];
 }
 
-export interface NormalizedAIResult extends RawAIResult {}
+export interface NormalizedAIResult extends RawAIResult {
+  suggestedAction?: 'approve' | 'reject' | 'manual_review';
+}
 
 export interface FunctionResponse {
   success: boolean;

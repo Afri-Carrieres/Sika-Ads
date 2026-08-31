@@ -23,6 +23,7 @@ import CreateCampaign from './views/CreateCampaign';
 import PaymentPage from './views/PaymentPage';
 import SuccessCampaign from './views/SuccessCampaign';
 import LoginView from './views/LoginView';
+import AdminLoginView from './views/AdminLoginView';
 import RegistrationForm from './views/RegistrationForm';
 import WalletView from './views/WalletView';
 import VerificationPending from './views/VerificationPending';
@@ -44,7 +45,7 @@ import { initializeDatabase } from './services/initDb';
 import { cleanupNonAdminUsers } from './services/cleanupUsers';
 import { Clock, Loader2 } from 'lucide-react';
 
-type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'register' | 'verification-pending' | 'reset-password';
+type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'admin-login' | 'register' | 'verification-pending' | 'reset-password';
 
 // Helper to parse current path and return view + tab
 const parsePathname = (pathname: string): { view: AppView; tab: string } => {
@@ -65,7 +66,11 @@ const parsePathname = (pathname: string): { view: AppView; tab: string } => {
     return { view: 'app', tab: 'profile' };
   }
 
-  if (['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'register', 'verification-pending', 'reset-password'].includes(firstPart)) {
+  if (firstPart === 'admin' && parts[1] === 'login') {
+    return { view: 'admin-login', tab: 'dashboard' };
+  }
+
+  if (['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'admin-login', 'register', 'verification-pending', 'reset-password'].includes(firstPart)) {
     return { view: firstPart, tab: 'dashboard' };
   }
 
@@ -218,22 +223,40 @@ const App: React.FC = () => {
         if (view === 'advertise') {
           setRedirectAfterLogin('advertise');
         }
-        setView('landing');
-        // On redirige vers login pour forcer l'auth après avoir cliqué sur "Je veux faire de la pub"
-        if (view === 'advertise') {
-          setView('login');
+        // Si l'utilisateur essaie d'acceder a une route admin, rediriger vers /admin/login
+        if (currentTab.startsWith('admin')) {
+          setView('admin-login');
+        } else {
+          setView('landing');
+          // On redirige vers login pour forcer l'auth apres avoir clique sur "Je veux faire de la pub"
+          if (view === 'advertise') {
+            setView('login');
+          }
         }
       }
 
       if (user && userData && view === 'app') {
-        // Autoriser STAFF (Admin + Mod) sur les onglets admin
+        // PROTECTION RENFORCEE: Redirection immediate si non-staff essaie d'acceder aux routes admin
+        if (!isStaff && currentTab.startsWith('admin')) {
+          console.warn('[SECURITY] Non-staff user attempted to access admin route:', currentTab);
+          setTab('dashboard');
+        }
+
+        // Auto-redirect staff vers dashboard admin
         if (isStaff && currentTab === 'dashboard' && !currentTab.startsWith('admin')) {
           setTab('admin-dashboard');
         }
+      }
 
-        // Bloquer strictement les AMBASSADORS des onglets Admin
-        if (!isStaff && currentTab.startsWith('admin')) {
-          setTab('dashboard');
+      // PROTECTION: Si user est connecte mais n'est pas staff et essaie d'acceder a /admin/login
+      if (user && view === 'admin-login') {
+        if (!isStaff) {
+          console.warn('[SECURITY] Non-staff user attempted to access admin login');
+          setView('landing');
+        } else {
+          // Deja connecte et staff, rediriger vers le dashboard admin
+          setView('app');
+          setTab('admin-dashboard');
         }
       }
 
@@ -352,6 +375,7 @@ const App: React.FC = () => {
     const showLoadingOverlay = loading && view !== 'landing' && view !== 'reset-password';
 
     if (view === 'login') return <LoginView onSuccess={() => setView(redirectAfterLogin || 'app')} onGoBack={() => setView('landing')} onGoToRegister={() => setView('register')} />
+    if (view === 'admin-login') return <AdminLoginView onSuccess={() => { setView('app'); setTab('admin-dashboard'); }} onGoBack={() => setView('landing')} />
     if (view === 'register') return <RegistrationForm onComplete={(dest) => {
       if (dest === 'verification') { setView('verification-pending'); return; }
       // Nouveau compte : atterrir sur le dashboard, pas sur le dernier onglet d'une session précédente

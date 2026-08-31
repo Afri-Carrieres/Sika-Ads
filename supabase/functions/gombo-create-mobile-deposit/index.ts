@@ -1,157 +1,151 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
 };
 
-serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
+
+async function gomboFetch(path: string, body: Record<string, unknown>) {
+  const publicKey = Deno.env.get('GOMBO_PUBLIC_KEY_SECRET');
+  const privateKey = Deno.env.get('GOMBO_PRIVATE_KEY_SECRET');
+  
+  if (!publicKey || !privateKey) {
+    throw new Error('Missing GOMBO_PUBLIC_KEY or GOMBO_PRIVATE_KEY');
   }
 
-  // Helper interne pour simuler le gomboFetch de ton code Firebase
-  const gomboFetch = async (baseUrl: string, path: string, publicKey: string, privateKey: string, body: any) => {
-    const url = `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
-    console.log(`🚀 Appel GomboPlus: ${url}`, JSON.stringify(body));
+  const res = await fetch(`${GOMBO_BASE_URL}/${path.replace(/^\//, '')}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Public-Key': publicKey,
+      'X-Private-Key': privateKey,
+    },
+    body: JSON.stringify(body),
+  });
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Public-Key": publicKey,
-        "X-Private-Key": privateKey,
-      },
-      body: JSON.stringify(body),
-    });
+  const text = await res.text();
+  let json: unknown = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    // keep raw text
+  }
 
-    const text = await res.text();
-    let json: any = null;
-    try {
-      json = text ? JSON.parse(text) : null;
-    } catch {
-      // ignore parsing error
-    }
+  if (!res.ok) {
+    const message = typeof json === 'object' && json && 'message' in json
+      ? String((json as Record<string, unknown>).message)
+      : `gombo_http_${res.status}`;
+    throw new Error(`${message}:${text || ''}`.slice(0, 2000));
+  }
 
-    if (!res.ok) {
-      const message = json && typeof json === "object" && json.message
-        ? String(json.message)
-        : `gombo_http_${res.status}`;
+  return json;
+}
 
-      // On jette une erreur structurée pour le catch global
-      const errorInfo = {
-        message,
-        status: res.status,
-        details: json
-      };
-      throw new Error(JSON.stringify(errorInfo));
-    }
-
-    return json;
-  };
+serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const privateKey = Deno.env.get("GOMBO_PRIVATE_KEY_SECRET");
-    const publicKey = Deno.env.get("GOMBO_PUBLIC_KEY_SECRET");
-    const gomboBaseUrl = Deno.env.get("GOMBO_BASE_URL") || "https://api.gomboplus.com";
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Les données envoyées par ton frontend (PaymentPage.tsx)
-    const body = await req.json();
-    console.log("📥 Payload reçu du frontend:", JSON.stringify(body));
-
-    const { amount, recipient_number, operator, campaignId, country = "TG" } = body;
-
-    if (!amount || !recipient_number || !operator || !campaignId) {
-      const missingFields = [];
-      if (!amount) missingFields.push("amount");
-      if (!recipient_number) missingFields.push("recipient_number");
-      if (!operator) missingFields.push("operator");
-      if (!campaignId) missingFields.push("campaignId");
-
-      return new Response(JSON.stringify({ error: `Champs obligatoires manquants: ${missingFields.join(", ")}` }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
 
-    if (!publicKey || !privateKey) {
-      throw new Error("Clés API GomboPlus non configurées dans les secrets");
-    }
-
-    // 1. Création d'une référence locale temporaire
-    const localRef = `CMP-${campaignId.substring(0, 8)}-${Date.now()}`;
-
-    // 2. Préparation du payload (en s'inspirant de ta logique Firebase)
-    const cleanNumber = recipient_number.replace(/\s+/g, '').replace('+', '');
-
-    const gomboPayload = {
-      amount: Math.round(Number(amount)), // Arrondi comme dans ton code Firebase
-      currency: "XOF",
-      number: cleanNumber,
-      recipient_number: cleanNumber,
-      country: country.toUpperCase(),
-      operator: operator.toLowerCase(),
-      transaction_ref: localRef,
-      transaction_reference: localRef, // Double sécurité sur le nom du champ
-      callback_url: `${supabaseUrl}/functions/v1/gombo-webhook`,
-    };
-
-    // 3. Appel API via le helper standardisé
-    // On utilise "api/..." au lieu de "/api/..." pour laisser le helper gérer le slash
-    const gomboData = await gomboFetch(
-      gomboBaseUrl,
-      "api/mobile-services/mobile-deposit/",
-      publicKey,
-      privateKey,
-      gomboPayload
-    );
-
-    console.log("📥 Réponse GomboPlus succès:", JSON.stringify(gomboData));
-
-    // 4. Récupération de la référence finale
-    // On vérifie content.reference en priorité, sinon la racine, sinon localRef
-    const finalReference =
-      gomboData.content?.reference ||
-      gomboData.reference ||
-      gomboData.content?.id ||
-      localRef;
-
-    await supabase
-      .from("campaigns")
-      .update({
-        paymentReference: finalReference,
-        paymentOperator: operator,
-        updatedAt: new Date().toISOString(),
-      })
-      .eq("id", campaignId);
-
-    return new Response(JSON.stringify(gomboData), {
-      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      global: { headers: { Authorization: authHeader } }
     });
 
-  } catch (err: any) {
-    console.error("❌ Erreur gombo-create-mobile-deposit:", err);
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
 
-    let status = 500;
-    let errorPayload = { error: err.message };
+    const body = await req.json();
+    const { campaignId, recipient_number, country, operator } = body;
 
-    // Si c'est une erreur venant de gomboFetch (JSON stringifié)
-    try {
-      const parsedError = JSON.parse(err.message);
-      status = parsedError.status || 500;
-      errorPayload = {
-        error: parsedError.message,
-        details: parsedError.details
-      };
-    } catch { /* pas un JSON, on garde l'erreur brute */ }
+    if (!campaignId || !recipient_number || !country || !operator) {
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
 
-    return new Response(JSON.stringify(errorPayload), {
-      status: status, headers: { ...corsHeaders, "Content-Type": "application/json" }
+    const { data: campaign, error: campaignErr } = await supabase
+      .from('campaigns')
+      .select('*')
+      .eq('id', campaignId)
+      .single();
+
+    if (campaignErr || !campaign) {
+      return new Response(JSON.stringify({ error: 'Campaign not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    if (campaign.advertiserId !== user.id) {
+      return new Response(JSON.stringify({ error: 'Not your campaign' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const amount = Number(campaign.totalBudget || 0);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return new Response(JSON.stringify({ error: 'Invalid amount' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const transaction_ref = `CMP-${campaignId.substring(0, 8)}-${Date.now()}`;
+    const callback_url = Deno.env.get('GOMBO_WEBHOOK_URL') || '';
+
+    const result = await gomboFetch('mobile-services/mobile-deposit/', {
+      amount: Math.round(amount),
+      currency: 'XOF',
+      number: recipient_number,
+      recipient_number,
+      operator: operator.toLowerCase(),
+      country: country.toUpperCase(),
+      transaction_ref,
+      callback_url,
+    });
+
+    const resObj = result as Record<string, unknown>;
+    const reference = resObj.reference || (operator === 'moov' ? `GOMBOMOOV-${transaction_ref}` : `GOMBOYAS-${transaction_ref}`);
+
+    await supabase
+      .from('campaigns')
+      .update({
+        paymentReference: reference,
+        paymentOperator: operator,
+      })
+      .eq('id', campaignId);
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  } catch (error) {
+    console.error('gombo-create-mobile-deposit error:', error);
+    return new Response(JSON.stringify({ error: String(error) }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
 });
