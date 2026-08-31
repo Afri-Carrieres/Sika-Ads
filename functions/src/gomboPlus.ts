@@ -1,7 +1,16 @@
 import {defineSecret} from "firebase-functions/params";
+import * as crypto from "crypto";
 
 export const GOMBO_PUBLIC_KEY_SECRET = defineSecret("GOMBO_PUBLIC_KEY_SECRET");
 export const GOMBO_PRIVATE_KEY_SECRET = defineSecret("GOMBO_PRIVATE_KEY_SECRET");
+export const GOMBO_WEBHOOK_SECRET = defineSecret("GOMBO_WEBHOOK_SECRET");
+
+export function verifyWebhookSignature(payload: string, signature: string | undefined): boolean {
+    const secret = GOMBO_WEBHOOK_SECRET.value();
+    if (!secret || !signature) return false;
+    const expected = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
 
 const GOMBO_BASE_URL = "https://api.gomboplus.com/api";
 

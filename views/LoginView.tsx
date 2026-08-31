@@ -43,19 +43,50 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_MS = 60_000;
+
+  const isLockedOut = (): boolean => {
+    if (!lockoutUntil) return false;
+    if (Date.now() >= lockoutUntil) {
+      setLockoutUntil(null);
+      setAttempts(0);
+      return false;
+    }
+    return true;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isLockedOut()) {
+      const remaining = Math.ceil(((lockoutUntil || 0) - Date.now()) / 1000);
+      setError(`Trop de tentatives. Reessayez dans ${remaining}s.`);
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-      if (err) throw err;
+      if (err) {
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
+        if (newAttempts >= MAX_ATTEMPTS) {
+          setLockoutUntil(Date.now() + LOCKOUT_MS);
+          setError(`Trop de tentatives. Compte verrouille 60s.`);
+        } else {
+          setError(`Email ou mot de passe incorrect. (${MAX_ATTEMPTS - newAttempts} essais restants)`);
+        }
+        return;
+      }
       onSuccess();
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Email ou mot de passe incorrect.');
+    } catch {
+      setError('Erreur de connexion. Reessayez.');
     } finally {
       setLoading(false);
     }

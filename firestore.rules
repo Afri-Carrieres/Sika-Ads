@@ -128,7 +128,7 @@ service cloud.firestore {
     // 2) Campaigns
     // ─────────────────────────────────────────────
     match /campaigns/{campaignId} {
-      allow read: if true;
+      allow read: if isSignedIn();
 
       // Création:
       // - Staff: peut créer des campagnes admin (ex: VIP)

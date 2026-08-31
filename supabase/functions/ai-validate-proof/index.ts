@@ -1,7 +1,5 @@
-// index.ts
-// Edge Function entry point. Pure orchestration, no business logic here.
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { RequestBody, FunctionResponse } from './types.ts';
 import { callAI } from './ai.ts';
 import { parseAIResponse } from './parser.ts';
@@ -32,6 +30,32 @@ function validateRequest(payload: any): RequestBody {
   return { proofId, imageUrl };
 }
 
+async function authenticateRequest(req: Request): Promise<{ userId: string; isStaff: boolean } | null> {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+
+  const token = authHeader.replace('Bearer ', '');
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: `Bearer ${token}` } }
+  });
+
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) return null;
+
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  const isStaff = profile?.role === 'ADMIN' || profile?.role === 'MODERATOR';
+  return { userId: user.id, isStaff };
+}
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -40,6 +64,14 @@ serve(async (req: Request) => {
   let proofId = 'unknown';
 
   try {
+    const auth = await authenticateRequest(req);
+    if (!auth || !auth.isStaff) {
+      return jsonResponse(
+        { success: false, proofId: 'unknown', error: 'Unauthorized: staff access required' },
+        401
+      );
+    }
+
     const body = await req.json();
     console.log('[index.ts] Received body:', JSON.stringify(body));
 
@@ -60,7 +92,7 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`[index.ts] Validating proof ${proofId}`);
+    console.log(`[index.ts] Validating proof ${proofId} for user ${auth.userId}`);
 
     const rawProviderText = await callAI(parsedRequest.imageUrl, apiKey);
     const rawResult = parseAIResponse(rawProviderText);

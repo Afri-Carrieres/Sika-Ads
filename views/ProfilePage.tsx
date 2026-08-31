@@ -145,17 +145,24 @@ const ProfilePage: React.FC = () => {
 
   // --- AVATAR MANAGEMENT ---
 
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      showError("Format non autorise. Utilisez JPG, PNG, WebP ou GIF.");
+      e.target.value = '';
+      return;
+    }
+
     setIsUploading(true);
     try {
-      // 1. Upload to Storage
       const filePath = `${user.id}`;
       const { error: uploadErr } = await supabase.storage
         .from('profile-pictures')
-        .upload(filePath, file, { upsert: true });
+        .upload(filePath, file, { upsert: true, contentType: file.type });
 
       if (uploadErr) throw uploadErr;
 
@@ -252,8 +259,8 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setPasswordError('Le nouveau mot de passe doit contenir au moins 6 caracteres.');
+    if (newPassword.length < 8) {
+      setPasswordError('Le nouveau mot de passe doit contenir au moins 8 caracteres.');
       return;
     }
 
@@ -269,19 +276,17 @@ const ProfilePage: React.FC = () => {
 
     setIsChangingPassword(true);
     try {
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password: currentPassword
-      });
-      if (signInErr) {
-        setPasswordError('Mot de passe actuel incorrect.');
-        return;
-      }
-
       const { error: updateErr } = await supabase.auth.updateUser({
         password: newPassword
       });
-      if (updateErr) throw updateErr;
+      if (updateErr) {
+        if (updateErr.message?.includes('password') || updateErr.message?.includes('auth')) {
+          setPasswordError('Session expiree. Veuillez vous reconnecter et reessayer.');
+        } else {
+          setPasswordError(updateErr.message || 'Une erreur est survenue.');
+        }
+        return;
+      }
 
       setCurrentPassword('');
       setNewPassword('');
@@ -312,16 +317,9 @@ const ProfilePage: React.FC = () => {
 
     setIsDeleting(true);
     try {
-      const uid = user.id;
+      const { error } = await supabase.functions.invoke('delete-account');
+      if (error) throw error;
 
-      // 1. Delete user row from database
-      const { error: dbErr } = await supabase.from('users').delete().eq('id', uid);
-      if (dbErr) throw dbErr;
-
-      // 2. Delete Profile Picture (if exists)
-      await supabase.storage.from('profile-pictures').remove([uid]).catch(() => { });
-
-      // 3. Sign Out
       await supabase.auth.signOut();
     } catch (error: any) {
       console.error("Delete account error:", error);

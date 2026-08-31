@@ -5,6 +5,7 @@ import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
 import * as logger from "firebase-functions/logger";
+import {defineSecret} from "firebase-functions/params";
 
 // ✅ Import email functions (secrets are auto-managed)
 import {
@@ -30,6 +31,8 @@ import {
     createMobileWithdrawal,
     GOMBO_PUBLIC_KEY_SECRET,
     GOMBO_PRIVATE_KEY_SECRET,
+    GOMBO_WEBHOOK_SECRET,
+    verifyWebhookSignature,
 } from "./gomboPlus";
 
 initializeApp();
@@ -37,13 +40,14 @@ const db = getFirestore();
 
 setGlobalOptions({maxInstances: 10});
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "danielattoh79@gmail.com";
+const ADMIN_EMAIL_SECRET = defineSecret("ADMIN_EMAIL");
+const ADMIN_EMAIL = ADMIN_EMAIL_SECRET.value() || "admin@sikaads.app";
 
 // ✅ Secrets must be explicitly listed in the functions options
 const commonOptions = {
     region: "us-central1",
     enforceAppCheck: false,
-    secrets: [RESEND_API_KEY_SECRET, RESEND_FROM_SECRET],
+    secrets: [RESEND_API_KEY_SECRET, RESEND_FROM_SECRET, ADMIN_EMAIL_SECRET],
 };
 
 const gomboOptions = {
@@ -54,6 +58,7 @@ const gomboOptions = {
         RESEND_FROM_SECRET,
         GOMBO_PUBLIC_KEY_SECRET,
         GOMBO_PRIVATE_KEY_SECRET,
+        GOMBO_WEBHOOK_SECRET,
     ],
 };
 
@@ -835,7 +840,6 @@ function isGomboFailure(status: unknown, message?: unknown): boolean {
 export const gomboWebhook = onRequest(
     {...gomboOptions},
     async (req, res) => {
-        // ✅ Log complet pour le débogage
         console.log("--- GOMBO CALLBACK RECEIVED ---");
         console.log("Full Request:", {
             method: req.method,
@@ -853,6 +857,14 @@ export const gomboWebhook = onRequest(
         if (req.method !== "POST") {
             logger.warn("gomboWebhook: Invalid method", {method: req.method});
             res.status(405).send("Method Not Allowed");
+            return;
+        }
+
+        const rawBody = typeof req.rawBody === "string" ? req.rawBody : req.rawBody?.toString("utf-8") || JSON.stringify(req.body);
+        const signature = req.headers["x-gombo-signature"] as string | undefined;
+        if (!verifyWebhookSignature(rawBody, signature)) {
+            logger.error("gomboWebhook: Invalid or missing HMAC signature");
+            res.status(401).json({error: "invalid_signature"});
             return;
         }
 
