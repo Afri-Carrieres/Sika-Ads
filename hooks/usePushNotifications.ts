@@ -48,7 +48,18 @@ export function usePushNotifications({ userId }: UsePushNotificationsOptions): U
       return;
     }
 
-    setPermission(Notification.permission as PushPermissionState);
+    const currentPermission = Notification.permission as PushPermissionState;
+    setPermission(currentPermission);
+
+    if (currentPermission === 'granted' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.pushManager.getSubscription().then((subscription) => {
+          if (subscription) {
+            setIsSubscribed(true);
+          }
+        });
+      }).catch(() => {});
+    }
   }, []);
 
   const saveSubscription = useCallback(async (subscription: PushSubscription) => {
