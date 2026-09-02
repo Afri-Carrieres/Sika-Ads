@@ -55,7 +55,7 @@ const TOC: { id: string; n: number; label: string }[] = [
 
 const SectionHeading: React.FC<{ n: number; title: string }> = ({ n, title }) => (
   <div className="flex items-center gap-3">
-    <span className="w-8 h-8 shrink-0 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">
+    <span className="w-8 h-8 shrink-0 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">
       {String(n).padStart(2, '0')}
     </span>
     <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{title}</h2>
@@ -68,9 +68,9 @@ const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ chi
 
 const InfoRow: React.FC<{ label: string; value: string; href?: string }> = ({ label, value, href }) => (
   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-slate-200 last:border-b-0 pb-3 last:pb-0 sm:pb-3">
-    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
+    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{label}</span>
     {href ? (
-      <a href={href} className="text-sm font-bold text-slate-900 hover:text-[#128785] transition-colors break-all">
+      <a href={href} className="text-sm font-bold text-slate-900 hover:text-[#128686] transition-colors break-all">
         {value}
       </a>
     ) : (
@@ -83,7 +83,7 @@ const BulletList: React.FC<{ items: string[]; danger?: boolean }> = ({ items, da
   <ul className="space-y-2">
     {items.map((item) => (
       <li key={item} className="flex gap-3 text-sm text-slate-600 font-medium leading-relaxed">
-        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${danger ? 'bg-red-500' : 'bg-[#128785]'}`} />
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-2 ${danger ? 'bg-red-500' : 'bg-[#128686]'}`} />
         {item}
       </li>
     ))}
@@ -105,9 +105,9 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
         badge="Sika Ads"
         title="Mentions légales"
         subtitle="Retrouvez les informations essentielles concernant Sika Ads, son éditeur, son hébergement, son infrastructure et les règles applicables à l'utilisation de la plateforme."
-        accent="indigo"
+        accent="teal"
       >
-        <p className="text-blue-200/70 text-sm font-bold mt-4">Dernière mise à jour : Août 2026</p>
+        <p className="text-[#A9DADA]/80 text-sm font-bold mt-4">Dernière mise à jour : Août 2026</p>
       </PageHero>
 
       {/* ── BLOC INFORMATIONS ESSENTIELLES ── */}
@@ -119,11 +119,11 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
               return (
                 <div key={info.label} className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icon size={15} className="text-[#128785]" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{info.label}</p>
+                    <Icon size={15} className="text-[#128686]" />
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{info.label}</p>
                   </div>
                   {info.href ? (
-                    <a href={info.href} className="text-sm font-bold text-slate-900 hover:text-[#128785] transition-colors break-all">
+                    <a href={info.href} className="text-sm font-bold text-slate-900 hover:text-[#128686] transition-colors break-all">
                       {info.value}
                     </a>
                   ) : (
@@ -148,8 +148,8 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   <ul className="space-y-2.5 text-sm font-bold text-slate-600 overflow-y-auto max-h-[60vh] pr-2 scrollbar-hide">
                     {TOC.map((item) => (
                       <li key={item.id}>
-                        <a href={`#${item.id}`} className="hover:text-indigo-600 transition-colors block py-0.5">
-                          <span className="text-slate-300 font-black mr-2">{item.n}.</span>
+                        <a href={`#${item.id}`} className="hover:text-[#128686] transition-colors block py-0.5">
+                          <span className="text-slate-300 font-bold mr-2">{item.n}.</span>
                           {item.label}
                         </a>
                       </li>
@@ -157,9 +157,9 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   </ul>
                 </nav>
                 <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mt-8">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
                   <p className="text-xs text-slate-600 mb-4 font-medium italic leading-relaxed">Une information vous semble manquante ? Notre équipe est là pour vous éclairer.</p>
-                  <button onClick={() => onNavigate('contact')} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg">
+                  <button onClick={() => onNavigate('contact')} className="text-[10px] font-bold uppercase text-[#128686] hover:text-[#0E6B6B] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg">
                     Contacter le support <ArrowRight size={12} />
                   </button>
                 </div>
@@ -170,7 +170,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
             <div className="lg:col-span-2 space-y-14">
               {/* Mobile compact TOC */}
               <details className="lg:hidden group bg-slate-50 rounded-2xl border border-slate-100 px-5 py-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black text-slate-900 uppercase tracking-widest">
+                <summary className="flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-bold text-slate-900 uppercase tracking-widest">
                   Sommaire
                   <span className="text-slate-400 group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
                 </summary>
@@ -178,7 +178,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   {TOC.map((item) => (
                     <li key={item.id}>
                       <a href={`#${item.id}`} className="block py-1">
-                        <span className="text-slate-300 font-black mr-2">{item.n}.</span>
+                        <span className="text-slate-300 font-bold mr-2">{item.n}.</span>
                         {item.label}
                       </a>
                     </li>
@@ -229,13 +229,13 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   <div className="flex flex-col sm:flex-row gap-3 pt-3">
                     <button
                       onClick={() => onNavigate('contact')}
-                      className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#f55d05] text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#ea580c] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#F65E06] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#D14E04] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
                     >
                       <Mail size={14} /> Envoyer un message
                     </button>
                     <a
                       href="tel:+22891416745"
-                      className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white border-2 border-slate-200 text-slate-700 text-[11px] font-black uppercase tracking-widest hover:border-[#128785] hover:text-[#128785] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-100"
+                      className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white border-2 border-slate-200 text-slate-700 text-[11px] font-bold uppercase tracking-widest hover:border-[#128686] hover:text-[#128686] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-100"
                     >
                       <Phone size={14} /> Appeler Sika Ads
                     </a>
@@ -257,7 +257,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                     href="https://www.lws.fr"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-1"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-1"
                   >
                     Site officiel de LWS <ArrowRight size={12} />
                   </a>
@@ -279,7 +279,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                     href="https://supabase.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-1"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-1"
                   >
                     Site officiel de Supabase <ArrowRight size={12} />
                   </a>
@@ -314,7 +314,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                     {['Statut WhatsApp', 'Story Instagram', 'Story Facebook'].map((platform) => (
-                      <div key={platform} className="flex items-center justify-center px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-black text-slate-900 uppercase tracking-wide text-center">
+                      <div key={platform} className="flex items-center justify-center px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-900 uppercase tracking-wide text-center">
                         {platform}
                       </div>
                     ))}
@@ -348,7 +348,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
               <div id="fraude" className="space-y-6 scroll-mt-28">
                 <SectionHeading n={9} title="Utilisation responsable et lutte contre la fraude" />
                 <Card>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Sont notamment interdits</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Sont notamment interdits</p>
                   <BulletList
                     danger
                     items={[
@@ -376,7 +376,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
               <div id="resp-utilisateurs" className="space-y-6 scroll-mt-28">
                 <SectionHeading n={10} title="Responsabilités des utilisateurs" />
                 <Card>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Les utilisateurs doivent</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Les utilisateurs doivent</p>
                   <BulletList
                     items={[
                       'Fournir des informations exactes.',
@@ -395,7 +395,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
               <div id="resp-marques" className="space-y-6 scroll-mt-28">
                 <SectionHeading n={11} title="Responsabilités des marques" />
                 <Card>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Les marques utilisant Sika Ads doivent notamment</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Les marques utilisant Sika Ads doivent notamment</p>
                   <BulletList
                     items={[
                       'Fournir des informations exactes.',
@@ -415,7 +415,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                   <p className="text-slate-600 font-medium leading-relaxed">
                     Sika Ads peut traiter certaines données personnelles nécessaires au fonctionnement de la plateforme, notamment pour la création et la gestion des comptes, la participation aux campagnes, la communication avec les utilisateurs, la sécurité et la validation des participations.
                   </p>
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest pt-2">Données traitées dans le cadre du fonctionnement de la plateforme</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest pt-2">Données traitées dans le cadre du fonctionnement de la plateforme</p>
                   <BulletList
                     items={[
                       'Données de compte : nom, adresse email, sexe, ville et tranche d’âge, utilisés pour l’inscription, la connexion et la vérification de l’email.',
@@ -428,13 +428,13 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                     ]}
                   />
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
-                    <ShieldCheck size={18} className="text-[#128785] shrink-0 mt-0.5" />
+                    <ShieldCheck size={18} className="text-[#128686] shrink-0 mt-0.5" />
                     <p className="text-sm text-slate-600 font-medium leading-relaxed">
                       Le détail complet de la collecte, de l'utilisation et de la protection de ces données est décrit dans notre{' '}
-                      <button onClick={() => onNavigate('privacy')} className="text-indigo-600 font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded">politique de confidentialité</button>.
+                      <button onClick={() => onNavigate('privacy')} className="text-[#128686] font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded">politique de confidentialité</button>.
                       Pour toute question relative à vos données personnelles, contactez-nous à{' '}
-                      <a href="mailto:team@sika-ads.com" className="text-[#128785] font-bold underline">team@sika-ads.com</a>{' '}
-                      ou via le <button onClick={() => onNavigate('contact')} className="text-indigo-600 font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded">formulaire de contact</button>.
+                      <a href="mailto:team@sika-ads.com" className="text-[#128686] font-bold underline">team@sika-ads.com</a>{' '}
+                      ou via le <button onClick={() => onNavigate('contact')} className="text-[#128686] font-bold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded">formulaire de contact</button>.
                     </p>
                   </div>
                 </Card>
@@ -513,8 +513,8 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
                     Ces informations peuvent être mises à jour lorsque cela est nécessaire afin de tenir compte de l'évolution de Sika Ads, de ses services ou de son environnement technique.
                   </p>
                   <div className="flex items-center gap-3 pt-2">
-                    <AlertCircle size={18} className="text-indigo-600 shrink-0" />
-                    <p className="text-sm font-black text-slate-900">Dernière mise à jour : Août 2026</p>
+                    <AlertCircle size={18} className="text-[#128686] shrink-0" />
+                    <p className="text-sm font-bold text-slate-900">Dernière mise à jour : Août 2026</p>
                   </div>
                 </Card>
               </div>
@@ -534,19 +534,19 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
               Notre équipe reste à votre disposition pour toute question concernant Sika Ads.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mb-10 text-sm font-bold text-slate-700">
-              <a href="mailto:team@sika-ads.com" className="inline-flex items-center gap-2 hover:text-[#128785] transition-colors">
-                <Mail size={16} className="text-[#128785]" /> team@sika-ads.com
+              <a href="mailto:team@sika-ads.com" className="inline-flex items-center gap-2 hover:text-[#128686] transition-colors">
+                <Mail size={16} className="text-[#128686]" /> team@sika-ads.com
               </a>
-              <a href="tel:+22891416745" className="inline-flex items-center gap-2 hover:text-[#128785] transition-colors">
-                <Phone size={16} className="text-[#128785]" /> +228 91 41 67 45
+              <a href="tel:+22891416745" className="inline-flex items-center gap-2 hover:text-[#128686] transition-colors">
+                <Phone size={16} className="text-[#128686]" /> +228 91 41 67 45
               </a>
               <span className="inline-flex items-center gap-2">
-                <MapPin size={16} className="text-[#128785]" /> Hédzranawoé, Lomé, Togo
+                <MapPin size={16} className="text-[#128686]" /> Hédzranawoé, Lomé, Togo
               </span>
             </div>
             <button
               onClick={() => onNavigate('contact')}
-              className="px-12 py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-black hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-200"
+              className="px-12 py-6 bg-[#F65E06] text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:bg-[#D14E04] hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
             >
               Contacter Sika Ads
             </button>

@@ -30,7 +30,7 @@ const TOC: { id: string; n: number; label: string }[] = [
 
 const SectionHeading: React.FC<{ n: number; title: string }> = ({ n, title }) => (
   <div className="flex items-center gap-3">
-    <span className="w-8 h-8 shrink-0 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">
+    <span className="w-8 h-8 shrink-0 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">
       {String(n).padStart(2, '0')}
     </span>
     <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{title}</h2>
@@ -45,7 +45,7 @@ const BulletList: React.FC<{ items: string[] }> = ({ items }) => (
   <ul className="space-y-2">
     {items.map((item) => (
       <li key={item} className="flex gap-3 text-sm text-slate-600 font-medium leading-relaxed">
-        <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-2 bg-[#128785]" />
+        <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-2 bg-[#128686]" />
         {item}
       </li>
     ))}
@@ -53,7 +53,7 @@ const BulletList: React.FC<{ items: string[] }> = ({ items }) => (
 );
 
 const SubTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest pt-2">{children}</p>
+  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest pt-2">{children}</p>
 );
 
 const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
@@ -71,9 +71,9 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
         badge="Sika Ads"
         title="Politique de confidentialité"
         subtitle="Chez Sika Ads, nous accordons une importance particulière à la protection de vos données personnelles. Cette politique explique quelles données nous pouvons collecter, pourquoi nous les utilisons, comment elles sont protégées et quels sont vos droits."
-        accent="indigo"
+        accent="teal"
       >
-        <p className="text-blue-200/70 text-sm font-bold mt-4">Dernière mise à jour : août 2026</p>
+        <p className="text-[#A9DADA]/80 text-sm font-bold mt-4">Dernière mise à jour : août 2026</p>
       </PageHero>
 
       <section className="py-16 sm:py-20 bg-white">
@@ -87,8 +87,8 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   <ul className="space-y-2.5 text-sm font-bold text-slate-600 overflow-y-auto max-h-[60vh] pr-2 scrollbar-hide">
                     {TOC.map((item) => (
                       <li key={item.id}>
-                        <a href={`#${item.id}`} className="hover:text-indigo-600 transition-colors block py-0.5">
-                          <span className="text-slate-300 font-black mr-2">{item.n}.</span>
+                        <a href={`#${item.id}`} className="hover:text-[#128686] transition-colors block py-0.5">
+                          <span className="text-slate-300 font-bold mr-2">{item.n}.</span>
                           {item.label}
                         </a>
                       </li>
@@ -96,9 +96,9 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   </ul>
                 </nav>
                 <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mt-8">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Une question sur vos données ?</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Une question sur vos données ?</p>
                   <p className="text-xs text-slate-600 mb-4 font-medium italic leading-relaxed">Écrivez-nous, nous vous répondrons dans les meilleurs délais.</p>
-                  <button onClick={() => onNavigate('contact')} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg">
+                  <button onClick={() => onNavigate('contact')} className="text-[10px] font-bold uppercase text-[#128686] hover:text-[#0E6B6B] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg">
                     Contacter le support <ArrowRight size={12} />
                   </button>
                 </div>
@@ -109,7 +109,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
             <div className="lg:col-span-2 space-y-14">
               {/* Mobile compact TOC */}
               <details className="lg:hidden group bg-slate-50 rounded-2xl border border-slate-100 px-5 py-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-black text-slate-900 uppercase tracking-widest">
+                <summary className="flex items-center justify-between cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs font-bold text-slate-900 uppercase tracking-widest">
                   Sommaire
                   <span className="text-slate-400 group-open:rotate-180 transition-transform" aria-hidden="true">▾</span>
                 </summary>
@@ -117,7 +117,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   {TOC.map((item) => (
                     <li key={item.id}>
                       <a href={`#${item.id}`} className="block py-1">
-                        <span className="text-slate-300 font-black mr-2">{item.n}.</span>
+                        <span className="text-slate-300 font-bold mr-2">{item.n}.</span>
                         {item.label}
                       </a>
                     </li>
@@ -138,10 +138,10 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                     <p className="font-medium text-slate-600">Responsable : AKPALO Mawuli</p>
                     <p className="font-medium text-slate-600">Adresse : Hédzranawoé, Lomé, Togo</p>
                     <p className="font-medium text-slate-600">
-                      Email : <a href="mailto:team@sika-ads.com" className="text-[#128785] underline">team@sika-ads.com</a>
+                      Email : <a href="mailto:team@sika-ads.com" className="text-[#128686] underline">team@sika-ads.com</a>
                     </p>
                     <p className="font-medium text-slate-600">
-                      Téléphone : <a href="tel:+22891416745" className="text-[#128785] underline">+228 91 41 67 45</a>
+                      Téléphone : <a href="tel:+22891416745" className="text-[#128686] underline">+228 91 41 67 45</a>
                     </p>
                   </div>
                 </Card>
@@ -290,7 +290,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                     ]}
                   />
                   <div className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
-                    <ShieldCheck size={18} className="text-[#128785] shrink-0 mt-0.5" />
+                    <ShieldCheck size={18} className="text-[#128686] shrink-0 mt-0.5" />
                     <p className="text-sm text-slate-600 font-medium leading-relaxed">
                       Nous ne vendons pas vos données personnelles. Toutefois, certaines données peuvent être communiquées lorsqu'une telle communication est nécessaire au fonctionnement du service ou imposée par une obligation légale.
                     </p>
@@ -337,7 +337,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                     ]}
                   />
                   <p className="text-slate-600 font-medium leading-relaxed">
-                    En cas de suppression de votre compte, certaines de ces données peuvent être archivées le temps nécessaire aux finalités décrites ci-dessus et aux obligations légales applicables. Si vous souhaitez demander la suppression de vos données, contactez-nous à <a href="mailto:team@sika-ads.com" className="text-[#128785] font-bold underline">team@sika-ads.com</a>, sous réserve des obligations légales qui nous imposent de conserver certains éléments.
+                    En cas de suppression de votre compte, certaines de ces données peuvent être archivées le temps nécessaire aux finalités décrites ci-dessus et aux obligations légales applicables. Si vous souhaitez demander la suppression de vos données, contactez-nous à <a href="mailto:team@sika-ads.com" className="text-[#128686] font-bold underline">team@sika-ads.com</a>, sous réserve des obligations légales qui nous imposent de conserver certains éléments.
                   </p>
                 </Card>
               </div>
@@ -362,7 +362,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   <p className="text-slate-600 font-medium leading-relaxed">Pour exercer vos droits, contactez-nous :</p>
                   <a
                     href="mailto:team@sika-ads.com"
-                    className="inline-flex items-center gap-2 text-sm font-black text-[#128785] hover:text-teal-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-1"
+                    className="inline-flex items-center gap-2 text-sm font-bold text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-1"
                   >
                     <Mail size={16} /> team@sika-ads.com
                   </a>
@@ -448,7 +448,7 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   <p className="text-slate-600 font-medium leading-relaxed">
                     Cette politique peut être mise à jour afin de tenir compte de l'évolution de Sika Ads, de ses fonctionnalités, de son infrastructure ou des obligations applicables.
                   </p>
-                  <p className="text-sm font-black text-slate-900 pt-1">Dernière mise à jour : août 2026</p>
+                  <p className="text-sm font-bold text-slate-900 pt-1">Dernière mise à jour : août 2026</p>
                 </Card>
               </div>
 
@@ -462,20 +462,20 @@ const PrivacyView: React.FC<PrivacyViewProps> = ({ onNavigate, onStart }) => {
                   <div className="space-y-2 pt-1 text-sm font-bold text-slate-900">
                     <p>Sika Ads — Omenka</p>
                     <p className="inline-flex items-center gap-2 font-medium text-slate-600">
-                      <MapPin size={15} className="text-[#128785]" /> Hédzranawoé, Lomé, Togo
+                      <MapPin size={15} className="text-[#128686]" /> Hédzranawoé, Lomé, Togo
                     </p>
                     <p className="inline-flex items-center gap-2 font-medium text-slate-600">
-                      <Phone size={15} className="text-[#128785]" />
-                      <a href="tel:+22891416745" className="hover:text-[#128785] transition underline">+228 91 41 67 45</a>
+                      <Phone size={15} className="text-[#128686]" />
+                      <a href="tel:+22891416745" className="hover:text-[#128686] transition underline">+228 91 41 67 45</a>
                     </p>
                     <p className="inline-flex items-center gap-2 font-medium text-slate-600">
-                      <Mail size={15} className="text-[#128785]" />
-                      <a href="mailto:team@sika-ads.com" className="hover:text-[#128785] transition underline">team@sika-ads.com</a>
+                      <Mail size={15} className="text-[#128686]" />
+                      <a href="mailto:team@sika-ads.com" className="hover:text-[#128686] transition underline">team@sika-ads.com</a>
                     </p>
                   </div>
                   <button
                     onClick={() => onNavigate('contact')}
-                    className="inline-flex items-center gap-2 px-6 py-4 rounded-xl bg-[#f55d05] text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#ea580c] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+                    className="inline-flex items-center gap-2 px-6 py-4 rounded-xl bg-[#F65E06] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#D14E04] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
                   >
                     Contacter Sika Ads <ArrowRight size={14} />
                   </button>

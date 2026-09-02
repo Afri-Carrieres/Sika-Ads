@@ -200,7 +200,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
           title={
             <>
               Parlons de votre projet
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2dd4bf] to-indigo-400">.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#128686] to-[#2BA8A8]">.</span>
             </>
           }
           subtitle="Une question, une idée, un problème ou une opportunité ? Envoyez-nous un message et notre équipe vous répondra."
@@ -224,39 +224,39 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
 
                 <ul className="space-y-4">
                   <li className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div className="w-11 h-11 rounded-xl bg-[#128785]/10 border border-[#128785]/20 flex items-center justify-center shrink-0">
-                      <Mail size={20} className="text-[#128785]" />
+                    <div className="w-11 h-11 rounded-xl bg-[#128686]/10 border border-[#128686]/20 flex items-center justify-center shrink-0">
+                      <Mail size={20} className="text-[#128686]" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Email</p>
                       <a
                         href="mailto:team@sika-ads.com"
-                        className="text-sm font-bold text-slate-900 hover:text-[#128785] transition-colors break-all"
+                        className="text-sm font-bold text-slate-900 hover:text-[#128686] transition-colors break-all"
                       >
                         team@sika-ads.com
                       </a>
                     </div>
                   </li>
                   <li className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div className="w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
-                      <MapPin size={20} className="text-indigo-600" />
+                    <div className="w-11 h-11 rounded-xl bg-[#128686]/10 border border-[#128686]/20 flex items-center justify-center shrink-0">
+                      <MapPin size={20} className="text-[#128686]" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Localisation</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Localisation</p>
                       <p className="text-sm font-bold text-slate-900">Lomé, Togo</p>
                     </div>
                   </li>
                 </ul>
 
-                <div className="p-6 bg-slate-950 rounded-3xl text-white relative overflow-hidden">
-                  <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-[#128785]/20 blur-3xl rounded-full" />
-                  <p className="relative text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Vous êtes créateur ?</p>
+                <div className="p-6 bg-[#062127] rounded-3xl text-white relative overflow-hidden">
+                  <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-[#128686]/25 blur-3xl rounded-full" />
+                  <p className="relative text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest mb-2">Vous êtes créateur ?</p>
                   <p className="relative text-sm font-medium text-slate-300 leading-relaxed mb-4">
                     Rejoignez la communauté et monétisez vos réseaux sociaux dès aujourd'hui.
                   </p>
                   <button
                     onClick={onStart}
-                    className="relative inline-flex items-center gap-2 px-5 py-3 bg-[#f55d05] text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+                    className="relative inline-flex items-center gap-2 px-5 py-3 bg-[#F65E06] text-white rounded-xl text-[11px] font-bold uppercase tracking-widest hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
                   >
                     Devenir créateur <ArrowRight size={14} />
                   </button>
@@ -269,8 +269,8 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                   {status === 'success' ? (
                     /* ── SUCCESS STATE ── */
                     <div className="text-center py-10" role="status" aria-live="polite">
-                      <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-6">
-                        <CheckCircle2 size={40} className="text-emerald-500" />
+                      <div className="w-20 h-20 mx-auto rounded-full bg-[#E7F4F4] border border-[#128686]/20 flex items-center justify-center mb-6">
+                        <CheckCircle2 size={40} className="text-[#128686]" />
                       </div>
                       <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 uppercase tracking-tight mb-4">
                         Message envoyé !
@@ -278,19 +278,19 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                       <p className="text-slate-600 font-medium leading-relaxed max-w-md mx-auto mb-3">
                         Merci pour votre message. Nous avons bien reçu votre demande et notre équipe vous répondra prochainement.
                       </p>
-                      <p className="text-sm font-bold text-[#128785] mb-8">
+                      <p className="text-sm font-bold text-[#128686] mb-8">
                         Votre message a été envoyé à team@sika-ads.com.
                       </p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <button
                           onClick={() => onNavigate('landing')}
-                          className="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-black transition focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-200"
+                          className="w-full sm:w-auto px-8 py-4 bg-[#062127] text-white rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-[#103B47] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#128686]/30"
                         >
                           Retour à l'accueil
                         </button>
                         <button
                           onClick={resetForm}
-                          className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-[11px] font-black uppercase tracking-widest hover:border-[#128785] hover:text-[#128785] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-100"
+                          className="w-full sm:w-auto px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:border-[#128686] hover:text-[#128686] transition focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-100"
                         >
                           Envoyer un autre message
                         </button>
@@ -305,23 +305,23 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                       {/* Progress */}
                       <div className="mb-8">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Étape {step} sur 4
                           </p>
                           {STEPS.map((s) => (
                             <span
                               key={s.id}
-                              className={`hidden sm:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${
-                                s.id === step ? 'text-[#128785]' : s.id < step ? 'text-slate-500' : 'text-slate-300'
+                              className={`hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ${
+                                s.id === step ? 'text-[#128686]' : s.id < step ? 'text-slate-500' : 'text-slate-300'
                               }`}
                             >
                               <span
                                 aria-hidden="true"
                                 className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors ${
                                   s.id < step
-                                    ? 'bg-[#128785] border-[#128785] text-white'
+                                    ? 'bg-[#128686] border-[#128686] text-white'
                                     : s.id === step
-                                    ? 'border-[#128785] text-[#128785]'
+                                    ? 'border-[#128686] text-[#128686]'
                                     : 'border-slate-200 text-slate-300'
                                 }`}
                               >
@@ -335,7 +335,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                         <div className="sm:hidden">
                           <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#128785] rounded-full transition-all duration-300 motion-reduce:transition-none"
+                              className="h-full bg-[#128686] rounded-full transition-all duration-300 motion-reduce:transition-none"
                               style={{ width: `${(step / 4) * 100}%` }}
                             />
                           </div>
@@ -343,7 +343,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                         {/* Desktop rail */}
                         <div className="hidden sm:block mt-4 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-[#128785] to-indigo-500 rounded-full transition-all duration-300 motion-reduce:transition-none"
+                            className="h-full bg-gradient-to-r from-[#128686] to-[#2BA8A8] rounded-full transition-all duration-300 motion-reduce:transition-none"
                             style={{ width: `${(step / 4) * 100}%` }}
                           />
                         </div>
@@ -381,7 +381,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                     key={opt.id}
                                     className={`flex items-start gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200 motion-reduce:transition-none focus-within:ring-4 focus-within:ring-teal-100 ${
                                       selected
-                                        ? 'border-[#128785] bg-[#128785]/5'
+                                        ? 'border-[#128686] bg-[#128686]/5'
                                         : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                                     }`}
                                   >
@@ -395,7 +395,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                     />
                                     <span
                                       className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                                        selected ? 'bg-[#128785] text-white' : 'bg-white border border-slate-200 text-slate-400'
+                                        selected ? 'bg-[#128686] text-white' : 'bg-white border border-slate-200 text-slate-400'
                                       }`}
                                     >
                                       <Icon size={18} />
@@ -430,7 +430,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                     key={opt.id}
                                     className={`flex items-center gap-3 px-5 py-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 motion-reduce:transition-none focus-within:ring-4 focus-within:ring-teal-100 ${
                                       selected
-                                        ? 'border-[#128785] bg-[#128785]/5'
+                                        ? 'border-[#128686] bg-[#128686]/5'
                                         : 'border-slate-200 bg-slate-50 hover:border-slate-300'
                                     }`}
                                   >
@@ -444,10 +444,10 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                     />
                                     <span
                                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                        selected ? 'border-[#128785]' : 'border-slate-300'
+                                        selected ? 'border-[#128686]' : 'border-slate-300'
                                       }`}
                                     >
-                                      {selected && <span className="w-2 h-2 rounded-full bg-[#128785]" />}
+                                      {selected && <span className="w-2 h-2 rounded-full bg-[#128686]" />}
                                     </span>
                                     <span className="text-sm font-bold text-slate-900">{opt.label}</span>
                                   </label>
@@ -466,7 +466,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                         {step === 3 && (
                           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                              <label htmlFor="contact-first-name" className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                              <label htmlFor="contact-first-name" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
                                 Prénom
                               </label>
                               <input
@@ -477,7 +477,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                 aria-invalid={!!errors.firstName}
                                 aria-describedby={errors.firstName ? 'err-firstName' : undefined}
                                 autoComplete="given-name"
-                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128785] focus:ring-4 focus:ring-teal-100 transition"
+                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128686] focus:ring-4 focus:ring-teal-100 transition"
                                 placeholder="Votre prénom"
                               />
                               {errors.firstName && (
@@ -487,7 +487,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                               )}
                             </div>
                             <div>
-                              <label htmlFor="contact-last-name" className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                              <label htmlFor="contact-last-name" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
                                 Nom
                               </label>
                               <input
@@ -498,7 +498,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                 aria-invalid={!!errors.lastName}
                                 aria-describedby={errors.lastName ? 'err-lastName' : undefined}
                                 autoComplete="family-name"
-                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128785] focus:ring-4 focus:ring-teal-100 transition"
+                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128686] focus:ring-4 focus:ring-teal-100 transition"
                                 placeholder="Votre nom"
                               />
                               {errors.lastName && (
@@ -508,7 +508,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                               )}
                             </div>
                             <div className="sm:col-span-2">
-                              <label htmlFor="contact-email" className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                              <label htmlFor="contact-email" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
                                 Adresse email
                               </label>
                               <input
@@ -519,7 +519,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                 aria-invalid={!!errors.email}
                                 aria-describedby={errors.email ? 'err-email' : undefined}
                                 autoComplete="email"
-                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128785] focus:ring-4 focus:ring-teal-100 transition"
+                                className="w-full h-14 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128686] focus:ring-4 focus:ring-teal-100 transition"
                                 placeholder="vous@exemple.com"
                               />
                               {errors.email && (
@@ -535,7 +535,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                         {step === 4 && (
                           <div className="mt-5 space-y-6">
                             <div>
-                              <label htmlFor="contact-message" className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">
+                              <label htmlFor="contact-message" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
                                 Votre message
                               </label>
                               <textarea
@@ -546,7 +546,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                                 aria-describedby={errors.message ? 'err-message' : 'message-hint'}
                                 rows={6}
                                 maxLength={MAX_MESSAGE}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128785] focus:ring-4 focus:ring-teal-100 transition resize-y"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#128686] focus:ring-4 focus:ring-teal-100 transition resize-y"
                                 placeholder="Décrivez votre question, votre problème ou votre projet..."
                               />
                               <div className="flex items-center justify-between mt-2">
@@ -567,38 +567,38 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
 
                             {/* Récapitulatif avant envoi */}
                             <div className="rounded-2xl bg-slate-50 border border-slate-100 p-5 sm:p-6">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
                                 Récapitulatif de votre demande
                               </p>
                               <dl className="space-y-3 text-sm">
                                 <div className="flex items-center justify-between gap-4">
                                   <div>
-                                    <dt className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</dt>
+                                    <dt className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Type</dt>
                                     <dd className="font-bold text-slate-900">{typeLabel(form.type)}</dd>
                                   </div>
-                                  <button type="button" onClick={() => setStep(1)} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#128785] hover:text-teal-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-2 py-1">
+                                  <button type="button" onClick={() => setStep(1)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-2 py-1">
                                     <Pencil size={12} /> Modifier
                                   </button>
                                 </div>
                                 <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-3">
                                   <div>
-                                    <dt className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sujet</dt>
+                                    <dt className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sujet</dt>
                                     <dd className="font-bold text-slate-900">{subjectLabel(form.subject)}</dd>
                                   </div>
-                                  <button type="button" onClick={() => setStep(2)} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#128785] hover:text-teal-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-2 py-1">
+                                  <button type="button" onClick={() => setStep(2)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-2 py-1">
                                     <Pencil size={12} /> Modifier
                                   </button>
                                 </div>
                                 <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-3">
                                   <div>
-                                    <dt className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nom</dt>
+                                    <dt className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nom</dt>
                                     <dd className="font-bold text-slate-900">
                                       {form.firstName} {form.lastName}
                                     </dd>
-                                    <dt className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Email</dt>
+                                    <dt className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Email</dt>
                                     <dd className="font-bold text-slate-900 break-all">{form.email}</dd>
                                   </div>
-                                  <button type="button" onClick={() => setStep(3)} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-[#128785] hover:text-teal-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg px-2 py-1">
+                                  <button type="button" onClick={() => setStep(3)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#128686] hover:text-[#0E6B6B] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg px-2 py-1">
                                     <Pencil size={12} /> Modifier
                                   </button>
                                 </div>
@@ -609,7 +609,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                               <div className="flex items-start gap-3 border border-red-100 bg-red-50 p-4 rounded-xl" role="alert">
                                 <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
                                 <div>
-                                  <p className="text-sm font-black text-red-700">Votre message n'a pas pu être envoyé.</p>
+                                  <p className="text-sm font-bold text-red-700">Votre message n'a pas pu être envoyé.</p>
                                   <p className="text-xs font-medium text-red-600 mt-1">{submitError}</p>
                                 </div>
                               </div>
@@ -623,7 +623,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                             <button
                               type="button"
                               onClick={handleBack}
-                              className="inline-flex items-center gap-2 px-6 py-4 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+                              className="inline-flex items-center gap-2 px-6 py-4 rounded-xl text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686]"
                             >
                               <ArrowLeft size={14} /> Retour
                             </button>
@@ -635,7 +635,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                             <button
                               type="button"
                               onClick={handleNext}
-                              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#f55d05] text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#ea580c] hover:scale-[1.02] active:scale-95 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+                              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#F65E06] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#D14E04] hover:scale-[1.02] active:scale-95 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
                             >
                               Continuer <ArrowRight size={14} />
                             </button>
@@ -643,7 +643,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                             <button
                               type="submit"
                               disabled={status === 'loading'}
-                              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#f55d05] text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#ea580c] hover:scale-[1.02] active:scale-95 transition motion-reduce:hover:scale-100 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
+                              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#F65E06] text-white text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 hover:bg-[#D14E04] hover:scale-[1.02] active:scale-95 transition motion-reduce:hover:scale-100 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
                             >
                               {status === 'loading' ? (
                                 <>
@@ -699,7 +699,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                   key={item.q}
                   className="group bg-white rounded-2xl border border-slate-100 px-5 sm:px-6 py-4 open:shadow-md transition-shadow"
                 >
-                  <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-sm font-black text-slate-900 uppercase tracking-tight py-1">
+                  <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden text-sm font-bold text-slate-900 uppercase tracking-tight py-1">
                     {item.q}
                     <span className="w-6 h-6 shrink-0 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-open:rotate-45 transition-transform" aria-hidden="true">
                       +
@@ -721,7 +721,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
               </h2>
               <button
                 onClick={onStart}
-                className="px-12 py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-black hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-200"
+                className="px-12 py-6 bg-[#F65E06] text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:bg-[#D14E04] hover:scale-105 transition motion-reduce:hover:scale-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-200"
               >
                 Commencer avec Sika Ads
               </button>

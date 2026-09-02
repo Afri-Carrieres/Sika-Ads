@@ -26,7 +26,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
         title={
           <>
             CGU & Protection <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-indigo-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-[#F65E06]">
               Anti-Fraude.
             </span>
           </>
@@ -45,16 +45,16 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   <div className="sticky top-28 space-y-6">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
                       <ul className="space-y-4 text-sm font-bold text-slate-600">
-                          <li><a href="#objet" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">1. Objet de la plateforme</a></li>
-                          <li><a href="#eligibilite" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">2. Éligibilité des ambassadeurs</a></li>
-                          <li><a href="#remuneration" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">3. Rémunération & Paiements</a></li>
+                          <li><a href="#objet" className="hover:text-[#128686] transition-colors block py-2 border-b border-slate-50">1. Objet de la plateforme</a></li>
+                          <li><a href="#eligibilite" className="hover:text-[#128686] transition-colors block py-2 border-b border-slate-50">2. Éligibilité des ambassadeurs</a></li>
+                          <li><a href="#remuneration" className="hover:text-[#128686] transition-colors block py-2 border-b border-slate-50">3. Rémunération & Paiements</a></li>
                           <li><a href="#antifraude" className="hover:text-red-600 transition-colors block py-2 border-b border-slate-50 text-red-500">4. POLITIQUE ANTI-FRAUDE</a></li>
-                          <li><a href="#resiliation" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">5. Résiliation de compte</a></li>
+                          <li><a href="#resiliation" className="hover:text-[#128686] transition-colors block py-2 border-b border-slate-50">5. Résiliation de compte</a></li>
                       </ul>
                       <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 mt-10">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Besoin d'aide ?</p>
                           <p className="text-xs text-slate-600 mb-4 font-medium italic leading-relaxed">Une clause vous semble obscure ? Nos conseillers sont là pour vous éclairer.</p>
-                          <button onClick={() => onNavigate('contact')} className="text-[10px] font-black uppercase text-indigo-600 hover:text-indigo-700 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg">Contact Support <ExternalLink size={12} /></button>
+                          <button onClick={() => onNavigate('contact')} className="text-[10px] font-bold uppercase text-[#128686] hover:text-[#0E6B6B] flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg">Contact Support <ExternalLink size={12} /></button>
                       </div>
                   </div>
               </div>
@@ -65,7 +65,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   {/* Section: Objet */}
                   <div id="objet" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">01</span>
+                          <span className="w-8 h-8 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">01</span>
                           <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Objet de la Plateforme</h2>
                       </div>
                       <p className="text-slate-600 leading-relaxed font-medium">
@@ -76,7 +76,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   {/* Section: Éligibilité */}
                   <div id="eligibilite" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">02</span>
+                          <span className="w-8 h-8 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">02</span>
                           <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Éligibilité des Ambassadeurs</h2>
                       </div>
                       <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-4">
@@ -92,19 +92,19 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   {/* Section: Rémunération */}
                   <div id="remuneration" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">03</span>
+                        <span className="w-8 h-8 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">03</span>
                         <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Rémunération & Paiements</h2>
                       </div>
                       <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                         <div className="flex items-start gap-4">
-                            <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" />
+                            <CheckCircle size={20} className="text-[#128686] shrink-0 mt-1" />
                             <div>
                                 <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-widest">Calcul des gains</h4>
                                 <p className="text-sm text-slate-600 leading-relaxed italic">Les gains sont indexés sur la qualité et la quantité de l'audience réelle constatée. Chaque campagne définit ses propres tarifs (Forfait ou Par Vues).</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4 border-t border-slate-200 pt-6">
-                            <Lock size={20} className="text-indigo-500 shrink-0 mt-1" />
+                            <Lock size={20} className="text-[#128686] shrink-0 mt-1" />
                             <div>
                                 <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-widest">Retraits (Seuil)</h4>
                                 <p className="text-sm text-slate-600 leading-relaxed italic">Le seuil minimum pour effectuer un retrait est fixé à <strong>2 000 FCFA</strong>. Les paiements sont traités via T-Money ou Flooz dans un délai de 24 à 72 heures ouvrées.</p>
@@ -150,7 +150,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                                   Nos algorithmes analysent les métadonnées de chaque image soumise (EXIF, Pixels, Profondeur). Nous détectons automatiquement 99% des tentatives de fraude visuelle.
                               </p>
                               <div className="text-center pt-4">
-                                 <span className="px-6 py-2 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">Soyez honnêtes, gagnez durablement</span>
+                                 <span className="px-6 py-2 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/20">Soyez honnêtes, gagnez durablement</span>
                               </div>
                           </div>
                       </div>
@@ -159,7 +159,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   {/* Section: Résiliation */}
                   <div id="resiliation" className="space-y-6 scroll-mt-28 pb-10">
                       <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">05</span>
+                        <span className="w-8 h-8 rounded-lg bg-[#E7F4F4] flex items-center justify-center text-[#128686] font-bold text-xs">05</span>
                         <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Résiliation de Compte</h2>
                       </div>
                       <p className="text-slate-600 leading-relaxed font-medium">
@@ -176,7 +176,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
           <h3 className="text-3xl font-bold text-slate-900 mb-8 max-w-xl mx-auto">
               En utilisant SikaAds, vous participez à une communauté de confiance.
           </h3>
-          <button onClick={onStart} className="px-12 py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-black hover:scale-105 transition-all">
+          <button onClick={onStart} className="px-12 py-6 bg-[#F65E06] text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl hover:bg-[#D14E04] hover:scale-105 transition-all">
               J'accepte et je commence
           </button>
       </section>
