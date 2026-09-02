@@ -39,8 +39,8 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = ({ threshold = 350 }) => 
           : 'opacity-0 translate-y-6 scale-90 pointer-events-none'
       }`}
       style={{
-        backgroundColor: '#ea580c',
-        boxShadow: '0 8px 30px rgba(234, 88, 12, 0.45)',
+        backgroundColor: '#F65E06',
+        boxShadow: '0 8px 30px rgba(246, 94, 6, 0.45)',
       }}
     >
       <ChevronUp className="w-5 h-5 text-white transition-transform duration-200 group-hover:-translate-y-1" />

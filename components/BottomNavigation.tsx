@@ -40,7 +40,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({ currentTab, onMenuC
               className={`
                 flex flex-col items-center justify-center gap-1 min-w-[64px] min-h-[44px] px-2 py-2 rounded-lg transition-all duration-200
                 ${isActive
-                  ? 'text-indigo-600'
+                  ? 'text-[#128686]'
                   : 'text-gray-500 hover:text-gray-700'
                 }
               `}

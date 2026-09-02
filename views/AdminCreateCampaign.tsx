@@ -163,7 +163,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                 <p className="text-xs text-red-100 font-medium">Vous créez une campagne VIP qui sera immédiatement active.</p>
             </div>
         </div>
-        <div className="bg-white/10 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2">
+        <div className="bg-white/10 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2">
             <Crown size={14} />
             Accès VIP
         </div>
@@ -184,20 +184,20 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
             {/* 1. ADVERTISER SELECTION */}
             <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600"><User size={20} /></div>
+                    <div className="bg-[#E7F4F4] p-2.5 rounded-xl text-[#128686]"><User size={20} /></div>
                     <h3 className="text-lg font-bold text-gray-900">1. Client / Annonceur</h3>
                 </div>
 
                 <div className="flex gap-4 p-1 bg-gray-50 rounded-2xl w-fit">
                     <button 
                         onClick={() => setAdvertiserMode('existing')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${advertiserMode === 'existing' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${advertiserMode === 'existing' ? 'bg-white text-[#128686] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         Utilisateur Existant
                     </button>
                     <button 
                         onClick={() => setAdvertiserMode('manual')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${advertiserMode === 'manual' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${advertiserMode === 'manual' ? 'bg-white text-[#128686] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         Saisie Manuelle
                     </button>
@@ -211,13 +211,13 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Rechercher par email ou nom..."
-                                className="flex-1 bg-gray-50 border border-gray-100 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-sm"
+                                className="flex-1 bg-gray-50 border border-gray-100 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-[#128686] transition-all font-bold text-sm"
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearchUser()}
                             />
                             <button 
                                 onClick={handleSearchUser}
                                 disabled={isSearching}
-                                className="bg-indigo-600 text-white px-6 rounded-2xl hover:bg-indigo-700 transition-colors"
+                                className="bg-[#128686] text-white px-6 rounded-2xl hover:bg-[#0E6B6B] transition-colors"
                             >
                                 {isSearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
                             </button>
@@ -235,7 +235,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                                             <p className="font-bold text-gray-900 text-sm">{user.name}</p>
                                             <p className="text-xs text-gray-500">{user.email}</p>
                                         </div>
-                                        <div className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase">
+                                        <div className="bg-[#E7F4F4] text-[#128686] px-3 py-1 rounded-lg text-[10px] font-bold uppercase">
                                             Sélectionner
                                         </div>
                                     </button>
@@ -246,11 +246,11 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                         {selectedUser && (
                             <div className="bg-green-50 border border-green-100 p-4 rounded-2xl flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center text-green-700 font-black">
+                                    <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center text-green-700 font-bold">
                                         {selectedUser.name.charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="text-xs font-black uppercase text-green-600 mb-0.5">Annonceur Sélectionné</p>
+                                        <p className="text-xs font-bold uppercase text-green-600 mb-0.5">Annonceur Sélectionné</p>
                                         <p className="font-bold text-gray-900">{selectedUser.name}</p>
                                         <p className="text-xs text-gray-500">{selectedUser.email}</p>
                                     </div>
@@ -268,7 +268,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                             value={manualAdvertiserName}
                             onChange={(e) => setManualAdvertiserName(e.target.value)}
                             placeholder="Nom de l'entreprise / Client"
-                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold"
+                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-[#128686] transition-all font-bold"
                         />
                     </div>
                 )}
@@ -277,55 +277,55 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
             {/* 2. CAMPAIGN DETAILS */}
             <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600"><FileText size={20} /></div>
+                    <div className="bg-[#E7F4F4] p-2.5 rounded-xl text-[#128686]"><FileText size={20} /></div>
                     <h3 className="text-lg font-bold text-gray-900">2. Détails Campagne</h3>
                 </div>
 
                 <div className="space-y-4">
                     <label className="block">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Titre de la campagne</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Titre de la campagne</span>
                         <input 
                             type="text" 
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white" 
+                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white" 
                             placeholder="Ex: Lancement Nouvelle Boisson"
                         />
                     </label>
 
                     <label className="block">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Description (Consignes)</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Description (Consignes)</span>
                         <textarea 
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]" 
+                            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]" 
                             placeholder="Texte accrocheur pour les ambassadeurs..."
                         />
                     </label>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <label className="block">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Lien Cible</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Lien Cible</span>
                             <div className="relative">
                                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input 
                                     type="text" 
                                     value={targetUrl}
                                     onChange={(e) => setTargetUrl(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white" 
+                                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white" 
                                     placeholder="https://..."
                                 />
                             </div>
                         </label>
                         <label className="block">
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Coût par Vue (CPV)</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Coût par Vue (CPV)</span>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-black text-xs">FCFA</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">FCFA</span>
                                 <input 
                                     type="number" 
                                     value={cpv}
                                     onChange={(e) => setCpv(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-14 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white" 
+                                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-14 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white" 
                                     placeholder="20"
                                 />
                             </div>
@@ -333,14 +333,14 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                     </div>
 
                     <label className="block">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Budget Total (Illimité)</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Budget Total (Illimité)</span>
                         <div className="relative">
                             <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input 
                                 type="number" 
                                 value={budget}
                                 onChange={(e) => setBudget(e.target.value)}
-                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-black text-xl text-gray-900 transition-all focus:bg-white" 
+                                className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-xl text-gray-900 transition-all focus:bg-white" 
                                 placeholder="500000"
                             />
                             <span className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 font-bold">FCFA</span>
@@ -348,11 +348,11 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                     </label>
 
                     <div className="space-y-2">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Visuel</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Visuel</span>
                         <div 
                             onClick={() => fileInputRef.current?.click()}
                             className={`relative w-full aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group ${
-                            imagePreview ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                            imagePreview ? 'border-[#7FD1D1]/50 bg-[#E7F4F4]' : 'border-gray-200 hover:border-[#7FD1D1]/60 hover:bg-gray-50'
                             }`}
                         >
                             {imagePreview ? (
@@ -367,7 +367,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                             ) : (
                             <>
                                 <div className="bg-white p-4 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                                <ImageIcon size={32} className="text-indigo-600" />
+                                <ImageIcon size={32} className="text-[#128686]" />
                                 </div>
                                 <p className="text-sm font-bold text-gray-600">Ajouter l'image</p>
                             </>
@@ -387,7 +387,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
             <button 
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full py-5 bg-gray-900 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-5 bg-gray-900 text-white rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl hover:bg-black transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
             >
                 {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Check size={20} />}
                 Publier la Campagne VIP
@@ -396,34 +396,34 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
 
         {/* RIGHT COLUMN - PREVIEW */}
         <div className="lg:col-span-1">
-             <div className="bg-indigo-900 text-white p-8 rounded-[2.5rem] sticky top-24 shadow-2xl shadow-indigo-200 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+             <div className="bg-[#0B3A44] text-white p-8 rounded-[2.5rem] sticky top-24 shadow-2xl shadow-[#062127]/30 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#128686] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
                 <div className="relative z-10 space-y-8">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                              <Crown size={16} className="text-yellow-400" />
-                             <p className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em]">Aperçu VIP</p>
+                             <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-[0.2em]">Aperçu VIP</p>
                         </div>
                         <h3 className="text-2xl font-bold tracking-tight">{title || "Titre Campagne"}</h3>
                     </div>
 
                     <div className="space-y-6">
                         <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-                            <span className="text-indigo-200 text-[10px] font-black uppercase tracking-wide">Budget</span>
-                            <p className="text-3xl font-black tracking-tighter mt-1">
-                                {budget ? parseInt(budget).toLocaleString() : '0'} <span className="text-base text-indigo-300 font-bold">FCFA</span>
+                            <span className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-wide">Budget</span>
+                            <p className="text-3xl font-bold tracking-tighter mt-1">
+                                {budget ? parseInt(budget).toLocaleString() : '0'} <span className="text-base text-[#7FD1D1] font-bold">FCFA</span>
                             </p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-white/5 p-4 rounded-2xl">
-                                <span className="text-indigo-300 text-[10px] font-black uppercase">Vues Est.</span>
+                                <span className="text-[#7FD1D1] text-[10px] font-bold uppercase">Vues Est.</span>
                                 <p className="text-xl font-bold mt-1">
                                     {budget ? Math.floor(parseInt(budget) / parseInt(cpv || '20')).toLocaleString() : '0'}
                                 </p>
                             </div>
                             <div className="bg-white/5 p-4 rounded-2xl">
-                                <span className="text-indigo-300 text-[10px] font-black uppercase">Statut</span>
+                                <span className="text-[#7FD1D1] text-[10px] font-bold uppercase">Statut</span>
                                 <div className="flex items-center gap-1.5 mt-1 text-green-400 font-bold text-sm">
                                     <CheckCircle2 size={14} /> Active
                                 </div>

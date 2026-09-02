@@ -148,7 +148,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
             <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-[#128785]">
               <Loader2 className="animate-spin" size={24} />
             </div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Sécurité</p>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">Sécurité</p>
             <h2 className="mt-2 text-2xl font-bold text-slate-950">Vérification de la session</h2>
             <p className="mt-3 text-sm font-medium leading-6 text-slate-500">Nous validons votre lien de réinitialisation. Cela ne prendra qu’un instant.</p>
           </div>
@@ -160,7 +160,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
   return (
     <div className="min-h-screen bg-white text-slate-950 selection:bg-[#f55d05] selection:text-slate-950">
       <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
-        <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
+        <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#062127] px-10 py-10 text-white lg:flex xl:px-14">
           <div>
             <div className="flex justify-start place-items-start">
               <button onClick={onBackToLogin} className="inline-flex items-center gap-3" aria-label="Retour à la connexion">
@@ -215,7 +215,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Redirection vers la connexion dans quelques secondes...</p>
                 <button
                   onClick={onBackToLogin}
-                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-orange-100 transition hover:bg-[#f56505e3] active:scale-[0.99]"
+                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-bold text-white shadow-lg shadow-orange-100 transition hover:bg-[#f56505e3] active:scale-[0.99]"
                 >
                   Retourner à la connexion
                   <ArrowRight size={18} />
@@ -224,7 +224,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
             ) : (
               <form onSubmit={handleReset} className="space-y-5">
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Nouveau mot de passe</span>
+                  <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Nouveau mot de passe</span>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
@@ -239,7 +239,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Confirmer le mot de passe</span>
+                  <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Confirmer le mot de passe</span>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
@@ -293,7 +293,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
                 <button
                   type="submit"
                   disabled={loading || (!!error && !email)}
-                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-bold text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {loading ? <Loader2 className="animate-spin" size={22} /> : <>
                     Changer mon mot de passe
@@ -303,7 +303,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
 
                 <p className="text-center text-sm font-medium text-slate-500">
                   Vous vous souvenez de votre mot de passe ?{' '}
-                  <button type="button" onClick={onBackToLogin} className="font-black text-[#128785] transition hover:text-teal-700">
+                  <button type="button" onClick={onBackToLogin} className="font-bold text-[#128785] transition hover:text-teal-700">
                     Retourner à la connexion
                   </button>
                 </p>

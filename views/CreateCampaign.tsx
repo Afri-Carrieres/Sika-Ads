@@ -20,8 +20,8 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
 
   const PACKS = [
     { id: 'starter', label: 'Starter', price: 2500, color: 'bg-blue-50 border-blue-200 text-blue-400' },
-    { id: 'boost', label: 'Boost', price: 5000, color: 'bg-indigo-50 border-indigo-200 text-indigo-700' },
-    { id: 'business', label: 'Business', price: 25000, color: 'bg-purple-50 border-purple-200 text-purple-700' },
+    { id: 'boost', label: 'Boost', price: 5000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
+    { id: 'business', label: 'Business', price: 25000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
     { id: 'pro', label: 'Pro', price: 50000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
   ];
 
@@ -235,9 +235,9 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
           <div className="lg:col-span-2 space-y-8">
 
             {/* STEP 1: BUDGET */}
-            <div className={`bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border transition-all duration-500 ${step === 1 ? 'border-indigo-200 ring-4 ring-indigo-50/50' : 'border-gray-100 opacity-50 pointer-events-none grayscale'}`}>
+            <div className={`bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border transition-all duration-500 ${step === 1 ? 'border-[#9ED0D0] ring-4 ring-[#E7F4F4]/60' : 'border-gray-100 opacity-50 pointer-events-none grayscale'}`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600"><Coins size={20} /></div>
+                <div className="bg-[#E7F4F4] p-2.5 rounded-xl text-[#128686]"><Coins size={20} /></div>
                 <h2 className="text-xl font-bold text-gray-900">1. Définir le Budget</h2>
               </div>
 
@@ -249,15 +249,15 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                       key={pack.id}
                       onClick={() => handlePackSelect(pack)}
                       className={`relative p-4 rounded-2xl border-2 transition-all text-left flex flex-col justify-between h-28 md:h-32 ${selectedPackId === pack.id
-                        ? 'border-indigo-600 ring-2 ring-indigo-100 bg-indigo-50/30'
-                        : 'border-gray-100 hover:border-indigo-200 hover:bg-gray-50'
+                        ? 'border-[#128686] ring-2 ring-[#9ED0D0] bg-[#E7F4F4]/30'
+                        : 'border-gray-100 hover:border-[#9ED0D0] hover:bg-gray-50'
                         }`}
                     >
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md w-fit mb-2 ${pack.color}`}>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md w-fit mb-2 ${pack.color}`}>
                         {pack.label}
                       </span>
                       <div>
-                        <p className="text-lg font-black text-gray-900">{pack.price.toLocaleString()}F</p>
+                        <p className="text-lg font-bold text-gray-900">{pack.price.toLocaleString()}F</p>
                         <p className="text-[10px] font-bold text-gray-400">~{Math.floor(pack.price / CPV)} vues</p>
                       </div>
                     </button>
@@ -273,7 +273,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                     type="text"
                     value={customAmount}
                     onChange={handleCustomBudgetChange}
-                    className={`w-full bg-gray-50 border-2 rounded-2xl py-4 pl-32 md:pl-36 pr-12 focus:ring-0 outline-none font-black text-gray-900 transition-all ${budgetError ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-100 focus:border-indigo-500 focus:bg-white'
+                    className={`w-full bg-gray-50 border-2 rounded-2xl py-4 pl-32 md:pl-36 pr-12 focus:ring-0 outline-none font-bold text-gray-900 transition-all ${budgetError ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-100 focus:border-[#128686] focus:bg-white'
                       }`}
                     placeholder="5000"
                   />
@@ -290,12 +290,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                 )}
 
                 {/* --- GRANDS COMPTES SECTION --- */}
-                <div className="mt-8 p-6 md:p-8 bg-indigo-50 border border-indigo-100 rounded-[2rem] shadow-sm">
+                <div className="mt-8 p-6 md:p-8 bg-[#E7F4F4] border border-[#128686]/20 rounded-[2rem] shadow-sm">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     {/* Text Column */}
                     <div className="text-center sm:text-left space-y-1">
-                      <h4 className="text-xl font-bold text-indigo-900">Pour un budget de +50 000 FCFA ?</h4>
-                      <p className="text-indigo-600 font-semibold">Contactez nous!</p>
+                      <h4 className="text-xl font-bold text-[#0B2B33]">Pour un budget de +50 000 FCFA ?</h4>
+                      <p className="text-[#128686] font-semibold">Contactez nous!</p>
                     </div>
 
                     {/* Buttons Column */}
@@ -305,7 +305,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                         href="https://wa.me/22891416745"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-lg active:scale-95"
+                        className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all shadow-lg active:scale-95"
                       >
                         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
@@ -329,33 +329,33 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
             </div>
 
             {/* STEP 2: DETAILS */}
-            <div className={`bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border transition-all duration-500 ${step === 2 ? 'border-indigo-200 ring-4 ring-indigo-50/50' : 'border-gray-100 opacity-60'}`}>
+            <div className={`bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border transition-all duration-500 ${step === 2 ? 'border-[#9ED0D0] ring-4 ring-[#E7F4F4]/60' : 'border-gray-100 opacity-60'}`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600"><LayoutGrid size={20} /></div>
+                <div className="bg-[#E7F4F4] p-2.5 rounded-xl text-[#128686]"><LayoutGrid size={20} /></div>
                 <h2 className="text-xl font-bold text-gray-900">2. Détails de l'Annonce</h2>
               </div>
 
               {step === 2 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">Titre de l'offre</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Titre de l'offre</span>
                     <input
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white"
                       placeholder="Ex: Promo Pizza 2 achetées = 1 offerte"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">
                       Catégorie
                     </span>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white"
                     >
                       <option value="">Sélectionnez une catégorie</option>
                       <option value="Tech">Tech</option>
@@ -371,13 +371,13 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   </label>
 
                   {/* <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">
                       Plateforme de partage
                     </span>
                     <select
                       value={platform}
                       onChange={(e) => setPlatform(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white"
                     >
                       <option value="">Sélectionnez une plateforme</option>
                       <option value="WhatsApp">WhatsApp</option>
@@ -390,34 +390,34 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   </label> */}
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur</span>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]"
                       placeholder="Décrivez ce que l'ambassadeur doit mettre en avant..."
                     />
                   </label>
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">Lien de redirection (Optionnel)</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Lien de redirection (Optionnel)</span>
                     <div className="relative">
                       <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <input
                         type="url"
                         value={targetUrl}
                         onChange={(e) => setTargetUrl(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-gray-900 transition-all focus:bg-white"
+                        className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white"
                         placeholder="https:// ou wa.me/..."
                       />
                     </div>
                   </label>
 
                   <div className="space-y-2">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block ml-1">Visuel de campagne</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Visuel de campagne</span>
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className={`relative w-full aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group ${imagePreview ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                      className={`relative w-full aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden group ${imagePreview ? 'border-[#7FD1D1]/50 bg-[#E7F4F4]' : 'border-gray-200 hover:border-[#7FD1D1]/60 hover:bg-gray-50'
                         }`}
                     >
                       {imagePreview ? (
@@ -432,7 +432,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                       ) : (
                         <>
                           <div className="bg-white p-4 rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
-                            <ImageIcon size={32} className="text-indigo-600" />
+                            <ImageIcon size={32} className="text-[#128686]" />
                           </div>
                           <p className="text-sm font-bold text-gray-600">Cliquez pour ajouter une image</p>
                           <p className="text-[10px] text-gray-400 font-medium mt-1">Format recommandé : 1080x1920 (Statut)</p>
@@ -456,7 +456,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
               {step === 2 && (
                 <button
                   onClick={() => setStep(1)}
-                  className="w-full sm:w-auto px-10 py-4 bg-white border-2 border-gray-100 text-gray-500 rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs hover:bg-gray-50 hover:border-gray-200 hover:text-gray-700 transition-all flex items-center justify-center gap-3 active:scale-95"
+                  className="w-full sm:w-auto px-10 py-4 bg-white border-2 border-gray-100 text-gray-500 rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-gray-50 hover:border-gray-200 hover:text-gray-700 transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
                   <ArrowLeft size={16} className="rotate-0 shrink-0" />
                   Retour
@@ -475,7 +475,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                 disabled={
                   (step === 1 && (!!budgetError || budget < MIN_BUDGET)) ||
                   (step === 2 && (!title || !description || !imageFile || !category || !platform || isSubmitting))
-                } className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100"
+                } className="flex-1 py-4 bg-[#128686] text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs shadow-xl shadow-[#128686]/20 hover:bg-[#0E6B6B] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100"
               >
                 {isSubmitting ? (
                   <Loader2 className="animate-spin" size={20} />
@@ -491,22 +491,22 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
 
           {/* RIGHT COLUMN: SUMMARY */}
           <div className="lg:col-span-1">
-            <div className="bg-indigo-900 text-white p-8 rounded-[2.5rem] sticky top-24 shadow-2xl shadow-indigo-200 overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
+            <div className="bg-[#0B3A44] text-white p-8 rounded-[2.5rem] sticky top-24 shadow-2xl shadow-[#062127]/30 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#128686] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50"></div>
 
               <div className="relative z-10 space-y-8">
                 <div>
-                  <p className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Simulateur</p>
+                  <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Simulateur</p>
                   <h3 className="text-2xl font-bold tracking-tight">Résumé</h3>
                 </div>
 
                 <div className="space-y-6">
                   <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-indigo-200 text-[10px] font-black uppercase tracking-wide">Budget Total</span>
-                      <Coins size={14} className="text-indigo-300" />
+                      <span className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-wide">Budget Total</span>
+                      <Coins size={14} className="text-[#7FD1D1]" />
                     </div>
-                    <p className="text-2xl font-black tracking-tighter">{budget.toLocaleString()} <span className="text-base text-indigo-300 font-bold">FCFA</span></p>
+                    <p className="text-2xl font-bold tracking-tighter">{budget.toLocaleString()} <span className="text-base text-[#7FD1D1] font-bold">FCFA</span></p>
                   </div>
 
                   <div className="grid grid-cols-1 gap-4">
@@ -515,8 +515,8 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                         <Target size={18} />
                       </div>
                       <div>
-                        <p className="text-xl font-black">{targetViews.toLocaleString()}</p>
-                        <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">Vues Garanties</p>
+                        <p className="text-xl font-bold">{targetViews.toLocaleString()}</p>
+                        <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Vues Garanties</p>
                       </div>
                     </div>
 
@@ -525,21 +525,21 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                         <Users size={18} />
                       </div>
                       <div>
-                        <p className="text-xl font-black">~{estimatedAmbassadors}</p>
-                        <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest">Ambassadeurs</p>
+                        <p className="text-xl font-bold">~{estimatedAmbassadors}</p>
+                        <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Ambassadeurs</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-indigo-400">
+                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#7FD1D1]">
                     <span>Impact</span>
                     <span>{Math.min(100, Math.round((budget / MAX_BUDGET) * 100))}%</span>
                   </div>
                   <div className="h-2 bg-black/20 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-400 to-indigo-400 transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-[#2BA8A8] to-[#128686] transition-all duration-500"
                       style={{ width: `${Math.min(100, Math.round((budget / MAX_BUDGET) * 100))}%` }}
                     ></div>
                   </div>

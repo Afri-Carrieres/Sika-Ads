@@ -29,11 +29,11 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 selection:bg-indigo-100">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 selection:bg-[#D9ECEC]">
       <div className="max-w-md w-full bg-white p-10 rounded-[3rem] shadow-2xl border border-gray-100 text-center space-y-8 animate-in zoom-in-95 duration-500">
         
         <div className="relative">
-          <div className="bg-indigo-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto text-indigo-600 mb-4">
+          <div className="bg-[#D9ECEC] w-24 h-24 rounded-full flex items-center justify-center mx-auto text-[#128686] mb-4">
             <Mail size={48} />
           </div>
           <div className="absolute top-0 right-1/2 translate-x-10 bg-orange-100 p-2 rounded-full border-2 border-white text-orange-500">
@@ -45,7 +45,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
           <h2 className="text-2xl font-bold text-gray-900 leading-tight">Vérifiez votre email</h2>
           <p className="text-gray-500 font-medium leading-relaxed">
             Nous vous avons envoyé un email de vérification à <br/>
-            <span className="text-indigo-600 font-bold">{email || 'votre adresse email'}</span>.
+            <span className="text-[#128686] font-bold">{email || 'votre adresse email'}</span>.
             <br/>Cliquez sur le lien dans l'email pour activer votre compte.
           </p>
         </div>
@@ -73,7 +73,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
           <button
             onClick={handleResend}
             disabled={resendState === 'loading' || resendState === 'success'}
-            className="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-4 rounded-2xl font-bold tracking-wide border border-indigo-100 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#E7F4F4] hover:bg-[#D9ECEC] text-[#0E6B6B] py-4 rounded-2xl font-bold tracking-wide border border-[#128686]/20 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <RefreshCw size={18} className={resendState === 'loading' ? 'animate-spin' : ''} />
             {resendState === 'loading' ? 'Envoi en cours…' : 'Renvoyer l\'email de vérification'}
@@ -82,7 +82,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
 
         <button 
           onClick={onGoToLogin}
-          className="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95"
+          className="w-full bg-gray-900 hover:bg-black text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95"
         >
           <LogOut size={18} />
           Se connecter

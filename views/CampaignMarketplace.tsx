@@ -214,7 +214,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                 <PartyPopper size={24} />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-black text-gray-900 leading-tight">C'est parti ! 🚀</p>
+                <p className="text-sm font-bold text-gray-900 leading-tight">C'est parti ! 🚀</p>
                 <p className="text-[10px] text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. N'oubliez pas de revenir envoyer votre preuve de vues dans 24h !</p>
               </div>
               <button onClick={() => setShowGlobalSuccess(false)} className="text-gray-300 hover:text-gray-500">
@@ -230,8 +230,8 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
             <div className="flex items-center gap-3 mt-1">
               <p className="text-gray-500 text-sm">Gagnez de l'argent en partageant.</p>
               {/* <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Quota journalier</p>
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black ${isLimitReached ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Quota journalier</p>
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${isLimitReached ? 'bg-red-50 text-red-600' : 'bg-[#E7F4F4] text-[#128686]'}`}>
                   {isLimitReached ? <Lock size={14} /> : <Check size={14} />}
                   {dailyCount}/{DAILY_LIMIT} participations
                 </div>
@@ -241,7 +241,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             <button
               onClick={() => setSelectedCategory('All')}
-              className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === 'All' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-indigo-200'}`}
+              className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === 'All' ? 'bg-[#128686] text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-[#9ED0D0]'}`}
             >
               Tous
             </button>
@@ -249,7 +249,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-indigo-200'}`}
+                className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === cat ? 'bg-[#128686] text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-[#9ED0D0]'}`}
               >
                 {cat}
               </button>
@@ -257,7 +257,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
             <div className="w-px h-6 bg-gray-200 mx-2 shrink-0"></div>
             <button
               onClick={() => setSelectedCategory('Terminé')}
-              className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${selectedCategory === 'Terminé' ? 'bg-gray-800 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-300'}`}
+              className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${selectedCategory === 'Terminé' ? 'bg-gray-800 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-300'}`}
             >
               <Archive size={14} />
               Archives
@@ -270,7 +270,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-200">
               <Archive size={40} />
             </div>
-            <p className="text-gray-400 font-black uppercase tracking-widest text-xs">Aucune campagne {selectedCategory === 'Terminé' ? 'archivée' : 'dans cette catégorie'}</p>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Aucune campagne {selectedCategory === 'Terminé' ? 'archivée' : 'dans cette catégorie'}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -286,7 +286,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
               const BadgeIcon = badgeConfig.icon;
 
               return (
-                <div key={campaign.id} className={`bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col group transition-all duration-500 ${isCompleted ? 'opacity-80' : 'hover:shadow-2xl hover:shadow-indigo-100/50 hover:-translate-y-1'}`}>
+                <div key={campaign.id} className={`bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col group transition-all duration-500 ${isCompleted ? 'opacity-80' : 'hover:shadow-2xl hover:shadow-[#128686]/15 hover:-translate-y-1'}`}>
                   <div className="relative h-64 overflow-hidden">
                     <img src={campaign.imageUrl} alt={campaign.title} className={`w-full h-full object-cover transition-all duration-700 ${isCompleted ? 'grayscale brightness-50 contrast-[0.8]' : 'group-hover:scale-110'}`} />
 
@@ -298,7 +298,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                           e.stopPropagation();
                           downloadImage(campaign.imageUrl, campaign.title);
                         }}
-                        className="absolute top-4 right-4 p-3 bg-white/20 hover:bg-white text-white hover:text-indigo-600 rounded-2xl backdrop-blur-md transition-all shadow-lg z-10 group/dl"
+                        className="absolute top-4 right-4 p-3 bg-white/20 hover:bg-white text-white hover:text-[#128686] rounded-2xl backdrop-blur-md transition-all shadow-lg z-10 group/dl"
                         title="Télécharger l'image"
                       >
                         <Download size={20} className="group-hover/dl:scale-110 transition-transform" />
@@ -309,17 +309,17 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
                         <div className="bg-white/90 px-6 py-2 rounded-full flex items-center gap-2 shadow-xl border border-gray-100 animate-in fade-in zoom-in-90 duration-500">
                           <Ban size={16} className="text-red-600" />
-                          <span className="text-xs font-black text-gray-900 uppercase tracking-widest">Épuisée / Terminé</span>
+                          <span className="text-xs font-bold text-gray-900 uppercase tracking-widest">Épuisée / Terminé</span>
                         </div>
                       </div>
                     )}
 
                     <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
-                      <span className={`${isCompleted ? 'bg-gray-700/80' : 'bg-indigo-600/90'} backdrop-blur-md text-white text-[9px] font-black uppercase tracking-[0.15em] px-4 py-1.5 rounded-full shadow-lg`}>
+                      <span className={`${isCompleted ? 'bg-gray-700/80' : 'bg-[#128686]/90'} backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-[0.15em] px-4 py-1.5 rounded-full shadow-lg`}>
                         {campaign.category}
                       </span>
                       {!isCompleted && (
-                        <span className={`${badgeConfig.className} backdrop-blur-md text-[9px] font-black uppercase tracking-[0.15em] px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5`}>
+                        <span className={`${badgeConfig.className} backdrop-blur-md text-[9px] font-bold uppercase tracking-[0.15em] px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5`}>
                           <BadgeIcon size={10} />
                           {badgeConfig.label}
                         </span>
@@ -333,18 +333,18 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
                       {/* <div className={`${isCompleted ? 'bg-gray-50 border-gray-100 grayscale' : 'bg-green-50/50 border-green-100'} p-4 rounded-2xl border`}>
-                      <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isCompleted ? 'text-gray-300' : 'text-green-700'}`}>Par Clic</p>
-                      <p className={`text-xl font-black ${isCompleted ? 'text-gray-400' : 'text-green-800'}`}>{campaign.cpc} FCFA</p>
+                      <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isCompleted ? 'text-gray-300' : 'text-green-700'}`}>Par Clic</p>
+                      <p className={`text-xl font-bold ${isCompleted ? 'text-gray-400' : 'text-green-800'}`}>{campaign.cpc} FCFA</p>
                     </div> */}
-                      <div className={`${isCompleted ? 'bg-gray-50 border-gray-100 grayscale' : 'bg-indigo-50/50 border-indigo-100'} p-4 rounded-2xl border`}>
-                        <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isCompleted ? 'text-gray-300' : 'text-indigo-700'}`}>Par Statut</p>
-                        <p className={`text-xl font-black ${isCompleted ? 'text-gray-400' : 'text-indigo-800'}`}>{campaign.cpv} FCFA</p>
+                      <div className={`${isCompleted ? 'bg-gray-50 border-gray-100 grayscale' : 'bg-[#E7F4F4]/50 border-[#128686]/20'} p-4 rounded-2xl border`}>
+                        <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isCompleted ? 'text-gray-300' : 'text-[#0E6B6B]'}`}>Par Statut</p>
+                        <p className={`text-xl font-bold ${isCompleted ? 'text-gray-400' : 'text-[#0A4F50]'}`}>{campaign.cpv} FCFA</p>
                       </div>
                     </div>
 
                     <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                       <div>
-                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1 flex items-center gap-2">
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
                           Budget rest.
                           {lastUpdatedId === campaign.id && !isCompleted && !isPaused && (
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
@@ -357,13 +357,13 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                       <button
                         onClick={() => openSharePage(campaign)}
                         disabled={isCompleted || isPaused || isProcessing}
-                        className={`px-8 py-3.5 rounded-[1.25rem] font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-2 ${isCompleted || isPaused
+                        className={`px-8 py-3.5 rounded-[1.25rem] font-bold uppercase tracking-widest text-[10px] transition-all flex items-center gap-2 ${isCompleted || isPaused
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                           : isRecentlyShared
                             ? 'bg-green-500 text-white shadow-xl shadow-green-100'
                             : isLimitReached
                               ? 'bg-gray-100 text-gray-400 border border-gray-200 hover:bg-gray-200'
-                              : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-100 hover:scale-105 active:scale-95'
+                              : 'bg-[#128686] hover:bg-[#0E6B6B] text-white shadow-xl shadow-[#128686]/20 hover:scale-105 active:scale-95'
                           }`}
                       >
                         {isCompleted ? 'Terminé' : isPaused ? 'En Pause' : (isRecentlyShared ? 'Partagé !' : isProcessing ? 'En cours...' : (isLimitReached ? 'Limite atteinte' : 'Participer'))}
@@ -384,7 +384,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="p-3 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50 transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:border-gray-100 disabled:hover:text-gray-400 active:scale-90"
+                className="p-3 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-[#128686] hover:border-[#128686]/25 hover:bg-[#E7F4F4] transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:border-gray-100 disabled:hover:text-gray-400 active:scale-90"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -404,9 +404,9 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`w-11 h-11 rounded-2xl text-xs font-black transition-all active:scale-90 ${isSelected
-                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
-                          : 'bg-white text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 border border-transparent'
+                        className={`w-11 h-11 rounded-2xl text-xs font-bold transition-all active:scale-90 ${isSelected
+                          ? 'bg-[#128686] text-white shadow-lg shadow-[#128686]/20'
+                          : 'bg-white text-gray-500 hover:bg-[#E7F4F4] hover:text-[#128686] border border-transparent'
                           }`}
                       >
                         {pageNum}
@@ -433,13 +433,13 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="p-3 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-indigo-600 hover:border-indigo-100 hover:bg-indigo-50 transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:border-gray-100 disabled:hover:text-gray-400 active:scale-90"
+                className="p-3 rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-[#128686] hover:border-[#128686]/25 hover:bg-[#E7F4F4] transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:border-gray-100 disabled:hover:text-gray-400 active:scale-90"
               >
                 <ChevronRight size={20} />
               </button>
             </div>
 
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
               Page {currentPage} sur {totalPages} — {filteredCampaigns.length} campagnes au total
             </p>
           </div>
@@ -461,7 +461,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
             </p>
             <button
               onClick={() => setShowLimitModal(false)}
-              className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:bg-black transition-all active:scale-95"
+              className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl hover:bg-black transition-all active:scale-95"
             >
               J'ai compris
             </button>

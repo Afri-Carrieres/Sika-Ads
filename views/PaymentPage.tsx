@@ -244,7 +244,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
             <div className="space-y-3">
               <button
                 onClick={() => setShowConfirmationModal(false)}
-                className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all active:scale-95 shadow-xl"
+                className="w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-sm bg-blue-600 text-white hover:bg-blue-700 transition-all active:scale-95 shadow-xl"
               >
                 OK
               </button>
@@ -252,7 +252,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                 <button
                   onClick={() => manualRetryPayment(reference)}
                   disabled={status !== "pending"}
-                  className="w-full py-3 rounded-2xl font-black uppercase tracking-widest text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all active:scale-95 border-2 border-indigo-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3 rounded-2xl font-bold uppercase tracking-widest text-xs bg-[#E7F4F4] text-[#128686] hover:bg-[#D9ECEC] transition-all active:scale-95 border-2 border-[#9ED0D0] flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <RefreshCw size={14} className="animate-spin" />
                   Vérifier le paiement
@@ -284,7 +284,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                 setResultPopup(null);
                 if (cb) cb();
               }}
-              className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-xl ${resultPopup.type === "success"
+              className={`w-full py-4 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all active:scale-95 shadow-xl ${resultPopup.type === "success"
                   ? "bg-green-600 text-white hover:bg-green-700 shadow-green-100"
                   : resultPopup.type === "info"
                     ? "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100"
@@ -313,14 +313,14 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           Retour
         </button>
 
-        <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl shadow-indigo-100/50 border border-indigo-50/50 relative overflow-hidden">
+        <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl shadow-[#128686]/15 border border-[#E7F4F4]/50 relative overflow-hidden">
           {/* Subtle Background Accent */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#E7F4F4] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
 
           <div className="relative z-10 space-y-8">
             {/* Header */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E7F4F4] text-[#128686] text-[10px] font-bold uppercase tracking-widest mb-3">
                 <CreditCard size={12} />
                 Paiement Sécurisé
               </div>
@@ -329,21 +329,21 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
             </div>
 
             {/* Campaign Summary & Amount */}
-            <div className="bg-indigo-900 text-white p-6 rounded-3xl space-y-4 shadow-lg shadow-indigo-900/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-30"></div>
+            <div className="bg-[#0B3A44] text-white p-6 rounded-3xl space-y-4 shadow-lg shadow-[#062127]/40 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#128686] rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-30"></div>
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Campagne ID</p>
+                    <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Campagne ID</p>
                     <p className="font-mono text-xs opacity-80">{campaignId}</p>
                   </div>
-                  <Coins className="text-indigo-300" size={20} />
+                  <Coins className="text-[#7FD1D1]" size={20} />
                 </div>
                 <div className="pt-2 border-t border-white/10">
-                  <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest leading-none mb-1">Montant à régler</p>
+                  <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Montant à régler</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black tracking-tighter">{amount.toLocaleString()}</span>
-                    <span className="text-sm font-bold text-indigo-300">FCFA</span>
+                    <span className="text-3xl font-bold tracking-tighter">{amount.toLocaleString()}</span>
+                    <span className="text-sm font-bold text-[#7FD1D1]">FCFA</span>
                   </div>
                 </div>
               </div>
@@ -351,20 +351,20 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
 
             {/* Operator Selection Card Grid */}
             <div className="space-y-4">
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Choisir l'opérateur</span>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Choisir l'opérateur</span>
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setOperator("yas")}
                   disabled={status === "creating" || status === "pending" || status === "success"}
                   className={`relative p-4 rounded-3xl border-2 transition-all flex flex-col items-center justify-center gap-3 h-28 ${operator === "yas"
-                      ? "border-indigo-600 ring-4 ring-indigo-50 bg-indigo-50/30"
-                      : "border-gray-50 hover:border-indigo-100 hover:bg-gray-50 bg-gray-50/50"
+                      ? "border-[#128686] ring-4 ring-[#E7F4F4] bg-[#E7F4F4]/30"
+                      : "border-gray-50 hover:border-[#128686]/25 hover:bg-gray-50 bg-gray-50/50"
                     } disabled:opacity-50`}
                 >
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm ${operator === 'yas' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>T</div>
-                  <span className="text-[11px] font-black uppercase tracking-wider">TMoney</span>
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm ${operator === 'yas' ? 'bg-[#128686] text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>T</div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">TMoney</span>
                   {operator === 'yas' && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50 duration-200">
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-[#128686] text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50 duration-200">
                       <CheckCircle2 size={12} strokeWidth={4} />
                     </div>
                   )}
@@ -374,14 +374,14 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                   onClick={() => setOperator("moov")}
                   disabled={status === "creating" || status === "pending" || status === "success"}
                   className={`relative p-4 rounded-3xl border-2 transition-all flex flex-col items-center justify-center gap-3 h-28 ${operator === "moov"
-                      ? "border-indigo-600 ring-4 ring-indigo-50 bg-indigo-50/30"
-                      : "border-gray-50 hover:border-indigo-100 hover:bg-gray-50 bg-gray-50/50"
+                      ? "border-[#128686] ring-4 ring-[#E7F4F4] bg-[#E7F4F4]/30"
+                      : "border-gray-50 hover:border-[#128686]/25 hover:bg-gray-50 bg-gray-50/50"
                     } disabled:opacity-50`}
                 >
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm ${operator === 'moov' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>M</div>
-                  <span className="text-[11px] font-black uppercase tracking-wider">Moov</span>
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm ${operator === 'moov' ? 'bg-[#128686] text-white' : 'bg-white text-gray-400 border border-gray-100'}`}>M</div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Moov</span>
                   {operator === 'moov' && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50 duration-200">
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-[#128686] text-white rounded-full flex items-center justify-center shadow-md animate-in zoom-in-50 duration-200">
                       <CheckCircle2 size={12} strokeWidth={4} />
                     </div>
                   )}
@@ -391,9 +391,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
 
             {/* Phone Number Input */}
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 block">Numéro de téléphone</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 block">Numéro de téléphone</label>
               <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#128686] transition-colors">
                   <Phone size={18} />
                 </div>
                 <input
@@ -401,7 +401,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                   onChange={(e) => setRecipientNumber(e.target.value)}
                   placeholder="90xxxxxx"
                   disabled={status === "creating" || status === "pending" || status === "success"}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-3xl p-5 pl-14 focus:ring-2 focus:ring-indigo-500 outline-none font-black text-gray-900 transition-all focus:bg-white placeholder:text-gray-300"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-3xl p-5 pl-14 focus:ring-2 focus:ring-[#128686] outline-none font-bold text-gray-900 transition-all focus:bg-white placeholder:text-gray-300"
                 />
               </div>
             </div>
@@ -412,7 +412,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                   ? "bg-red-50 text-red-600 border-red-100"
                   : status === "pending"
                     ? "bg-green-50 text-green-700 border-green-100 shadow-lg shadow-green-100/50"
-                    : "bg-indigo-50 text-indigo-600 border-indigo-100"
+                    : "bg-[#E7F4F4] text-[#128686] border-[#128686]/20"
                 }`}>
                 {status === "failed" ? (
                   <AlertCircle size={22} className="shrink-0 mt-0.5" />
@@ -437,7 +437,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
               <button
                 onClick={handlePay}
                 disabled={status === "creating" || status === "pending" || status === "success"}
-                className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-indigo-100 hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
+                className="w-full py-5 bg-[#128686] text-white rounded-[2rem] font-bold uppercase tracking-[0.2em] text-xs shadow-xl shadow-[#128686]/20 hover:bg-[#0E6B6B] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
               >
                 {status === "creating" ? (
                   <Loader2 className="animate-spin" size={20} />

@@ -126,10 +126,10 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
             className="flex items-center gap-2 cursor-pointer group"
             onClick={() => handleNav('landing')}
           >
-            <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
+            <div className="bg-[#128686] p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
               <Megaphone className="text-white" size={20} />
             </div>
-            <span className="text-xl font-black text-gray-900 tracking-tighter">SikaAds</span>
+            <span className="text-xl font-bold text-gray-900 tracking-tighter">SikaAds</span>
           </div>
 
           {/* Desktop Nav */}
@@ -144,7 +144,7 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
                       onClick={() => handleNav(item.id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                         item.active 
-                          ? 'bg-indigo-50 text-indigo-600' 
+                          ? 'bg-[#E7F4F4] text-[#128686]' 
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
@@ -160,14 +160,14 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
 
             <button 
               onClick={authBtn.action}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold uppercase tracking-widest transition-all shadow-lg active:scale-95 ${
                 user && (view === 'app' || view === 'profile')
-                  ? 'bg-indigo-50 text-indigo-600 shadow-indigo-100 hover:bg-indigo-100'
+                  ? 'bg-[#E7F4F4] text-[#128686] shadow-[#128686]/20 hover:bg-[#D9ECEC]'
                   : 'bg-gray-900 text-white shadow-gray-200 hover:bg-black'
               }`}
             >
               {user?.user_metadata?.avatar_url ? (
-                <img src={user.user_metadata.avatar_url} className="w-6 h-6 rounded-full border border-indigo-200 object-cover" alt="Profile" />
+                <img src={user.user_metadata.avatar_url} className="w-6 h-6 rounded-full border border-[#9ED0D0] object-cover" alt="Profile" />
               ) : (
                 <authBtn.icon size={18} />
               )}
@@ -199,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
                   onClick={() => handleNav(item.id)}
                   className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-base font-bold transition-all ${
                     item.active 
-                      ? 'bg-indigo-50 text-indigo-600' 
+                      ? 'bg-[#E7F4F4] text-[#128686]' 
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -211,9 +211,9 @@ const Header: React.FC<HeaderProps> = ({ view, role, setView, setRole, user }) =
             <div className="pt-4 border-t border-gray-50">
               <button 
                 onClick={authBtn.action}
-                className={`w-full flex items-center justify-center gap-3 px-4 py-5 rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl active:scale-95 transition-all ${
+                className={`w-full flex items-center justify-center gap-3 px-4 py-5 rounded-2xl font-bold uppercase tracking-widest text-sm shadow-xl active:scale-95 transition-all ${
                   user && (view === 'app' || view === 'profile')
-                    ? 'bg-indigo-50 text-indigo-600 shadow-indigo-100'
+                    ? 'bg-[#E7F4F4] text-[#128686] shadow-[#128686]/20'
                     : 'bg-gray-900 text-white shadow-gray-100'
                 }`}
               >

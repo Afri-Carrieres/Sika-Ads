@@ -12,18 +12,18 @@ interface NotificationCenterProps {
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, onClose, onMarkAsRead }) => {
   const getIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'campaign': return <Megaphone className="text-blue-500" size={16} />;
+      case 'campaign': return <Megaphone className="text-[#128686]" size={16} />;
       case 'status': return <CheckCircle2 className="text-green-500" size={16} />;
       case 'payout': return <Wallet className="text-orange-500" size={16} />;
-      default: return <Info className="text-indigo-500" size={16} />;
+      default: return <Info className="text-[#0E6B6B]" size={16} />;
     }
   };
 
   return (
     <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[100] animate-in slide-in-from-top-2 duration-200 overflow-hidden">
-      <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-indigo-50/50">
+      <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-[#E7F4F4]/50">
         <h3 className="font-bold text-gray-900 flex items-center gap-2">
-          <Bell size={18} className="text-indigo-600" />
+          <Bell size={18} className="text-[#128686]" />
           Notifications
         </h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -42,14 +42,14 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
             <div 
               key={notif.id} 
               onClick={() => onMarkAsRead(notif.id)}
-              className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors relative ${!notif.read ? 'bg-indigo-50/30' : ''}`}
+              className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors relative ${!notif.read ? 'bg-[#E7F4F4]/30' : ''}`}
             >
               <div className="flex gap-3">
                 <div className="mt-1">{getIcon(notif.type)}</div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
                     <h4 className="text-sm font-bold text-gray-900">{notif.title}</h4>
-                    {!notif.read && <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>}
+                    {!notif.read && <span className="w-2 h-2 bg-[#128686] rounded-full"></span>}
                   </div>
                   <p className="text-xs text-gray-600 mt-1 leading-relaxed">{notif.message}</p>
                   <p className="text-[10px] text-gray-400 mt-2 font-medium">
@@ -63,7 +63,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, 
       </div>
       
       {notifications.length > 0 && (
-        <button className="w-full py-3 text-xs font-bold text-indigo-600 hover:bg-gray-50 transition-colors border-t border-gray-50">
+        <button className="w-full py-3 text-xs font-bold text-[#128686] hover:bg-gray-50 transition-colors border-t border-gray-50">
           Voir tout l'historique
         </button>
       )}

@@ -102,7 +102,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         className={`
           w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
           ${isActive
-            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+            ? 'bg-[#128686] text-white shadow-lg shadow-[#062127]/40'
             : 'text-slate-400 hover:bg-white/5 hover:text-white'
           }
         `}
@@ -129,7 +129,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
     if (!group.collapsible) {
       return (
         <div className="pt-4 pb-2 px-4 first:pt-2">
-          <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${groupIsActive ? 'text-indigo-400' : 'text-slate-500'}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${groupIsActive ? 'text-[#7FD1D1]' : 'text-slate-500'}`}>
             {group.label}
           </span>
         </div>
@@ -140,7 +140,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       <div className="pt-4 pb-1 px-1 first:pt-2">
         <button
           onClick={() => toggleGroup(group.id)}
-          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors duration-150 hover:bg-white/5 ${groupIsActive ? 'text-indigo-400' : 'text-slate-500 hover:text-slate-300'}`}
+          className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors duration-150 hover:bg-white/5 ${groupIsActive ? 'text-[#7FD1D1]' : 'text-slate-500 hover:text-slate-300'}`}
           aria-expanded={!isCollapsed}
           aria-controls={`nav-group-${group.id}`}
         >
@@ -175,7 +175,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
                   className={`
                     w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
                     ${isItemActive(item.id)
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+                      ? 'bg-[#128686] text-white shadow-lg shadow-[#062127]/40'
                       : 'text-slate-400 hover:bg-white/5 hover:text-white'
                     }
                   `}
@@ -212,7 +212,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
           className={`
             w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
             ${isActive
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+              ? 'bg-[#128686] text-white shadow-lg shadow-[#062127]/40'
               : 'text-slate-400 hover:bg-white/5 hover:text-white'
             }
           `}
@@ -234,9 +234,9 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
   };
 
   const renderSidebarFooter = () => (
-    <div className="p-4 border-t border-indigo-800/30 bg-[#0F172A] shrink-0 z-10">
+    <div className="p-4 border-t border-[#128686]/30 bg-[#062127] shrink-0 z-10">
       <div className="flex items-center gap-3 mb-4 px-2">
-        <div className="w-9 h-9 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-300 font-bold border border-indigo-500/30 text-xs">
+        <div className="w-9 h-9 rounded-full bg-[#128686]/20 flex items-center justify-center text-[#7FD1D1] font-bold border border-[#128686]/30 text-xs">
           {userData?.name?.charAt(0) || 'U'}
         </div>
         <div className="overflow-hidden">
@@ -246,7 +246,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
       </div>
       <button
         onClick={handleLogout}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-red-500/10 hover:border-red-500/30"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all border border-red-500/10 hover:border-red-500/30"
       >
         <LogOut size={14} />
         Déconnexion
@@ -259,12 +259,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
 
       {isStaff ? (
         <>
-          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
+          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#062127] text-white border-r border-[#128686]/25 h-screen transition-all duration-300">
 
-            <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
+            <div className="p-3 shrink-0 border-b border-[#128686]/30 bg-[#062127] z-10">
               <div className="p-1 rounded-lg flex flex-col items-center">
                 <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-                <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                <p className="text-[10px] bg-[#128686]/30 p-2 font-bold text-[#7FD1D1] uppercase tracking-widest mt-1">
                   {getRoleLabel()}
                 </p>
               </div>
@@ -286,12 +286,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
             />
 
             <aside
-              className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+              className={`absolute inset-y-0 left-0 w-72 bg-[#062127] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
-              <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
+              <div className="p-3 shrink-0 border-b border-[#128686]/30 bg-[#062127] flex items-center justify-between">
                 <div className="flex flex-col items-center gap-1">
                   <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-                  <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                  <p className="text-[10px] bg-[#128686]/30 p-2 font-bold text-[#7FD1D1] uppercase tracking-widest mt-1">
                     {getRoleLabel()}
                   </p>
                 </div>
@@ -314,12 +314,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         </>
       ) : (
         <>
-          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#0F172A] text-white border-r border-indigo-900/20 h-screen transition-all duration-300">
+          <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 z-50 w-72 bg-[#062127] text-white border-r border-[#128686]/25 h-screen transition-all duration-300">
 
-            <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] z-10">
+            <div className="p-3 shrink-0 border-b border-[#128686]/30 bg-[#062127] z-10">
               <div className="p-1 rounded-lg flex flex-col items-center">
                 <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-                <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                <p className="text-[10px] bg-[#128686]/30 p-2 font-bold text-[#7FD1D1] uppercase tracking-widest mt-1">
                   {getRoleLabel()}
                 </p>
               </div>
@@ -341,12 +341,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
             />
 
             <aside
-              className={`absolute inset-y-0 left-0 w-72 bg-[#0F172A] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+              className={`absolute inset-y-0 left-0 w-72 bg-[#062127] text-white shadow-2xl transition-transform duration-300 ease-in-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
-              <div className="p-3 shrink-0 border-b border-indigo-800/30 bg-[#0F172A] flex items-center justify-between">
+              <div className="p-3 shrink-0 border-b border-[#128686]/30 bg-[#062127] flex items-center justify-between">
                 <div className="flex flex-col items-center gap-3">
                   <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
-                  <p className="text-[10px] bg-indigo-600/30 p-2 font-bold text-indigo-400 uppercase tracking-widest mt-1">
+                  <p className="text-[10px] bg-[#128686]/30 p-2 font-bold text-[#7FD1D1] uppercase tracking-widest mt-1">
                     {getRoleLabel()}
                   </p>
                 </div>
@@ -369,11 +369,11 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         </>
       )}
 
-      <div className="md:hidden sticky top-0 z-[40] bg-[#0F172A] text-white p-4 flex items-center justify-between shadow-md">
+      <div className="md:hidden sticky top-0 z-[40] bg-[#062127] text-white p-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 -ml-2 text-indigo-400 hover:text-white transition-colors"
+            className="p-2 -ml-2 text-[#7FD1D1] hover:text-white transition-colors"
             aria-label="Ouvrir le menu"
           >
             <Menu size={24} />
@@ -382,7 +382,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
             <img className="w-40" src="/Header-LogoSika-Ads.png" alt="Logo SikaAds" />
           </div>
         </div>
-        <p className="text-[10px] font-black uppercase bg-white/10 px-2 py-1 rounded text-indigo-200">{getRoleLabel()}</p>
+        <p className="text-[10px] font-bold uppercase bg-white/10 px-2 py-1 rounded text-[#A9DADA]">{getRoleLabel()}</p>
       </div>
 
 
@@ -394,7 +394,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
         p-4 sm:p-6 md:p-8 lg:p-10
         pb-24 md:pb-8
         transition-all duration-300 ease-in-out
-        bg-[cbd3d8] backdrop-blur-sm rounded-2xl shadow-lg shadow-indigo-900/20
+        bg-transparent backdrop-blur-sm rounded-2xl shadow-lg shadow-[#062127]/40
       ">
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
           {children}

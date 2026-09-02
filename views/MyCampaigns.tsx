@@ -182,7 +182,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <Loader2 className="animate-spin text-indigo-600" size={40} />
+        <Loader2 className="animate-spin text-[#128686]" size={40} />
         <p className="text-slate-500 font-medium">Chargement de vos campagnes...</p>
       </div>
     );
@@ -214,7 +214,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
         </div>
         <button
           onClick={onNavigateToCreate}
-          className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/10 hover:shadow-indigo-900/20 transition-all text-sm self-start sm:self-center"
+          className="flex items-center gap-2 px-5 py-3 bg-[#128686] hover:bg-[#0E6B6B] text-white font-bold rounded-xl shadow-lg shadow-[#062127]/20 hover:shadow-[#062127]/40 transition-all text-sm self-start sm:self-center"
         >
           <PlusCircle size={16} />
           Lancer une campagne
@@ -230,7 +230,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
           </p>
           <button
             onClick={onNavigateToCreate}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#128686] hover:bg-[#0E6B6B] text-white font-bold rounded-xl shadow-md transition"
           >
             Créer ma première campagne
             <ChevronRight size={16} />
@@ -241,12 +241,12 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
           {/* Stats Overview */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
-              <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+              <div className="p-3 bg-[#E7F4F4] rounded-xl text-[#128686]">
                 <Layers size={20} />
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wide">Campagnes</p>
-                <p className="text-xl font-black text-slate-800 mt-0.5">{totalCampaigns}</p>
+                <p className="text-xl font-bold text-slate-800 mt-0.5">{totalCampaigns}</p>
               </div>
             </div>
 
@@ -256,7 +256,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wide">Actives</p>
-                <p className="text-xl font-black text-slate-800 mt-0.5">{activeCampaigns}</p>
+                <p className="text-xl font-bold text-slate-800 mt-0.5">{activeCampaigns}</p>
               </div>
             </div>
 
@@ -266,7 +266,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wide">Partages</p>
-                <p className="text-xl font-black text-slate-800 mt-0.5">{totalShares}</p>
+                <p className="text-xl font-bold text-slate-800 mt-0.5">{totalShares}</p>
               </div>
             </div>
 
@@ -276,7 +276,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wide">Vues validées</p>
-                <p className="text-xl font-black text-slate-800 mt-0.5">{totalValidatedViews.toLocaleString()}</p>
+                <p className="text-xl font-bold text-slate-800 mt-0.5">{totalValidatedViews.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                             <Eye size={12} />
                             VUES VALIDÉES
                           </span>
-                          <span className="text-indigo-700">
+                          <span className="text-[#0E6B6B]">
                             {validatedViews.toLocaleString()} / {target.toLocaleString()} ({progress}%)
                           </span>
                         </div>
@@ -340,8 +340,8 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                             style={{
                               width: `${progress}%`,
                               background: progress >= 100
-                                ? 'linear-gradient(90deg, #16a34a, #22c55e)'
-                                : 'linear-gradient(90deg, #4f46e5, #818cf8)'
+                                ? 'linear-gradient(90deg, #0E6B6B, #2BA8A8)'
+                                : 'linear-gradient(90deg, #D14E04, #FB7A28)'
                             }}
                           />
                         </div>
@@ -356,7 +356,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                       <div>
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Budget Total</span>
-                        <span className="text-base font-black text-indigo-950">{(campaign.totalBudget || campaign.paymentAmount || 0).toLocaleString()} F</span>
+                        <span className="text-base font-bold text-[#062127]">{(campaign.totalBudget || campaign.paymentAmount || 0).toLocaleString()} F</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Budget restant</span>

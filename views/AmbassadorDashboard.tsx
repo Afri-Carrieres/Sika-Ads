@@ -30,10 +30,10 @@ const ArrowDownRight: React.FC<{ size?: number; className?: string }> = ({ size 
 
 const StatCard: React.FC<{ title: string; value: string; icon: any; color: string }> = ({ title, value, icon: Icon, color }) => {
   const colorMap: Record<string, string> = {
-    indigo: 'bg-indigo-100 text-indigo-600',
-    green: 'bg-green-100 text-green-600',
-    orange: 'bg-orange-100 text-orange-600',
-    blue: 'bg-blue-100 text-blue-600',
+    indigo: 'bg-[#E7F4F4] text-[#0E6B6B]',
+    green: 'bg-[#E7F4F4] text-[#128686]',
+    orange: 'bg-[#F65E06]/10 text-[#F65E06]',
+    blue: 'bg-[#2BA8A8]/10 text-[#128686]',
   };
 
   return (
@@ -42,7 +42,7 @@ const StatCard: React.FC<{ title: string; value: string; icon: any; color: strin
         <Icon size={22} />
       </div>
       <div>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{title}</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">{title}</p>
         <p className="text-xl font-bold text-gray-900 leading-none">{value}</p>
       </div>
     </div>
@@ -297,7 +297,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
       
       {/* Push Notification Banner */}
       {showPermissionPrompt && (
-        <div className="bg-indigo-600 text-white p-4 md:p-6 rounded-[2rem] shadow-xl shadow-indigo-100 flex flex-col md:flex-row items-center justify-between gap-6 border border-indigo-500 animate-in slide-in-from-top-4 duration-700">
+        <div className="bg-gradient-to-r from-[#062127] via-[#0B3A44] to-[#0E4B55] text-white p-4 md:p-6 rounded-[2rem] shadow-xl shadow-[#062127]/40 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#128686]/30 animate-in slide-in-from-top-4 duration-700">
           <div className="flex items-center gap-5">
             <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-md animate-pulse">
               <BellRing size={28} className="text-white" />
@@ -305,9 +305,9 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
             <div className="space-y-1 text-center md:text-left">
               <h3 className="text-lg font-bold tracking-tight leading-none flex items-center justify-center md:justify-start gap-2">
                 Ne manquez plus aucun gain ! 💸
-                <Sparkles size={16} className="text-indigo-300" />
+                <Sparkles size={16} className="text-[#7FD1D1]" />
               </h3>
-              <p className="text-indigo-100 text-sm font-medium">
+              <p className="text-[#A9DADA] text-sm font-medium">
                 Recevez des alertes pour les <span className="text-white font-bold">nouvelles campagnes</span>, la <span className="text-white font-bold">validation de vos preuves</span> et vos <span className="text-white font-bold">paiements</span>.
               </p>
             </div>
@@ -315,13 +315,13 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
           <div className="flex items-center gap-3 w-full md:w-auto">
             <button 
               onClick={() => setShowPermissionPrompt(false)}
-              className="px-6 py-3 text-indigo-200 text-sm font-bold hover:text-white transition-colors"
+              className="px-6 py-3 text-[#A9DADA] text-sm font-bold hover:text-white transition-colors"
             >
               Plus tard
             </button>
             <button 
               onClick={handleRequestNotificationPermission}
-              className="flex-1 md:flex-none px-8 py-3 bg-white text-indigo-600 rounded-xl font-black uppercase tracking-widest text-xs shadow-lg hover:bg-indigo-50 transition-all active:scale-95 whitespace-nowrap"
+              className="flex-1 md:flex-none px-8 py-3 bg-[#F65E06] text-white rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg hover:bg-[#D14E04] transition-all active:scale-95 whitespace-nowrap"
             >
               Activer maintenant
             </button>
@@ -340,7 +340,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
         <div className="flex items-center gap-3">
           <button 
             onClick={onNavigateToWallet}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 flex-1 md:flex-none justify-center active:scale-95"
+            className="bg-[#F65E06] hover:bg-[#D14E04] text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 flex-1 md:flex-none justify-center active:scale-95"
           >
             Retrait rapide
           </button>
@@ -363,12 +363,12 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
               <BarChart data={chartData}>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} />
                 <Tooltip 
-                  cursor={{fill: 'rgba(79, 70, 229, 0.05)'}}
+                  cursor={{fill: 'rgba(18, 134, 134, 0.06)'}}
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'}}
                 />
                 <Bar dataKey="earnings" radius={[6, 6, 0, 0]}>
                   {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 6 ? '#4f46e5' : '#e0e7ff'} />
+                    <Cell key={`cell-${index}`} fill={index === 6 ? '#128686' : '#BFE3E3'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -380,17 +380,17 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
           <h3 className="text-lg font-bold mb-6 text-gray-800">Activités récentes</h3>
           <div className="space-y-4">
             {activities.slice(0, 5).map((activity) => (
-              <div key={activity.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-indigo-50/50 transition-all border border-transparent hover:border-indigo-100 group">
+              <div key={activity.id} className="flex items-center justify-between p-3 rounded-2xl hover:bg-[#E7F4F4]/60 transition-all border border-transparent hover:border-[#128686]/20 group">
                 <div className="flex items-center gap-3">
-                  <div className="bg-indigo-50 p-2.5 rounded-xl group-hover:bg-white transition-colors">
-                    <ArrowUpRight size={18} className="text-indigo-600" />
+                  <div className="bg-[#E7F4F4] p-2.5 rounded-xl group-hover:bg-white transition-colors">
+                    <ArrowUpRight size={18} className="text-[#128686]" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-gray-900">{activity.title}</p>
                     <p className="text-xs text-gray-500 truncate max-w-[140px]">{activity.subtitle}</p>
                   </div>
                 </div>
-                <p className={`text-sm font-black ${activity.amount > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                <p className={`text-sm font-bold ${activity.amount > 0 ? 'text-[#0E6B6B]' : 'text-red-500'}`}>
                   {activity.amount > 0 ? '+' : ''}{activity.amount} F
                 </p>
               </div>
@@ -398,7 +398,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
           </div>
           <button 
             onClick={() => setShowHistoryModal(true)}
-            className="w-full mt-6 py-3 text-sm font-bold text-indigo-600 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2"
+            className="w-full mt-6 py-3 text-sm font-bold text-[#128686] bg-[#E7F4F4] rounded-xl hover:bg-[#D9ECEC] transition-colors flex items-center justify-center gap-2"
           >
             <History size={16} />
             Voir tout l'historique
@@ -413,12 +413,12 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
             {/* Modal Header */}
             <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
               <div className="flex items-center gap-4">
-                <div className="bg-indigo-100 text-indigo-600 p-3 rounded-2xl shadow-sm">
+                <div className="bg-[#E7F4F4] text-[#128686] p-3 rounded-2xl shadow-sm">
                   <History size={24} />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 tracking-tight leading-none">Historique Complet</h3>
-                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">Suivi détaillé de vos gains SikaAds</p>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Suivi détaillé de vos gains SikaAds</p>
                 </div>
               </div>
               <button 
@@ -433,23 +433,23 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
             <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide shrink-0">
               <div className="flex items-center gap-2 text-gray-400 mr-2 shrink-0">
                 <Filter size={14} />
-                <span className="text-[10px] font-black uppercase tracking-widest">Période :</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Période :</span>
               </div>
               <button 
                 onClick={() => setHistoryFilter('week')}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === 'week' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-indigo-200'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === 'week' ? 'bg-[#128686] text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-[#9ED0D0]'}`}
               >
                 7 jours
               </button>
               <button 
                 onClick={() => setHistoryFilter('month')}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === 'month' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-indigo-200'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === 'month' ? 'bg-[#128686] text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-[#9ED0D0]'}`}
               >
                 Ce mois
               </button>
               <button 
                 onClick={() => setHistoryFilter('3months')}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === '3months' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-indigo-200'}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${historyFilter === '3months' ? 'bg-[#128686] text-white shadow-lg' : 'bg-white text-gray-500 border border-gray-100 hover:border-[#9ED0D0]'}`}
               >
                 3 derniers mois
               </button>
@@ -459,18 +459,18 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
             <div className="flex-1 overflow-y-auto p-8 space-y-4 scrollbar-hide">
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-5 rounded-[1.75rem] bg-gray-50/50 border border-gray-100 hover:bg-white hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-50/50 transition-all group">
+                  <div key={activity.id} className="flex items-center justify-between p-5 rounded-[1.75rem] bg-gray-50/50 border border-gray-100 hover:bg-white hover:border-[#128686]/20 hover:shadow-lg hover:shadow-[#128686]/15 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className={`p-4 rounded-2xl shadow-sm transition-all group-hover:scale-110 ${
-                        activity.type === 'validation' ? 'bg-green-100 text-green-600' :
+                        activity.type === 'validation' ? 'bg-[#E7F4F4] text-[#128686]' :
                         activity.type === 'payout' ? 'bg-red-100 text-red-600' :
-                        'bg-indigo-100 text-indigo-600'
+                        'bg-[#128686]/10 text-[#0E6B6B]'
                       }`}>
                         {activity.amount > 0 ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} className="rotate-90" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="font-black text-gray-900 leading-none">{activity.title}</p>
+                          <p className="font-bold text-gray-900 leading-none">{activity.title}</p>
                           <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
                           <span className="text-[10px] font-bold text-gray-400">
                             {new Date(activity.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -480,17 +480,17 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-base font-black ${activity.amount > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                      <p className={`text-base font-bold ${activity.amount > 0 ? 'text-[#0E6B6B]' : 'text-red-500'}`}>
                         {activity.amount > 0 ? '+' : ''}{activity.amount.toLocaleString()} F
                       </p>
-                      <p className="text-[9px] text-gray-300 font-black uppercase tracking-widest mt-1">Transaction OK</p>
+                      <p className="text-[9px] text-gray-300 font-bold uppercase tracking-widest mt-1">Transaction OK</p>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="py-20 flex flex-col items-center justify-center text-center space-y-4 opacity-40">
                   <Calendar size={64} className="text-gray-300" />
-                  <p className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Aucune activité enregistrée</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-[0.2em]">Aucune activité enregistrée</p>
                 </div>
               )}
             </div>
@@ -499,7 +499,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
             <div className="p-8 bg-gray-50 border-t border-gray-100 shrink-0 text-center">
               <button 
                 onClick={() => setShowHistoryModal(false)}
-                className="px-12 py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl hover:bg-black transition-all active:scale-95"
+                className="px-12 py-4 bg-gray-900 text-white rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl hover:bg-black transition-all active:scale-95"
               >
                 Fermer
               </button>

@@ -7,10 +7,10 @@ import { User, UserRole } from '../types';
 
 const TILE = 'bg-white rounded-3xl border border-gray-100 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)]';
 const TILE_HOVER = 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_16px_40px_rgba(15,23,42,0.08)]';
-const FIELD = 'w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white outline-none font-semibold text-gray-900 transition-all';
+const FIELD = 'w-full bg-gray-50 border border-gray-200 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-[#128686]/40 focus:bg-white outline-none font-semibold text-gray-900 transition-all';
 const LABEL = 'text-[11px] font-semibold text-gray-500 ml-1 mb-2 block';
 const SECTION_ICON = 'p-2.5 rounded-xl';
-const PRIMARY_BTN = 'px-6 py-3.5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
+const PRIMARY_BTN = 'px-6 py-3.5 bg-[#128686] text-white rounded-xl font-bold shadow-lg shadow-[#128686]/20 hover:bg-[#0E6B6B] active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 const EMERALD_BTN = 'px-6 py-3.5 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed';
 const DISABLED_FIELD = 'w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-semibold text-gray-500 cursor-not-allowed';
 
@@ -36,7 +36,7 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
   return (
     <div className={`${TILE} p-6 space-y-4`}>
       <div className="flex items-center gap-3">
-        <div className="bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
+        <div className="bg-[#E7F4F4] p-2.5 rounded-xl text-[#128686]">
           <Bell size={20} />
         </div>
         <div>
@@ -71,7 +71,7 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
               requestPermission();
             }}
             disabled={isLoading || permission === 'denied'}
-            className="px-5 py-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all disabled:opacity-50"
+            className="px-5 py-2.5 bg-[#128686] text-white hover:bg-[#0E6B6B] rounded-xl text-xs font-bold shadow-md shadow-[#128686]/20 transition-all disabled:opacity-50"
           >
             {isLoading ? 'Activation...' : 'Activer les notifications'}
           </button>
@@ -374,15 +374,15 @@ const ProfilePage: React.FC = () => {
 
         {/* Hero */}
         <div className={`${TILE} ${TILE_HOVER} p-8 relative overflow-hidden`}>
-          <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-gradient-to-br from-indigo-100/70 to-teal-100/40 blur-3xl pointer-events-none" aria-hidden />
+          <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-gradient-to-br from-[#D9ECEC]/70 to-[#BFE3E3]/40 blur-3xl pointer-events-none" aria-hidden />
           <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
             <div className="relative group shrink-0">
-              <div className={`w-24 h-24 rounded-full p-[3px] bg-gradient-to-br from-indigo-500 to-teal-400 ${isUploading ? 'opacity-70' : ''}`}>
+              <div className={`w-24 h-24 rounded-full p-[3px] bg-gradient-to-br from-[#128686] to-[#2BA8A8] ${isUploading ? 'opacity-70' : ''}`}>
                 <div className="w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
                   {photoURL ? (
                     <img src={photoURL} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl font-black text-blue-700 select-none">
+                    <span className="text-3xl font-bold text-blue-700 select-none">
                       {displayName ? displayName.charAt(0).toUpperCase() : <UserIcon size={40} />}
                     </span>
                   )}
@@ -391,7 +391,7 @@ const ProfilePage: React.FC = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="absolute bottom-0.5 right-0.5 p-3.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-105 transition-all disabled:opacity-70"
+                className="absolute bottom-0.5 right-0.5 p-3.5 bg-[#128686] text-white rounded-full shadow-lg hover:bg-[#0E6B6B] hover:scale-105 transition-all disabled:opacity-70"
                 aria-label="Changer la photo de profil"
               >
                 {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
@@ -402,7 +402,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-xl font-bold text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
-                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
+                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-[#E7F4F4] text-[#0E6B6B] border-[#9ED0D0]'}`}>
                   {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Ambassadeur'}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -428,7 +428,7 @@ const ProfilePage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <form onSubmit={handleSaveInfo} className={`${TILE} ${TILE_HOVER} lg:col-span-2 p-8 space-y-6`}>
             <div className="flex items-center gap-3 mb-2">
-              <div className={`${SECTION_ICON} bg-indigo-50 text-indigo-600`}>
+              <div className={`${SECTION_ICON} bg-[#E7F4F4] text-[#128686]`}>
                 <UserIcon size={20} />
               </div>
               <h3 className="text-lg font-bold text-gray-900">Informations personnelles</h3>
@@ -615,7 +615,7 @@ const ProfilePage: React.FC = () => {
             <button
               onClick={handleDeleteAccount}
               disabled={deleteConfirmation !== 'SUPPRIMER' || isDeleting}
-              className="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
+              className="w-full py-4 bg-red-600 text-white rounded-2xl font-bold text-sm shadow-xl shadow-red-100 hover:bg-red-700 transition-all disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none flex items-center justify-center gap-2"
             >
               {isDeleting ? <Loader2 className="animate-spin" size={20} /> : "Confirmer la suppression"}
             </button>

@@ -21,7 +21,7 @@ const AdminBottomNavigation: React.FC<AdminBottomNavigationProps> = ({ currentTa
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0F172A] border-t border-indigo-800/30 shadow-lg"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#062127] border-t border-[#128686]/30 shadow-lg"
       style={{
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
@@ -44,7 +44,7 @@ const AdminBottomNavigation: React.FC<AdminBottomNavigationProps> = ({ currentTa
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              <div className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${isActive ? 'bg-indigo-600' : ''}`}>
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${isActive ? 'bg-[#128686]' : ''}`}>
                 <item.icon
                   size={20}
                   className={isActive ? 'stroke-[2.5]' : 'stroke-[2]'}

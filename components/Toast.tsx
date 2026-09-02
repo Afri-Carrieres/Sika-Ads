@@ -25,7 +25,7 @@ const Toast: React.FC<ToastProps> = ({ id, title, message, type, duration = 5000
     success: 'bg-green-600 border-green-500/20',
     error: 'bg-red-600 border-red-500/20',
     warning: 'bg-amber-600 border-amber-500/20',
-    info: 'bg-indigo-600 border-indigo-500/20'
+    info: 'bg-[#128686] border-[#128686]/40'
   }[type];
 
   const icon = {
@@ -41,7 +41,7 @@ const Toast: React.FC<ToastProps> = ({ id, title, message, type, duration = 5000
     >
       <div className="mt-0.5 flex-shrink-0">{icon}</div>
       <div className="flex-1">
-        <p className="font-black uppercase text-xs tracking-widest mb-1">{title}</p>
+        <p className="font-bold uppercase text-xs tracking-widest mb-1">{title}</p>
         <p className="text-sm font-medium leading-snug opacity-95">{message}</p>
       </div>
       <button 

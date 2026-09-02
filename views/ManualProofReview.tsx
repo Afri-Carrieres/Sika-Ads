@@ -52,7 +52,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] p-8 text-white shadow-lg">
+      <div className="bg-gradient-to-r from-[#128686] to-[#0E6B6B] rounded-[2.5rem] p-8 text-white shadow-lg">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
             <Zap size={24} />
@@ -65,35 +65,35 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Total à examiner</p>
-          <p className="text-3xl font-black text-gray-900">{stats.total}</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Total à examiner</p>
+          <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
         </div>
         <div className="bg-red-50 rounded-2xl p-6 shadow-sm border border-red-100">
-          <p className="text-xs font-black text-red-600 uppercase tracking-widest mb-2">Avec alerte fraude</p>
-          <p className="text-3xl font-black text-red-600">{stats.withFraudAlert}</p>
+          <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Avec alerte fraude</p>
+          <p className="text-3xl font-bold text-red-600">{stats.withFraudAlert}</p>
         </div>
         <div className="bg-emerald-50 rounded-2xl p-6 shadow-sm border border-emerald-100">
-          <p className="text-xs font-black text-emerald-600 uppercase tracking-widest mb-2">Confiance haute (≥80%)</p>
-          <p className="text-3xl font-black text-emerald-600">{stats.highConfidence}</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Confiance haute (≥80%)</p>
+          <p className="text-3xl font-bold text-emerald-600">{stats.highConfidence}</p>
         </div>
         <div className="bg-amber-50 rounded-2xl p-6 shadow-sm border border-amber-100">
-          <p className="text-xs font-black text-amber-600 uppercase tracking-widest mb-2">Confiance basse (&lt;50%)</p>
-          <p className="text-3xl font-black text-amber-600">{stats.lowConfidence}</p>
+          <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-2">Confiance basse (&lt;50%)</p>
+          <p className="text-3xl font-bold text-amber-600">{stats.lowConfidence}</p>
         </div>
       </div>
 
       {/* Filtres et tri */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
         <div>
-          <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 block">Trier par</label>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 block">Trier par</label>
           <div className="flex gap-3">
             {(['confidence', 'date', 'fraudRisk'] as const).map(option => (
               <button
                 key={option}
                 onClick={() => setSortBy(option)}
-                className={`px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest transition-all ${
+                className={`px-6 py-3 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all ${
                   sortBy === option
-                    ? 'bg-indigo-600 text-white shadow-lg'
+                    ? 'bg-[#128686] text-white shadow-lg'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -104,7 +104,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
         </div>
 
         <div>
-          <label className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 block">
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 block">
             Filtrer par confiance: {confidenceFilter[0]}% - {confidenceFilter[1]}%
           </label>
           <div className="flex items-center gap-4">
@@ -154,12 +154,12 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-bold text-lg text-gray-900">{proof.userName}</h3>
                       {proof.aiAnalysis?.fraudAlert && (
-                        <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                        <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-bold uppercase tracking-widest">
                           ⚠ Fraude
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-indigo-600 font-black uppercase tracking-widest mb-1">{proof.campaignName}</p>
+                    <p className="text-sm text-[#128686] font-bold uppercase tracking-widest mb-1">{proof.campaignName}</p>
                     <p className="text-xs text-gray-400">
                       {new Date(proof.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
@@ -178,9 +178,9 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                           style={{ width: `${proof.aiAnalysis?.confidence || 0}%` }}
                         />
                       </div>
-                      <span className="text-sm font-black text-gray-900 w-8">{proof.aiAnalysis?.confidence}%</span>
+                      <span className="text-sm font-bold text-gray-900 w-8">{proof.aiAnalysis?.confidence}%</span>
                     </div>
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Confiance</p>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Confiance</p>
                   </div>
                   {expandedProofId === proof.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </div>
@@ -207,19 +207,19 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
 
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="bg-gray-50 rounded-xl p-4">
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Vues détectées</p>
-                          <p className="text-2xl font-black text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Vues détectées</p>
+                          <p className="text-2xl font-bold text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
                         </div>
                         {proof.aiAnalysis.imageAuthenticityConfidence && (
                           <div className="bg-blue-50 rounded-xl p-4">
-                            <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-2">Authenticité image</p>
-                            <p className="text-2xl font-black text-blue-600">{proof.aiAnalysis.imageAuthenticityConfidence}%</p>
+                            <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-2">Authenticité image</p>
+                            <p className="text-2xl font-bold text-blue-600">{proof.aiAnalysis.imageAuthenticityConfidence}%</p>
                           </div>
                         )}
                         {proof.aiAnalysis.viewCountDetectionConfidence && (
-                          <div className="bg-purple-50 rounded-xl p-4">
-                            <p className="text-[9px] font-black text-purple-600 uppercase tracking-widest mb-2">Détection vues</p>
-                            <p className="text-2xl font-black text-purple-600">{proof.aiAnalysis.viewCountDetectionConfidence}%</p>
+                          <div className="bg-[#E7F4F4] rounded-xl p-4">
+                            <p className="text-[9px] font-bold text-[#0E6B6B] uppercase tracking-widest mb-2">Détection vues</p>
+                            <p className="text-2xl font-bold text-[#0E6B6B]">{proof.aiAnalysis.viewCountDetectionConfidence}%</p>
                           </div>
                         )}
                       </div>
@@ -227,14 +227,14 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                       {/* Type de fraude et éléments */}
                       {proof.aiAnalysis.fraudType && proof.aiAnalysis.fraudType !== 'none' && (
                         <div className="bg-red-50 rounded-xl p-4 border border-red-100">
-                          <p className="text-[9px] font-black text-red-600 uppercase tracking-widest mb-2">Type de fraude détecté</p>
-                          <p className="text-sm font-black text-red-600">{proof.aiAnalysis.fraudType.replace(/_/g, ' ')}</p>
+                          <p className="text-[9px] font-bold text-red-600 uppercase tracking-widest mb-2">Type de fraude détecté</p>
+                          <p className="text-sm font-bold text-red-600">{proof.aiAnalysis.fraudType.replace(/_/g, ' ')}</p>
                         </div>
                       )}
 
                       {proof.aiAnalysis.fraudEvidenceDetails && proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
                         <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                          <p className="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-3">Éléments suspects détectés</p>
+                          <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-3">Éléments suspects détectés</p>
                           <ul className="space-y-2">
                             {proof.aiAnalysis.fraudEvidenceDetails.map((detail, idx) => (
                               <li key={idx} className="text-sm text-amber-600 font-medium flex gap-2">
@@ -248,7 +248,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
 
                       {proof.aiAnalysis.reason && (
                         <div className="bg-gray-100 rounded-xl p-4">
-                          <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Justification IA</p>
+                          <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-2">Justification IA</p>
                           <p className="text-sm text-gray-700 font-medium">{proof.aiAnalysis.reason}</p>
                         </div>
                       )}
@@ -257,10 +257,10 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
 
                   {/* Actions */}
                   <div className="flex gap-3">
-                    <button className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all">
+                    <button className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
                       ✓ Approuver
                     </button>
-                    <button className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all">
+                    <button className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
                       ✗ Rejeter
                     </button>
                   </div>

@@ -176,7 +176,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
             </button>
             <div className="flex items-center gap-2 lg:hidden">
               <Shield size={20} className="text-red-400" />
-              <span className="text-sm font-black">Admin</span>
+              <span className="text-sm font-bold">Admin</span>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
 
             <form onSubmit={handleLogin} className="space-y-5">
               <label className="block">
-                <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-400">Email professionnel</span>
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Email professionnel</span>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                   <input
@@ -209,7 +209,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-400">Mot de passe</span>
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Mot de passe</span>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                   <input
@@ -242,7 +242,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
               <button
                 type="submit"
                 disabled={loading || verifying}
-                className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-red-600 text-sm font-black text-white shadow-lg shadow-red-500/20 transition hover:bg-red-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-red-600 text-sm font-bold text-white shadow-lg shadow-red-500/20 transition hover:bg-red-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {(loading || verifying) ? <Loader2 className="animate-spin" size={22} /> : 'Acceder au panneau'}
               </button>

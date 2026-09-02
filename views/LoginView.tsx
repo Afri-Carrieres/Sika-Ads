@@ -113,7 +113,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
   return (
     <div className="min-h-screen bg-white text-slate-950 selection:bg-[#f55d05] selection:text-slate-950">
       <div className="min-h-screen lg:grid lg:grid-cols-[0.95fr_1.05fr]">
-        <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-10 text-white lg:flex xl:px-14">
+        <aside className="hidden min-h-screen flex-col justify-between overflow-hidden bg-[#062127] px-10 py-10 text-white lg:flex xl:px-14">
           <div>
             <div className="flex justify-start place-items-start">
               <button onClick={onGoBack} className="inline-flex items-center gap-3" aria-label="Retour à l'accueil">
@@ -142,7 +142,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
                     <Icon size={20} />
                   </div>
                   <div>
-                    <p className="font-black text-white">{title}</p>
+                    <p className="font-bold text-white">{title}</p>
                     <p className="mt-1 text-sm font-medium text-slate-400">{desc}</p>
                   </div>
                 </div>
@@ -173,20 +173,20 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
               </p>
             </div>
 
-            <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white text-sm font-black text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
+            <button onClick={handleGoogleLogin} disabled={loading} type="button" className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
               {loading ? <Loader2 className="animate-spin text-slate-400" size={20} /> : <GoogleIcon />}
               Continuer avec Google
             </button>
 
             <div className="my-7 flex items-center gap-4">
               <div className="h-px flex-1 bg-slate-200" />
-              <span className="text-xs font-black uppercase tracking-widest text-slate-300">ou</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-300">ou</span>
               <div className="h-px flex-1 bg-slate-200" />
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <label className="block">
-                <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Adresse e-mail</span>
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Adresse e-mail</span>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-14 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pl-12 text-sm font-bold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-100" placeholder="vous@email.com" autoComplete="email" />
@@ -195,8 +195,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Mot de passe</span>
-                  <button type="button" onClick={handleOpenReset} className="text-xs font-black text-[#128785] transition hover:text-teal-700">Mot de passe oublié ?</button>
+                  <span className="block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Mot de passe</span>
+                  <button type="button" onClick={handleOpenReset} className="text-xs font-bold text-[#128785] transition hover:text-teal-700">Mot de passe oublié ?</button>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -214,14 +214,14 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
                 </div>
               )}
 
-              <button type="submit" disabled={loading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
+              <button type="submit" disabled={loading} className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#f55d05] text-sm font-bold text-white shadow-lg shadow-teal-100 transition hover:bg-[#f56505e3] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
                 {loading ? <Loader2 className="animate-spin" size={22} /> : 'Se connecter'}
               </button>
             </form>
 
             <p className="mt-7 text-center text-sm font-medium text-slate-500">
               Pas encore de compte ?{' '}
-              <button onClick={onGoToRegister} className="font-black text-teal-700 transition hover:text-teal-900">Inscrivez-vous</button>
+              <button onClick={onGoToRegister} className="font-bold text-teal-700 transition hover:text-teal-900">Inscrivez-vous</button>
             </p>
           </div>
         </main>
@@ -235,13 +235,13 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100 text-teal-700">
                 <ShieldCheck size={21} />
               </div>
-              <p className="text-xs font-black uppercase tracking-widest text-slate-400">Réinitialisation</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Réinitialisation</p>
               <h3 className="mt-1 text-2xl font-bold text-slate-950">Modifier votre mot de passe</h3>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-500">Entrez votre email. Un lien de réinitialisation vous sera envoyé.</p>
             </div>
             <form onSubmit={handleSendReset} className="space-y-4 p-6">
               <label className="block">
-                <span className="mb-2 block text-xs font-black uppercase tracking-[0.16em] text-slate-600">Email</span>
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600">Email</span>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input type="email" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} className="h-14 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pl-12 text-sm font-bold text-slate-900 outline-none transition focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-100" placeholder="vous@email.com" autoComplete="email" />
@@ -257,8 +257,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
               {resetSuccess && <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-xs font-bold leading-5 text-emerald-800">{resetSuccess}</div>}
 
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setResetOpen(false)} className="h-12 flex-1 rounded-xl bg-slate-100 text-xs font-black uppercase tracking-widest text-slate-600 transition hover:bg-slate-200">Annuler</button>
-                <button type="submit" disabled={resetLoading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#f55d05] text-xs font-black uppercase tracking-widest text-white transition hover:bg-[#f55d05] disabled:cursor-not-allowed disabled:opacity-70">
+                <button type="button" onClick={() => setResetOpen(false)} className="h-12 flex-1 rounded-xl bg-slate-100 text-xs font-bold uppercase tracking-widest text-slate-600 transition hover:bg-slate-200">Annuler</button>
+                <button type="submit" disabled={resetLoading} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#f55d05] text-xs font-bold uppercase tracking-widest text-white transition hover:bg-[#f55d05] disabled:cursor-not-allowed disabled:opacity-70">
                   {resetLoading ? <Loader2 className="animate-spin" size={18} /> : 'Envoyer'}
                 </button>
               </div>

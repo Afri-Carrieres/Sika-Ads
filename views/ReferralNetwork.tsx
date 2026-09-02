@@ -98,33 +98,33 @@ const ReferralNetwork: React.FC = () => {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-100 transition-all flex items-center gap-2 justify-center active:scale-95"
+          className="bg-[#128686] hover:bg-[#0E6B6B] text-white px-6 py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#128686]/20 transition-all flex items-center gap-2 justify-center active:scale-95"
         >
           <UserPlus size={18} /> Inviter un ami
         </button>
       </div>
 
       {/* Code Banner */}
-      <div className="bg-gradient-to-r from-indigo-950 to-indigo-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#062127] to-[#0B3A44] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-2 text-center md:text-left">
-            <p className="text-indigo-300 text-xs font-black uppercase tracking-[0.2em]">Votre Code Parrain</p>
+            <p className="text-[#7FD1D1] text-xs font-bold uppercase tracking-[0.2em]">Votre Code Parrain</p>
             <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">
               <span className="text-3xl font-mono font-bold tracking-wider">{referralCode}</span>
-              <button onClick={handleCopyCode} className="text-indigo-200 hover:text-white transition-colors">
+              <button onClick={handleCopyCode} className="text-[#A9DADA] hover:text-white transition-colors">
                 {copied ? <Check size={24} className="text-green-400" /> : <Copy size={24} />}
               </button>
             </div>
           </div>
           <div className="flex gap-6 text-center">
             <div>
-              <p className="text-indigo-300 text-[10px] font-black uppercase tracking-widest mb-1">Total Filleuls</p>
-              <p className="text-3xl font-black">{referralCount}</p>
+              <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest mb-1">Total Filleuls</p>
+              <p className="text-3xl font-bold">{referralCount}</p>
             </div>
             <div className="w-px bg-white/10"></div>
             <div>
-              <p className="text-green-300 text-[10px] font-black uppercase tracking-widest mb-1">Commissions</p>
-              <p className="text-3xl font-black">{referralEarnings.toLocaleString()} F</p>
+              <p className="text-green-300 text-[10px] font-bold uppercase tracking-widest mb-1">Commissions</p>
+              <p className="text-3xl font-bold">{referralEarnings.toLocaleString()} F</p>
             </div>
           </div>
         </div>
@@ -134,13 +134,13 @@ const ReferralNetwork: React.FC = () => {
       {/* Referrals List */}
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 overflow-hidden">
         <h3 className="text-lg font-bold text-gray-900 mb-6 px-2 flex items-center gap-2">
-          <Users size={20} className="text-indigo-600" />
+          <Users size={20} className="text-[#128686]" />
           Membres de l'équipe
         </h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black">
+            <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-[0.2em] font-bold">
               <tr>
                 <th className="px-6 py-4 rounded-l-xl">Filleul</th>
                 <th className="px-6 py-4">Statut</th>
@@ -163,7 +163,7 @@ const ReferralNetwork: React.FC = () => {
                   <tr key={ref.id} className="hover:bg-gray-50/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 font-bold">
+                        <div className="w-10 h-10 bg-[#E7F4F4] rounded-xl flex items-center justify-center text-[#128686] font-bold">
                           {ref.name.charAt(0)}
                         </div>
                         <div>
@@ -173,7 +173,7 @@ const ReferralNetwork: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${ref.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${ref.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
                         {ref.status}
                       </span>
                     </td>
@@ -207,7 +207,7 @@ const ReferralNetwork: React.FC = () => {
           <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <div className="bg-indigo-100 w-12 h-12 rounded-2xl flex items-center justify-center text-indigo-600 mb-4">
+                <div className="bg-[#D9ECEC] w-12 h-12 rounded-2xl flex items-center justify-center text-[#128686] mb-4">
                   <UserPlus size={24} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Inviter un ami</h3>
@@ -219,9 +219,9 @@ const ReferralNetwork: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-indigo-50 p-6 rounded-3xl border border-indigo-100 text-center space-y-2">
-                <p className="text-xs font-black uppercase tracking-widest text-indigo-400">Votre Code Unique</p>
-                <p className="text-3xl font-black text-indigo-600 tracking-wider font-mono">{referralCode}</p>
+              <div className="bg-[#E7F4F4] p-6 rounded-3xl border border-[#128686]/20 text-center space-y-2">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#7FD1D1]">Votre Code Unique</p>
+                <p className="text-3xl font-bold text-[#128686] tracking-wider font-mono">{referralCode}</p>
               </div>
 
               <div className="space-y-2">
@@ -238,7 +238,7 @@ const ReferralNetwork: React.FC = () => {
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}
-                    className="p-2 bg-white rounded-xl shadow-sm text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    className="p-2 bg-white rounded-xl shadow-sm text-[#128686] hover:bg-[#E7F4F4] transition-colors"
                   >
                     {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                   </button>
@@ -247,7 +247,7 @@ const ReferralNetwork: React.FC = () => {
 
               <button
                 onClick={handleShare}
-                className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3 active:scale-95"
+                className="w-full py-5 bg-[#128686] hover:bg-[#0E6B6B] text-white rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-[#128686]/20 transition-all flex items-center justify-center gap-3 active:scale-95"
               >
                 <Share2 size={18} />
                 Partager le lien

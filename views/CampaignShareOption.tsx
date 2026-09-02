@@ -244,9 +244,9 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-indigo-600">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-[#128686]">
         <Loader2 className="animate-spin" size={36} />
-        <p className="text-xs font-black uppercase tracking-widest">Chargement de la campagne...</p>
+        <p className="text-xs font-bold uppercase tracking-widest">Chargement de la campagne...</p>
       </div>
     );
   }
@@ -254,7 +254,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
   if (!campaign) {
     return (
       <div className="space-y-6">
-        <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600">
+        <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#128686]">
           <ArrowLeft size={18} />
           Retour aux campagnes
         </button>
@@ -268,7 +268,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors">
+      <button onClick={onBack} className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#128686] transition-colors">
         <ArrowLeft size={18} />
         Retour aux campagnes
       </button>
@@ -279,7 +279,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
             <PartyPopper size={22} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-black text-gray-900">C'est parti !</p>
+            <p className="text-sm font-bold text-gray-900">C'est parti !</p>
             <p className="text-xs text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. Revenez envoyer votre preuve de vues dans 24h.</p>
           </div>
         </div>
@@ -291,7 +291,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
             <img src={campaign.imageUrl} className="w-full h-full object-cover" alt={campaign.title} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
             <div className="absolute bottom-8 left-8 right-8 text-white">
-              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-200 mb-3">Partage de campagne</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#A9DADA] mb-3">Partage de campagne</p>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-3">{campaign.title}</h2>
               <p className="text-white/80 text-sm font-medium max-w-2xl leading-relaxed">{campaign.description}</p>
             </div>
@@ -300,8 +300,8 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
 
         <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm p-6 md:p-8 space-y-6">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Quota journalier</p>
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-black ${isLimitReached ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'}`}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Quota journalier</p>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${isLimitReached ? 'bg-red-50 text-red-600' : 'bg-[#E7F4F4] text-[#128686]'}`}>
               {isLimitReached ? <Lock size={14} /> : <Check size={14} />}
               {dailyCount}/{DAILY_LIMIT} participations
             </div>
@@ -325,7 +325,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
               disabled={isSharing || isLimitReached || isCampaignUnavailable}
               className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl bg-green-50 border border-green-100 hover:bg-green-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="flex items-center gap-3 text-sm font-black text-green-800 uppercase tracking-widest">
+              <span className="flex items-center gap-3 text-sm font-bold text-green-800 uppercase tracking-widest">
                 <span className="bg-[#25D366] text-white p-3 rounded-xl">
                     <img src="/icons-whatsapp.png" alt="WhatsApp" className='h-6 w-6'/>
                   {/* {isSharing ? <Loader2 size={22} className="animate-spin" /> : <MessageCircle size={22} />} */}
@@ -339,7 +339,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
               disabled={isSharing || isLimitReached || isCampaignUnavailable}
               className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100 hover:bg-blue-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="flex items-center gap-3 text-sm font-black text-blue-800 uppercase tracking-widest">
+              <span className="flex items-center gap-3 text-sm font-bold text-blue-800 uppercase tracking-widest">
                 <span className="bg-[#1877F2] text-white p-3 rounded-xl">
                   {isSharing ? <Loader2 size={22} className="animate-spin" /> : <Facebook size={22} />}
                 </span>
@@ -352,7 +352,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
               disabled={isSharing || isLimitReached || isCampaignUnavailable}
               className="w-full flex items-center justify-between gap-4 p-4 rounded-2xl bg-pink-50 border border-pink-100 hover:bg-pink-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="flex items-center gap-3 text-sm font-black text-pink-800 uppercase tracking-widest">
+              <span className="flex items-center gap-3 text-sm font-bold text-pink-800 uppercase tracking-widest">
                 <span className="bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white p-3 rounded-xl">
                   {isSharing ? <Loader2 size={22} className="animate-spin" /> : <Instagram size={22} />}
                 </span>
@@ -362,7 +362,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
           </div>
 
           {copyFeedback && (
-            <div className="bg-indigo-600 text-white p-4 rounded-2xl text-center text-xs font-bold animate-in slide-in-from-bottom-2 duration-300 shadow-xl">
+            <div className="bg-[#128686] text-white p-4 rounded-2xl text-center text-xs font-bold animate-in slide-in-from-bottom-2 duration-300 shadow-xl">
               Lien copie !
             </div>
           )}

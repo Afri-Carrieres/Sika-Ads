@@ -385,7 +385,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
         </div>
         <button
           onClick={() => setIsUploadModalOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-100 transition-all flex items-center gap-2 justify-center active:scale-95"
+          className="bg-[#128686] hover:bg-[#0E6B6B] text-white px-8 py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs shadow-xl shadow-[#128686]/20 transition-all flex items-center gap-2 justify-center active:scale-95"
         >
           <Upload size={18} /> Soumettre une preuve
         </button>
@@ -394,7 +394,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
       <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black">
+            <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase tracking-[0.2em] font-bold">
               <tr>
                 <th className="px-8 py-5">Campagne</th>
                 <th className="px-8 py-5">Date & Analyse</th>
@@ -417,8 +417,8 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                     <tr key={proof.id} className="hover:bg-gray-50/30 transition-colors group">
                       <td className="px-8 py-5">
                         <div>
-                          <span className="font-black text-gray-900 block leading-tight mb-1">{proof.campaignName}</span>
-                          <span className="text-[10px] text-gray-400 uppercase font-black tracking-widest">{proof.id.substring(0, 8)}...</span>
+                          <span className="font-bold text-gray-900 block leading-tight mb-1">{proof.campaignName}</span>
+                          <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">{proof.id.substring(0, 8)}...</span>
                         </div>
                       </td>
                       <td className="px-8 py-5">
@@ -427,16 +427,16 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                         </div>
                         {proof.aiAnalysis ? (
                           <div className="flex flex-col gap-1 items-start">
-                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${proof.aiAnalysis.fraudAlert ? 'bg-red-50 text-red-600 border-red-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100'}`}>
+                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest border ${proof.aiAnalysis.fraudAlert ? 'bg-red-50 text-red-600 border-red-100' : 'bg-[#E7F4F4] text-[#128686] border-[#128686]/20'}`}>
                               {proof.aiAnalysis.fraudAlert ? <ShieldAlert size={10} /> : <BrainCircuit size={10} />}
                               {proof.aiAnalysis.fraudAlert ? 'Fraude Détectée' : `IA Confiance: ${Math.round(proof.aiAnalysis.confidence)}%`}
                             </div>
-                            <button onClick={() => setAnalysisProof(proof)} className="text-[10px] text-indigo-500 font-bold hover:text-indigo-700 hover:underline flex items-center gap-1 ml-0.5 mt-0.5 transition-colors">
+                            <button onClick={() => setAnalysisProof(proof)} className="text-[10px] text-[#128686] font-bold hover:text-[#0E6B6B] hover:underline flex items-center gap-1 ml-0.5 mt-0.5 transition-colors">
                               <Info size={10} /> Voir détails
                             </button>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-indigo-600 animate-pulse">
+                          <div className="flex items-center gap-2 text-[#128686] animate-pulse">
                             <Loader2 size={12} className="animate-spin" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">Analyse IA en cours...</span>
                           </div>
@@ -444,27 +444,27 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                       </td>
                       <td className="px-8 py-5">
                         <div className="space-y-2">
-                          {proof.status === 'pending' && <span className="flex items-center gap-1.5 text-yellow-600 font-black text-[9px] uppercase tracking-widest bg-yellow-100/50 px-3 py-1.5 rounded-full w-fit border border-yellow-100/50"><Clock size={12} /> En examen</span>}
-                          {proof.status === 'validated' && <span className="flex items-center gap-1.5 text-green-600 font-black text-[9px] uppercase tracking-widest bg-green-100/50 px-3 py-1.5 rounded-full w-fit border border-green-100/50"><CheckCircle2 size={12} /> Validé</span>}
-                          {proof.status === 'rejected' && <span className="flex items-center gap-1.5 text-red-600 font-black text-[9px] uppercase tracking-widest bg-red-100/50 px-3 py-1.5 rounded-full w-fit border border-red-100/50"><XCircle size={12} /> Refusé</span>}
+                          {proof.status === 'pending' && <span className="flex items-center gap-1.5 text-yellow-600 font-bold text-[9px] uppercase tracking-widest bg-yellow-100/50 px-3 py-1.5 rounded-full w-fit border border-yellow-100/50"><Clock size={12} /> En examen</span>}
+                          {proof.status === 'validated' && <span className="flex items-center gap-1.5 text-green-600 font-bold text-[9px] uppercase tracking-widest bg-green-100/50 px-3 py-1.5 rounded-full w-fit border border-green-100/50"><CheckCircle2 size={12} /> Validé</span>}
+                          {proof.status === 'rejected' && <span className="flex items-center gap-1.5 text-red-600 font-bold text-[9px] uppercase tracking-widest bg-red-100/50 px-3 py-1.5 rounded-full w-fit border border-red-100/50"><XCircle size={12} /> Refusé</span>}
 
                           {proof.aiAnalysis && (
                             <div className="flex items-center gap-1.5 bg-blue-600 text-white px-2 py-1 rounded shadow-sm w-fit animate-pulse">
                               <ShieldCheck size={10} />
-                              <span className="text-[8px] font-black uppercase tracking-tighter">IA Validation</span>
+                              <span className="text-[8px] font-bold uppercase tracking-tighter">IA Validation</span>
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <div className={`flex items-center gap-2 font-black text-sm ${gainInfo.color}`}>
+                        <div className={`flex items-center gap-2 font-bold text-sm ${gainInfo.color}`}>
                           <gainInfo.icon size={14} />
                           {gainInfo.text}
                         </div>
                       </td>
                       <td className="px-8 py-5 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => setPreviewImage(proof.downloadURL)} className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors" title="Voir la preuve">
+                          <button onClick={() => setPreviewImage(proof.downloadURL)} className="p-2 text-[#128686] bg-[#E7F4F4] hover:bg-[#D9ECEC] rounded-xl transition-colors" title="Voir la preuve">
                             <Eye size={18} />
                           </button>
                           {proof.status === 'pending' && (
@@ -496,7 +496,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
           <div className="bg-white rounded-[2.5rem] w-full max-w-lg p-8 shadow-2xl animate-in zoom-in-95 duration-300" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
-                <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600"><BrainCircuit size={20} /></div>
+                <div className="bg-[#D9ECEC] p-2 rounded-xl text-[#128686]"><BrainCircuit size={20} /></div>
                 <div><h3 className="text-xl font-bold text-gray-900 tracking-tight">Analyse Intelligente</h3><p className="text-xs text-gray-500 font-medium">{analysisProof.campaignName}</p></div>
               </div>
               <button onClick={() => setAnalysisProof(null)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
@@ -504,23 +504,23 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className={`p-4 rounded-2xl border ${analysisProof.aiAnalysis.fraudAlert ? 'bg-red-50 border-red-100' : 'bg-green-50 border-green-100'}`}>
-                  <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${analysisProof.aiAnalysis.fraudAlert ? 'text-red-400' : 'text-green-400'}`}>Statut Sécurité</p>
+                  <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${analysisProof.aiAnalysis.fraudAlert ? 'text-red-400' : 'text-green-400'}`}>Statut Sécurité</p>
                   <div className={`flex items-center gap-2 font-bold ${analysisProof.aiAnalysis.fraudAlert ? 'text-red-700' : 'text-green-700'}`}>
                     {analysisProof.aiAnalysis.fraudAlert ? <ShieldAlert size={18} /> : <ShieldCheck size={18} />}
                     {analysisProof.aiAnalysis.fraudAlert ? 'Fraude Suspectée' : 'Preuve Légitime'}
                   </div>
                 </div>
-                <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-100">
-                  <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-indigo-400">Confiance IA</p>
-                  <div className="flex items-center gap-2 font-bold text-indigo-700"><Search size={18} />{Math.round(analysisProof.aiAnalysis.confidence)}% certitude</div>
+                <div className="p-4 rounded-2xl bg-[#E7F4F4] border border-[#128686]/20">
+                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1 text-[#7FD1D1]">Confiance IA</p>
+                  <div className="flex items-center gap-2 font-bold text-[#0E6B6B]"><Search size={18} />{Math.round(analysisProof.aiAnalysis.confidence)}% certitude</div>
                 </div>
               </div>
-              {analysisProof.aiAnalysis.viewsCount > 0 && <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100"><span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vues Détectées</span><span className="text-lg font-black text-gray-900">{analysisProof.aiAnalysis.viewsCount} vues</span></div>}
+              {analysisProof.aiAnalysis.viewsCount > 0 && <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100"><span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vues Détectées</span><span className="text-lg font-bold text-gray-900">{analysisProof.aiAnalysis.viewsCount} vues</span></div>}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><FileText size={14} className="text-gray-400" />Rapport détaillé</h4>
                 <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 text-sm text-gray-700 leading-relaxed font-medium">"{analysisProof.aiAnalysis.reason}"</div>
               </div>
-              <button onClick={() => setAnalysisProof(null)} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">Fermer</button>
+              <button onClick={() => setAnalysisProof(null)} className="w-full py-4 bg-[#128686] text-white rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-[#128686]/20 hover:bg-[#0E6B6B] active:scale-95 transition-all">Fermer</button>
             </div>
           </div>
         </div>
@@ -533,12 +533,12 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
             <button onClick={() => !isUploading && setIsUploadModalOpen(false)} className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors z-10"><X size={24} /></button>
             <div className="p-8 md:p-10 space-y-8">
               <div className="flex items-center gap-3">
-                <div className="bg-indigo-600 p-2 rounded-xl text-white"><Upload size={20} /></div>
+                <div className="bg-[#128686] p-2 rounded-xl text-white"><Upload size={20} /></div>
                 <h3 className="text-xl font-bold text-gray-900 tracking-tight">Nouvelle Preuve</h3>
               </div>
               <div className="space-y-6">
                 <label className="block">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nom de la Campagne</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nom de la Campagne</span>
                   <div className="relative">
                     <select
                       value={campaignId}
@@ -550,7 +550,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                         }
                       }}
                       disabled={isUploading}
-                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pr-10 focus:ring-2 focus:ring-indigo-500 outline-none font-bold transition-all focus:bg-white text-gray-900 appearance-none"
+                      className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 pr-10 focus:ring-2 focus:ring-[#128686] outline-none font-bold transition-all focus:bg-white text-gray-900 appearance-none"
                     >
                       <option value="">Sélectionnez une campagne...</option>
 
@@ -564,18 +564,18 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                   </div>
                 </label>
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Fichier (Capture d'écran)</span>
-                  <div className={`border-2 border-dashed rounded-[2rem] p-8 flex flex-col items-center justify-center transition-all relative overflow-hidden group cursor-pointer ${selectedFile ? 'border-indigo-300 bg-indigo-50/20' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Fichier (Capture d'écran)</span>
+                  <div className={`border-2 border-dashed rounded-[2rem] p-8 flex flex-col items-center justify-center transition-all relative overflow-hidden group cursor-pointer ${selectedFile ? 'border-[#7FD1D1]/50 bg-[#E7F4F4]/20' : 'border-gray-200 hover:border-[#7FD1D1]/60 hover:bg-gray-50'}`}>
                     <input type="file" accept="image/*" onChange={handleFileSelect} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                     {selectedFile ? (
                       <div className="text-center relative z-0">
-                        <div className="bg-indigo-100 w-12 h-12 rounded-xl flex items-center justify-center text-indigo-600 mx-auto mb-3"><ImageIcon size={24} /></div>
+                        <div className="bg-[#D9ECEC] w-12 h-12 rounded-xl flex items-center justify-center text-[#128686] mx-auto mb-3"><ImageIcon size={24} /></div>
                         <p className="text-xs font-bold text-gray-900 truncate max-w-[200px]">{selectedFile.name}</p>
                         <p className="text-[10px] text-gray-400 mt-1">{(selectedFile.size / 1024).toFixed(1)} KB</p>
                       </div>
                     ) : (
                       <div className="text-center relative z-0">
-                        <div className="bg-gray-100 w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-indigo-500 group-hover:bg-indigo-50 transition-colors mx-auto mb-3"><Upload size={24} /></div>
+                        <div className="bg-gray-100 w-12 h-12 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-[#128686] group-hover:bg-[#E7F4F4] transition-colors mx-auto mb-3"><Upload size={24} /></div>
                         <p className="text-xs font-bold text-gray-500">Cliquez pour choisir une image</p>
                         <p className="text-[9px] text-gray-400 mt-1 font-medium">Max 5 MB • JPG, PNG</p>
                       </div>
@@ -585,21 +585,21 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                 {uploadError && <div className="flex items-center gap-2 text-red-500 bg-red-50 p-3 rounded-xl"><AlertCircle size={16} /><p className="text-xs font-bold">{uploadError}</p></div>}
 
                 {(isUploading || isAnalyzingAI) && ( // Afficher le message de chargement si l'upload ou l'analyse IA est en cours
-                  <div className="space-y-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 animate-pulse">
-                    <div className="flex items-center gap-2 text-indigo-600 font-black text-[10px] uppercase tracking-widest">
+                  <div className="space-y-3 p-4 bg-[#E7F4F4] rounded-2xl border border-[#128686]/20 animate-pulse">
+                    <div className="flex items-center gap-2 text-[#128686] font-bold text-[10px] uppercase tracking-widest">
 
                       <Sparkles size={14} />
                       {isAnalyzingAI ? "Analyse IA en cours..." : "Téléchargement en cours..."} {/* Message plus spécifique */}
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-indigo-400"><span>Progression</span><span>{Math.round(uploadProgress)}%</span></div>
-                      <div className="h-2 bg-indigo-100 rounded-full overflow-hidden"><div className="h-full bg-indigo-600 transition-all duration-300 rounded-full" style={{ width: `${uploadProgress}%` }}></div></div>
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#7FD1D1]"><span>Progression</span><span>{Math.round(uploadProgress)}%</span></div>
+                      <div className="h-2 bg-[#D9ECEC] rounded-full overflow-hidden"><div className="h-full bg-[#128686] transition-all duration-300 rounded-full" style={{ width: `${uploadProgress}%` }}></div></div>
                     </div>
                   </div>
                 )}
               </div>
               <div className="pt-2">
-                <button onClick={handleUpload} disabled={isUploading || isAnalyzingAI || !selectedFile || !campaignName} className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-[1.5rem] font-black uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-2 active:scale-95">
+                <button onClick={handleUpload} disabled={isUploading || isAnalyzingAI || !selectedFile || !campaignName} className="w-full bg-[#128686] hover:bg-[#0E6B6B] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-[1.5rem] font-bold uppercase tracking-widest shadow-xl shadow-[#128686]/20 transition-all flex items-center justify-center gap-2 active:scale-95">
                   {isUploading ? <Loader2 className="animate-spin" size={20} /> : "Envoyer la preuve"}
                 </button>
               </div>
@@ -623,14 +623,14 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
               <button
                 onClick={() => setProofToDelete(null)}
                 disabled={isDeleting}
-                className="flex-1 py-4 text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 rounded-2xl transition-all disabled:opacity-50"
+                className="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-50 rounded-2xl transition-all disabled:opacity-50"
               >
                 Annuler
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex-1 py-4 text-xs font-black uppercase tracking-widest bg-red-500 text-white rounded-2xl shadow-lg shadow-red-100 hover:bg-red-600 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 py-4 text-xs font-bold uppercase tracking-widest bg-red-500 text-white rounded-2xl shadow-lg shadow-red-100 hover:bg-red-600 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isDeleting ? <Loader2 className="animate-spin" size={16} /> : "Confirmer"}
               </button>

@@ -40,12 +40,12 @@ const StatCard: React.FC<{
   trend?: { value: number; positive: boolean };
 }> = ({ title, value, icon: Icon, color, subtitle, trend }) => {
   const colorMap: Record<string, string> = {
-    indigo: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+    indigo: 'bg-[#E7F4F4] text-[#128686] border-[#128686]/20',
     green: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     orange: 'bg-amber-50 text-amber-600 border-amber-100',
-    blue: 'bg-blue-50 text-blue-600 border-blue-100',
+    blue: 'bg-[#E7F4F4] text-[#128686] border-[#128686]/20',
     'emerald-700': 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    'violet-700': 'bg-violet-50 text-violet-700 border-violet-100',
+    'violet-700': 'bg-[#E7F4F4] text-[#0E6B6B] border-[#128686]/20',
     'amber-700': 'bg-amber-50 text-amber-700 border-amber-100',
   };
   return (
@@ -809,7 +809,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     const rejected = allProofs.filter(p => p.status === 'rejected').length;
     return [
       { name: 'En attente', value: pending, color: '#f59e0b' },
-      { name: 'Validées', value: validated, color: '#10b981' },
+      { name: 'Validées', value: validated, color: '#128686' },
       { name: 'Rejetées', value: rejected, color: '#ef4444' }
     ];
   }, [allProofs]);
@@ -819,7 +819,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     for (const p of allPayouts) counts[normalizePayoutStatus(p.status)]++;
     return [
       { name: 'En attente', value: counts.pending, color: '#f59e0b' },
-      { name: 'Validés', value: counts.completed, color: '#10b981' },
+      { name: 'Validés', value: counts.completed, color: '#128686' },
       { name: 'Rejetés', value: counts.failed, color: '#ef4444' }
     ];
   }, [allPayouts]);
@@ -833,8 +833,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     const order = ['pending', 'active', 'paused', 'completed', 'rejected'];
     const colors: Record<string, string> = {
       pending: '#f59e0b',
-      active: '#10b981',
-      paused: '#6366f1',
+      active: '#128686',
+      paused: '#F65E06',
       completed: '#9ca3af',
       rejected: '#ef4444'
     };
@@ -983,7 +983,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   : confirmModal.variant === 'danger'
                     ? 'bg-red-100 text-red-700'
                     : confirmModal.variant === 'info'
-                      ? 'bg-indigo-100 text-indigo-700'
+                      ? 'bg-[#D9ECEC] text-[#0E6B6B]'
                       : 'bg-amber-100 text-amber-700'
                   }`}
               >
@@ -1017,7 +1017,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 type="button"
                 onClick={() => closeConfirmModal()}
                 disabled={confirmBusy}
-                className="px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[11px] bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all active:scale-95 disabled:opacity-60"
+                className="px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-[11px] bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all active:scale-95 disabled:opacity-60"
               >
                 {confirmModal.cancelLabel || 'Annuler'}
               </button>
@@ -1025,11 +1025,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 type="button"
                 onClick={runConfirmAction}
                 disabled={confirmBusy}
-                className={`px-7 py-3 rounded-2xl font-black uppercase tracking-widest text-[11px] text-white transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 ${confirmModal.variant === 'danger'
+                className={`px-7 py-3 rounded-2xl font-bold uppercase tracking-widest text-[11px] text-white transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 ${confirmModal.variant === 'danger'
                   ? 'bg-red-600 hover:bg-red-700'
                   : confirmModal.variant === 'success'
                     ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-indigo-600 hover:bg-indigo-700'
+                    : 'bg-[#128686] hover:bg-[#0E6B6B]'
                   }`}
               >
                 {confirmBusy ? <Loader2 size={16} className="animate-spin" /> : null}
@@ -1061,7 +1061,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {view === 'team' && isSuperAdmin && (
             <button
               onClick={() => setShowAddMemberModal(true)}
-              className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-100 flex items-center gap-2 active:scale-95 transition-all"
+              className="bg-[#128686] text-white px-6 py-3 rounded-2xl font-bold uppercase text-[10px] tracking-widest shadow-lg shadow-[#128686]/20 flex items-center gap-2 active:scale-95 transition-all"
             >
               <UserPlus size={16} /> Ajouter Membre
             </button>
@@ -1074,7 +1074,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 placeholder="Rechercher un membre..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setUserPage(1); }}
-                className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
+                className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#128686] outline-none shadow-sm"
               />
             </div>
           )}
@@ -1123,24 +1123,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {/* ══════════════════════════════════════════
               SECTION 2: ANALYTICS CAMPAGNE
           ══════════════════════════════════════════ */}
-          <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-sky-500 rounded-2xl p-6 text-white shadow-lg">
+          <div className="bg-gradient-to-br from-[#062127] via-[#0B3A44] to-[#0E4B55] rounded-2xl p-6 text-white shadow-lg">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em]">
                   <Sparkles size={14} /> Analytics de campagne
                 </div>
                 <h3 className="text-xl font-bold mt-3">Performance globale des campagnes</h3>
-                <p className="text-sm text-indigo-100 mt-1 max-w-2xl">
+                <p className="text-sm text-[#A9DADA] mt-1 max-w-2xl">
                   Suivi des partages, clics et conversion pour piloter les actions marketing.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3 min-w-[280px]">
                 <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-[11px] uppercase tracking-widest text-indigo-100">Partages</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">Partages</p>
                   <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalShares.toLocaleString()}</p>
                 </div>
                 <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-[11px] uppercase tracking-widest text-indigo-100">Clics</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">Clics</p>
                   <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalClicks.toLocaleString()}</p>
                 </div>
               </div>
@@ -1200,8 +1200,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                       <XAxis dataKey="title" tick={{ fontSize: 11 }} angle={-10} textAnchor="end" height={70} />
                       <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                       <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
-                      <Bar dataKey="clicks" name="Clics" fill="#6366f1" radius={[6, 6, 0, 0]} />
-                      <Bar dataKey="shares" name="Partages" fill="#14b8a6" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="clicks" name="Clics" fill="#128686" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="shares" name="Partages" fill="#2BA8A8" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -1276,7 +1276,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <PieChart>
                       <Pie data={campaignAnalytics.platformChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
                         {campaignAnalytics.platformChart.map((entry, index) => (
-                          <Cell key={`platform-cell-${index}`} fill={['#6366f1', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6'][index % 5]} />
+                          <Cell key={`platform-cell-${index}`} fill={['#128686', '#2BA8A8', '#F65E06', '#ef4444', '#0E6B6B'][index % 5]} />
                         ))}
                       </Pie>
                       <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
@@ -1329,7 +1329,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
                   <Legend verticalAlign="bottom" height={36} />
                   <Line type="monotone" dataKey="requested" name="Demandé" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="paid" name="Payé" stroke="#10b981" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="paid" name="Payé" stroke="#128686" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1359,7 +1359,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                          <div className="w-10 h-10 rounded-lg bg-[#D9ECEC] text-[#0E6B6B] flex items-center justify-center font-bold text-sm">
                             {campaign.title.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -1406,13 +1406,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
               <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                <Megaphone className="text-indigo-600" />
+                <Megaphone className="text-[#128686]" />
                 Liste des Campagnes
               </h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-6">Campagne</th>
                     <th className="px-8 py-6">Budget</th>
@@ -1434,13 +1434,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-black text-gray-900">{camp.totalBudget.toLocaleString()} F</p>
+                        <p className="font-bold text-gray-900">{camp.totalBudget.toLocaleString()} F</p>
                         <p className="text-[10px] text-gray-400 font-medium">Restant: {camp.remainingBudget.toLocaleString()} F</p>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-600" style={{ width: `${Math.min(100, ((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%` }} />
+                            <div className="h-full bg-[#128686]" style={{ width: `${Math.min(100, ((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%` }} />
                           </div>
                           <span className="text-xs font-bold text-gray-600">
                             {Math.round(((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%
@@ -1448,7 +1448,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 w-fit ${camp.status === 'active' ? 'bg-green-100 text-green-700' :
+                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 w-fit ${camp.status === 'active' ? 'bg-green-100 text-green-700' :
                           camp.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
                             'bg-gray-100 text-gray-600'
                           }`}>
@@ -1471,7 +1471,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                               });
                             }
                           }}
-                          className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-all"
+                          className="inline-flex items-center gap-1.5 text-[#128686] hover:text-[#0A4F50] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#E7F4F4] transition-all"
                         >
                           Gérer
                           <ChevronDown size={13} className={`transition-transform duration-200 ${openMenuId === camp.id ? 'rotate-180' : ''}`} />
@@ -1504,10 +1504,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 >
                   <button
                     onClick={() => { setOpenMenuId(null); setMenuPosition(null); setEditingCampaign({ ...camp }); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all font-medium"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
                   >
-                    <span className="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                      <Pencil size={13} className="text-indigo-600" />
+                    <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
+                      <Pencil size={13} className="text-[#128686]" />
                     </span>
                     Modifier
                   </button>
@@ -1542,10 +1542,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </button>
                   <button
                     onClick={() => { setOpenMenuId(null); setMenuPosition(null); setStatsCampaign(camp); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
                   >
-                    <span className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <BarChart2 size={13} className="text-blue-600" />
+                    <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
+                      <BarChart2 size={13} className="text-[#128686]" />
                     </span>
                     Voir statistiques
                   </button>
@@ -1569,8 +1569,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-5">
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
-                    <Pencil size={18} className="text-indigo-600" />
+                  <span className="w-10 h-10 rounded-2xl bg-[#D9ECEC] flex items-center justify-center">
+                    <Pencil size={18} className="text-[#128686]" />
                   </span>
                   <h2 className="font-bold text-gray-900 text-lg">Modifier la campagne</h2>
                 </div>
@@ -1578,7 +1578,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <div>
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Titre</label>
                     <input
-                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.title}
                       onChange={e => setEditingCampaign(p => ({ ...p!, title: e.target.value }))}
                     />
@@ -1587,7 +1587,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Budget total (F)</label>
                     <input
                       type="number"
-                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.totalBudget}
                       onChange={e => setEditingCampaign(p => ({ ...p!, totalBudget: Number(e.target.value) }))}
                     />
@@ -1595,7 +1595,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <div>
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Catégorie</label>
                     <input
-                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.category}
                       onChange={e => setEditingCampaign(p => ({ ...p!, category: e.target.value }))}
                     />
@@ -1627,7 +1627,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
                       }
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all"
+                    className="flex-1 py-2.5 rounded-xl bg-[#128686] text-white text-sm font-bold hover:bg-[#0E6B6B] transition-all"
                   >
                     Enregistrer
                   </button>
@@ -1642,8 +1642,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 space-y-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center">
-                      <BarChart2 size={18} className="text-blue-600" />
+                    <span className="w-10 h-10 rounded-2xl bg-[#D9ECEC] flex items-center justify-center">
+                      <BarChart2 size={18} className="text-[#128686]" />
                     </span>
                     <div>
                       <h2 className="font-bold text-gray-900 text-lg">Statistiques</h2>
@@ -1654,27 +1654,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Budget total', value: `${statsCampaign.totalBudget.toLocaleString()} F`, bg: 'bg-indigo-50', text: 'text-indigo-700' },
+                    { label: 'Budget total', value: `${statsCampaign.totalBudget.toLocaleString()} F`, bg: 'bg-[#E7F4F4]', text: 'text-[#0E6B6B]' },
                     { label: 'Budget restant', value: `${statsCampaign.remainingBudget.toLocaleString()} F`, bg: 'bg-green-50', text: 'text-green-700' },
                     { label: 'Dépensé', value: `${(statsCampaign.totalBudget - statsCampaign.remainingBudget).toLocaleString()} F`, bg: 'bg-orange-50', text: 'text-orange-700' },
-                    { label: 'Progression', value: `${Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%`, bg: 'bg-purple-50', text: 'text-purple-700' },
+                    { label: 'Progression', value: `${Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%`, bg: 'bg-[#E7F4F4]', text: 'text-[#0E6B6B]' },
                   ].map(({ label, value, bg, text }) => (
                     <div key={label} className={`${bg} rounded-2xl p-4`}>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-                      <p className={`text-lg font-black ${text} mt-1`}>{value}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
+                      <p className={`text-lg font-bold ${text} mt-1`}>{value}</p>
                     </div>
                   ))}
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progression du budget</p>
-                    <span className="text-[10px] font-black text-gray-500">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Progression du budget</p>
+                    <span className="text-[10px] font-bold text-gray-500">
                       {Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%
                     </span>
                   </div>
                   <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-indigo-600 rounded-full transition-all"
+                      className="h-full bg-[#128686] rounded-full transition-all"
                       style={{ width: `${Math.min(100, ((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%` }}
                     />
                   </div>
@@ -1742,13 +1742,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
               <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                <ShieldCheck className="text-indigo-600" />
+                <ShieldCheck className="text-[#128686]" />
                 Membres de l'Équipe Administrative
               </h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-6">Membre</th>
                     <th className="px-8 py-6">Email</th>
@@ -1761,10 +1761,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <tr key={member.id} className="hover:bg-gray-50/30 transition-all">
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black">{member.name.charAt(0)}</div>
+                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">{member.name.charAt(0)}</div>
                           <div>
                             <p className="font-bold text-gray-900 leading-none">{member.name}</p>
-                            {member.id === currentAdminData?.id && <span className="text-[8px] font-black uppercase text-indigo-400">Moi</span>}
+                            {member.id === currentAdminData?.id && <span className="text-[8px] font-bold uppercase text-[#7FD1D1]">Moi</span>}
                           </div>
                         </div>
                       </td>
@@ -1772,7 +1772,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <p className="text-sm text-gray-500 font-medium">{member.email}</p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${member.role === UserRole.ADMIN ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest ${member.role === UserRole.ADMIN ? 'bg-[#D9ECEC] text-[#0E6B6B]' : 'bg-[#D9ECEC] text-[#0E6B6B]'
                           }`}>
                           {member.role === UserRole.ADMIN ? 'SUPER_ADMIN' : 'MODÉRATEUR'}
                         </span>
@@ -1809,9 +1809,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       ══════════════════════════════════════════ */}
       {view === 'users' && isSuperAdmin && (
         <div className="space-y-8">
-          <div className="bg-indigo-600 text-white p-8 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-between relative overflow-hidden">
+          <div className="bg-[#128686] text-white p-8 rounded-[2rem] shadow-xl shadow-[#128686]/20 flex items-center justify-between relative overflow-hidden">
             <div className="relative z-10">
-              <p className="text-indigo-200 text-[10px] font-black uppercase tracking-widest mb-1">Croissance Communauté</p>
+              <p className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-widest mb-1">Croissance Communauté</p>
               <h3 className="text-5xl font-bold tracking-tighter">Total Inscrits : {stats.totalInscrits}</h3>
             </div>
             <Users size={80} className="text-white/10 absolute -right-4 -bottom-4 -rotate-12" />
@@ -1820,7 +1820,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-6">Utilisateur</th>
                     <th className="px-8 py-6">Email</th>
@@ -1835,7 +1835,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <tr key={user.id} className="hover:bg-gray-50/30 transition-colors">
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black">{user.name?.charAt(0) || 'U'}</div>
+                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">{user.name?.charAt(0) || 'U'}</div>
                           <p className="font-bold text-gray-900 leading-none">{user.name || 'Utilisateur sans nom'}</p>
                         </div>
                       </td>
@@ -1846,8 +1846,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <select
                           value={user.role}
                           onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                          className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border-none focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer ${user.role === UserRole.ADMIN ? 'bg-purple-100 text-purple-700' :
-                            user.role === UserRole.MODERATOR ? 'bg-blue-100 text-blue-700' :
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border-none focus:ring-2 focus:ring-[#128686] outline-none cursor-pointer ${user.role === UserRole.ADMIN ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
+                            user.role === UserRole.MODERATOR ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
                               'bg-gray-100 text-gray-600'
                             }`}
                         >
@@ -1857,10 +1857,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         </select>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-black text-gray-900 text-sm">{user.balance?.toLocaleString() || 0} F</p>
+                        <p className="font-bold text-gray-900 text-sm">{user.balance?.toLocaleString() || 0} F</p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                           }`}>
                           {user.status === 'active' ? 'ACTIF' : 'BLOQUÉ'}
                         </span>
@@ -1870,7 +1870,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           {user.email && (
                             <button
                               onClick={() => handleResetPassword(user.email!)}
-                              className="p-3 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                              className="p-3 text-[#128686] hover:bg-[#E7F4F4] rounded-xl transition-all"
                               title="Réinitialiser Mot de Passe"
                             >
                               <Key size={18} />
@@ -1917,31 +1917,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {/* Section: Rentabilité Totale */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-indigo-50 text-indigo-600 p-4 rounded-2xl"><CreditCard size={24} /></div>
+              <div className="bg-[#E7F4F4] text-[#128686] p-4 rounded-2xl"><CreditCard size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Revenus (Campagnes)</p>
-                <p className="text-xl font-black text-gray-900 leading-none">{financialStats.totalRevenue.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Revenus (Campagnes)</p>
+                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalRevenue.toLocaleString()} F</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-orange-50 text-orange-600 p-4 rounded-2xl"><Banknote size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Reversé (Users)</p>
-                <p className="text-xl font-black text-gray-900 leading-none">{financialStats.totalPayouts.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reversé (Users)</p>
+                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalPayouts.toLocaleString()} F</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-red-50 text-red-600 p-4 rounded-2xl"><Wallet size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Dette (Soldes)</p>
-                <p className="text-xl font-black text-gray-900 leading-none">{financialStats.totalDebt.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Dette (Soldes)</p>
+                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalDebt.toLocaleString()} F</p>
               </div>
             </div>
             <div className={`p-6 rounded-3xl shadow-xl flex items-center gap-4 border ${financialStats.netProfit >= 0 ? 'bg-emerald-600 border-emerald-500 shadow-emerald-100' : 'bg-red-600 border-red-500 shadow-red-100'}`}>
               <div className="bg-white/20 text-white p-4 rounded-2xl"><Activity size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-white/70 uppercase tracking-widest mb-1">Profit Net Estimé</p>
-                <p className="text-xl font-black text-white leading-none">{financialStats.netProfit.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Profit Net Estimé</p>
+                <p className="text-xl font-bold text-white leading-none">{financialStats.netProfit.toLocaleString()} F</p>
               </div>
             </div>
           </div>
@@ -1954,11 +1954,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <h3 className="font-bold text-gray-900 tracking-tight">Top 10 des Ambassadeurs</h3>
                   <p className="text-xs text-gray-400 font-medium mt-1">Classés par gains totaux générés</p>
                 </div>
-                <div className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest">Performances</div>
+                <div className="bg-[#D9ECEC] text-[#0E6B6B] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Performances</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                  <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                     <tr>
                       <th className="px-8 py-6">Rang</th>
                       <th className="px-8 py-6">Utilisateur</th>
@@ -1970,7 +1970,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     {topEarners.map((user, index) => (
                       <tr key={user.id} className="hover:bg-gray-50/30 transition-colors">
                         <td className="px-8 py-6">
-                          <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black ${index === 0 ? 'bg-yellow-100 text-yellow-700' : index === 1 ? 'bg-gray-100 text-gray-600' : index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-400'}`}>
+                          <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-100 text-yellow-700' : index === 1 ? 'bg-gray-100 text-gray-600' : index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-400'}`}>
                             {index + 1}
                           </span>
                         </td>
@@ -1978,7 +1978,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           <p className="font-bold text-gray-900">{user.name}</p>
                           <p className="text-xs text-gray-400">{user.email}</p>
                         </td>
-                        <td className="px-8 py-6 font-black text-emerald-600">{user.totalEarned?.toLocaleString() || 0} F</td>
+                        <td className="px-8 py-6 font-bold text-emerald-600">{user.totalEarned?.toLocaleString() || 0} F</td>
                         <td className="px-8 py-6 font-bold text-gray-600">{user.balance?.toLocaleString() || 0} F</td>
                       </tr>
                     ))}
@@ -1988,26 +1988,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             </div>
 
             {/* Aide-mémoire Finance */}
-            <div className="bg-indigo-900 rounded-[2.5rem] h-96 p-8 text-white space-y-8 relative overflow-hidden shadow-2xl">
+            <div className="bg-[#0B3A44] rounded-[2.5rem] h-96 p-8 text-white space-y-8 relative overflow-hidden shadow-2xl">
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-6 leading-tight">Comprendre vos Finances</h3>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Formule Profit</p>
-                    <p className="text-sm font-medium text-indigo-100 leading-relaxed">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7FD1D1]">Formule Profit</p>
+                    <p className="text-sm font-medium text-[#A9DADA] leading-relaxed">
                       Votre profit net est calculé ainsi : <br />
-                      <span className="font-black text-white">(Budget total des campagnes)</span> <br />
-                      <span className="text-indigo-400">- (Somme des retraits validés)</span> <br />
-                      <span className="text-indigo-400">- (Soldes actuels des utilisateurs)</span>
+                      <span className="font-bold text-white">(Budget total des campagnes)</span> <br />
+                      <span className="text-[#7FD1D1]">- (Somme des retraits validés)</span> <br />
+                      <span className="text-[#7FD1D1]">- (Soldes actuels des utilisateurs)</span>
                     </p>
                   </div>
-                  <div className="pt-6 border-t border-indigo-800 space-y-4">
+                  <div className="pt-6 border-t border-[#128686]/20 space-y-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300"><RefreshCcw size={20} /></div>
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]"><RefreshCcw size={20} /></div>
                       <p className="text-xs font-bold">Mise à jour en temps réel à chaque transaction.</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300"><ShieldCheck size={20} /></div>
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]"><ShieldCheck size={20} /></div>
                       <p className="text-xs font-bold">Données sécurisées et synchronisées avec Firestore.</p>
                     </div>
                   </div>
@@ -2029,21 +2029,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl"><Clock size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === "pending").length}</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-green-200 text-green-600 p-4 rounded-2xl"><CheckCircle2 size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Validés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Validés</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === 'completed').length}</p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-red-200 text-red-600 p-4 rounded-2xl"><X size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Rejetés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Rejetés</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === 'failed').length}</p>
               </div>
             </div>
@@ -2053,7 +2053,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                <Wallet className="text-indigo-600" />
+                <Wallet className="text-[#128686]" />
                 Demandes de Retraits
               </h3>
 
@@ -2065,14 +2065,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     placeholder="Nom ou téléphone..."
                     value={withdrawalSearch}
                     onChange={(e) => setWithdrawalSearch(e.target.value)}
-                    className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-indigo-500 outline-none w-48"
+                    className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold focus:ring-2 focus:ring-[#128686] outline-none w-48"
                   />
                 </div>
 
                 <select
                   value={withdrawalStatusFilter}
                   onChange={(e) => setWithdrawalStatusFilter(e.target.value as any)}
-                  className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-[#128686]"
                 >
                   <option value="pending">En attente</option>
                   <option value="completed">Validés</option>
@@ -2083,7 +2083,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 <select
                   value={operatorFilter}
                   onChange={(e) => setOperatorFilter(e.target.value as any)}
-                  className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-[#128686]"
                 >
                   <option value="all">Tous Opérateurs</option>
                   <option value="yas">TMoney (YAS)</option>
@@ -2093,7 +2093,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-6">Ambassadeur</th>
                     <th className="px-8 py-6">Montant</th>
@@ -2112,9 +2112,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <td className="px-8 py-6">
                           <p className="font-bold text-gray-900 leading-none">{payout.userName}</p>
                         </td>
-                        <td className="px-8 py-6 font-black text-gray-900">{payout.amount.toLocaleString()} FCFA</td>
+                        <td className="px-8 py-6 font-bold text-gray-900">{payout.amount.toLocaleString()} FCFA</td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${payout.provider === 'yas' ? 'bg-blue-100 text-blue-700' :
+                          <span className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${payout.provider === 'yas' ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
                             payout.provider === 'moov' ? 'bg-orange-100 text-orange-700' :
                               'bg-gray-100 text-gray-600'
                             }`}>
@@ -2126,7 +2126,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           {formatDate(payout.createdAt || payout.date)}
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${payoutStatus === 'completed' ? 'bg-green-100 text-green-700' :
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${payoutStatus === 'completed' ? 'bg-green-100 text-green-700' :
                             payoutStatus === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-red-100 text-red-700'
                             }`}>
@@ -2225,7 +2225,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   {allPayouts.length === 0 && (
                     <tr>
                       <td colSpan={7} className="px-8 py-12 text-center">
-                        <p className="text-gray-400 font-black uppercase text-xs tracking-widest">Aucune demande de retrait</p>
+                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune demande de retrait</p>
                       </td>
                     </tr>
                   )}
@@ -2253,7 +2253,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl"><Clock size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
                   {allCampaigns.filter(c => c.paymentStatus === 'pending_payment' || c.paymentStatus === undefined).length}
                 </p>
@@ -2262,7 +2262,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-green-200 text-green-600 p-4 rounded-2xl"><CheckCircle2 size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Confirmés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confirmés</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
                   {allCampaigns.filter(c => c.paymentStatus === 'paid').length}
                 </p>
@@ -2272,16 +2272,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className="bg-red-200 text-red-600 p-4 rounded-2xl"><X size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Annulés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Annulés</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
                   {allCampaigns.filter(c => c.paymentStatus === 'failed').length}
                 </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-indigo-200 text-indigo-600 p-4 rounded-2xl"><CreditCard size={24} /></div>
+              <div className="bg-[#D9ECEC] text-[#128686] p-4 rounded-2xl"><CreditCard size={24} /></div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Budget</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Budget</p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
                   {allCampaigns.reduce((acc, c) => acc + (c.totalBudget || 0), 0).toLocaleString()} F
                 </p>
@@ -2293,13 +2293,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
               <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                <CreditCard className="text-indigo-600" />
+                <CreditCard className="text-[#128686]" />
                 Paiements des Campagnes Utilisateurs
               </h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-black tracking-widest">
+                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
                   <tr>
                     <th className="px-8 py-6">Campagne</th>
                     <th className="px-8 py-6">Annonceur</th>
@@ -2329,9 +2329,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           <p className="text-sm text-gray-500 font-medium">{advertiserName}</p>
                           <p className="text-xs text-gray-400">{advertiserPhone}</p>
                         </td>
-                        <td className="px-8 py-6 font-black text-gray-900">{campaign.totalBudget.toLocaleString()} F</td>
+                        <td className="px-8 py-6 font-bold text-gray-900">{campaign.totalBudget.toLocaleString()} F</td>
                         <td className="px-8 py-6">
-                          <span className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-700">
+                          <span className="px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest bg-[#D9ECEC] text-[#0E6B6B]">
                             {campaign.budgetPack || 'Standard'}
                           </span>
                         </td>
@@ -2339,7 +2339,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           {formatDate(campaign.createdAt)}
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${campaign.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${campaign.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
                             campaign.paymentStatus === 'failed' ? 'bg-red-100 text-red-700' :
                               'bg-yellow-100 text-yellow-700'
                             }`}>
@@ -2356,7 +2356,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   {allCampaigns.filter(c => c.createdBy === 'user' || c.createdBy === undefined).length === 0 && (
                     <tr>
                       <td colSpan={7} className="px-8 py-12 text-center">
-                        <p className="text-gray-400 font-black uppercase text-xs tracking-widest">Aucune campagne utilisateur en attente</p>
+                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune campagne utilisateur en attente</p>
                       </td>
                     </tr>
                   )}
@@ -2381,7 +2381,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
             <div className="flex flex-col items-center text-center mb-10">
-              <div className="bg-indigo-50 p-6 rounded-3xl text-indigo-600 mb-6">
+              <div className="bg-[#E7F4F4] p-6 rounded-3xl text-[#128686] mb-6">
                 <ShieldCheck size={48} />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">Vérificateur de Statut GomboPlus</h3>
@@ -2398,13 +2398,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   placeholder="Ex: TXN_20241002_001 ou CMP-..."
                   value={gomboRefInput}
                   onChange={(e) => setGomboRefInput(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4.5 bg-gray-50 border border-gray-100 rounded-2xl text-base font-bold focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm"
+                  className="w-full pl-12 pr-4 py-4.5 bg-gray-50 border border-gray-100 rounded-2xl text-base font-bold focus:ring-2 focus:ring-[#128686] outline-none shadow-sm"
                 />
               </div>
               <button
                 onClick={handleManualGomboCheck}
                 disabled={isCheckingGombo || !gomboRefInput.trim()}
-                className="w-full h-10 bg-indigo-600 text-white py-4.5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+                className="w-full h-10 bg-[#128686] text-white py-4.5 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
               >
                 {isCheckingGombo ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
                 {isCheckingGombo ? "Vérification en cours..." : "Vérifier le statut"}
@@ -2416,10 +2416,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
                 <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                  <Activity className="text-indigo-600" />
+                  <Activity className="text-[#128686]" />
                   Détails de la Transaction
                 </h3>
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${['completed', 'success', 'successful'].includes(String(gomboCheckResult.status || '').toLowerCase())
+                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${['completed', 'success', 'successful'].includes(String(gomboCheckResult.status || '').toLowerCase())
                   ? 'bg-green-100 text-green-700'
                   : ['failed', 'rejected', 'error'].includes(String(gomboCheckResult.status || '').toLowerCase())
                     ? 'bg-red-100 text-red-700'
@@ -2432,33 +2432,33 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Référence</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Référence</p>
                     <p className="text-lg font-bold text-gray-900 break-all">{gomboCheckResult.reference || gomboCheckResult.transaction_reference || gomboRefInput}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Montant</p>
-                    <p className="text-2xl font-black text-gray-900">{gomboCheckResult.amount?.toLocaleString() || '—'} F</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Montant</p>
+                    <p className="text-2xl font-bold text-gray-900">{gomboCheckResult.amount?.toLocaleString() || '—'} F</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Opérateur</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Opérateur</p>
                     <p className="text-lg font-bold text-gray-900 uppercase">{gomboCheckResult.operator || '—'}</p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Message API</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Message API</p>
                     <p className="text-sm font-bold text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100">
                       {gomboCheckResult.message || "Aucun message retourné par l'API."}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Date</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Date</p>
                     <p className="text-lg font-bold text-gray-900">{gomboCheckResult.created_at ? new Date(gomboCheckResult.created_at).toLocaleString() : '—'}</p>
                   </div>
                   {gomboCheckResult.recipient_number && (
                     <div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Numéro Client</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Numéro Client</p>
                       <p className="text-lg font-bold text-gray-900">{gomboCheckResult.recipient_number}</p>
                     </div>
                   )}
@@ -2466,7 +2466,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
 
               <div className="p-8 bg-gray-50/50 border-t border-gray-50">
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Réponse JSON Brute</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Réponse JSON Brute</p>
                 <pre className="bg-gray-900 text-green-400 p-6 rounded-2xl text-xs overflow-x-auto font-mono shadow-inner leading-relaxed">
                   {JSON.stringify(gomboCheckResult, null, 2)}
                 </pre>
@@ -2485,11 +2485,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Statut de la preuve</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Statut de la preuve</label>
                 <select
                   value={proofStatusFilter}
                   onChange={(e) => setProofStatusFilter(e.target.value as any)}
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="pending">En attente</option>
@@ -2498,11 +2498,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Action suggérée par l'IA</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Action suggérée par l'IA</label>
                 <select
                   value={suggestedActionFilter}
                   onChange={(e) => setSuggestedActionFilter(e.target.value as any)}
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
                 >
                   <option value="all">Toutes les actions</option>
                   <option value="approve">À approuver</option>
@@ -2513,7 +2513,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <div className="flex items-end">
                 <button
                   onClick={() => { setProofStatusFilter('pending'); setSuggestedActionFilter('manual_review'); }}
-                  className="w-full bg-amber-50 hover:bg-amber-100 text-amber-600 py-3 rounded-2xl font-black uppercase text-xs tracking-widest transition-all"
+                  className="w-full bg-amber-50 hover:bg-amber-100 text-amber-600 py-3 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all"
                 >
                   Preuves à examiner
                 </button>
@@ -2540,7 +2540,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <div className="flex-1 p-8 flex flex-col">
                     <div className="mb-4">
                       <h3 className="font-bold text-lg text-gray-900 leading-none">{proof.userName}</h3>
-                      <p className="text-xs text-indigo-600 font-black uppercase tracking-widest mt-2">{proof.campaignName}</p>
+                      <p className="text-xs text-[#128686] font-bold uppercase tracking-widest mt-2">{proof.campaignName}</p>
                       <p className="text-[10px] text-gray-400 font-medium mt-1">
                         {new Date(proof.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </p>
@@ -2555,22 +2555,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Shield size={13} className={proof.aiAnalysis.fraudAlert ? 'text-red-500' : proof.aiAnalysis.isValid ? 'text-emerald-600' : 'text-amber-500'} />
-                            <span className={`text-[10px] font-black uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'text-red-600' : proof.aiAnalysis.isValid ? 'text-emerald-700' : 'text-amber-600'
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'text-red-600' : proof.aiAnalysis.isValid ? 'text-emerald-700' : 'text-amber-600'
                               }`}>
                               Analyse IA
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'bg-red-100 text-red-700' :
+                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'bg-red-100 text-red-700' :
                               proof.aiAnalysis.isValid ? 'bg-emerald-100 text-emerald-700' :
                                 'bg-amber-100 text-amber-700'
                               }`}>
                               {proof.aiAnalysis.fraudAlert ? '⚠ Fraude' : proof.aiAnalysis.isValid ? '✓ Valide' : '✗ Invalide'}
                             </span>
                             {proof.aiAnalysis.suggestedAction && (
-                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${proof.aiAnalysis.suggestedAction === 'approve' ? 'bg-green-100 text-green-700' :
+                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${proof.aiAnalysis.suggestedAction === 'approve' ? 'bg-green-100 text-green-700' :
                                 proof.aiAnalysis.suggestedAction === 'reject' ? 'bg-red-100 text-red-700' :
-                                  'bg-blue-100 text-blue-700'
+                                  'bg-[#D9ECEC] text-[#0E6B6B]'
                                 }`}>
                                 {proof.aiAnalysis.suggestedAction === 'approve' ? '✓ Auto-approuver' :
                                   proof.aiAnalysis.suggestedAction === 'reject' ? '✗ Auto-rejeter' :
@@ -2583,7 +2583,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         {/* Scores de confiance */}
                         <div className="grid grid-cols-2 gap-2">
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Confiance globale</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confiance globale</p>
                             <div className="flex items-center gap-1.5">
                               <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div
@@ -2593,35 +2593,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                                   style={{ width: `${proof.aiAnalysis.confidence}%` }}
                                 />
                               </div>
-                              <span className="text-xs font-black text-gray-700">{proof.aiAnalysis.confidence}%</span>
+                              <span className="text-xs font-bold text-gray-700">{proof.aiAnalysis.confidence}%</span>
                             </div>
                           </div>
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Vues détectées</p>
-                            <p className="text-sm font-black text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Vues détectées</p>
+                            <p className="text-sm font-bold text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
                           </div>
                         </div>
 
                         {/* Scores de confiance granulaires */}
                         {(proof.aiAnalysis.imageAuthenticityConfidence || proof.aiAnalysis.viewCountDetectionConfidence || proof.aiAnalysis.platformUICompliance) && (
                           <div className="bg-white/70 rounded-xl p-2.5 space-y-2">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Scores spécifiques</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Scores spécifiques</p>
                             {proof.aiAnalysis.imageAuthenticityConfidence && (
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 font-medium">Authenticité image</span>
-                                <span className="font-black text-gray-900">{proof.aiAnalysis.imageAuthenticityConfidence}%</span>
+                                <span className="font-bold text-gray-900">{proof.aiAnalysis.imageAuthenticityConfidence}%</span>
                               </div>
                             )}
                             {proof.aiAnalysis.viewCountDetectionConfidence && (
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 font-medium">Détection vues</span>
-                                <span className="font-black text-gray-900">{proof.aiAnalysis.viewCountDetectionConfidence}%</span>
+                                <span className="font-bold text-gray-900">{proof.aiAnalysis.viewCountDetectionConfidence}%</span>
                               </div>
                             )}
                             {proof.aiAnalysis.platformUICompliance && (
                               <div className="flex items-center justify-between text-[10px]">
                                 <span className="text-gray-600 font-medium">Conformité interface</span>
-                                <span className="font-black text-gray-900">{proof.aiAnalysis.platformUICompliance}%</span>
+                                <span className="font-bold text-gray-900">{proof.aiAnalysis.platformUICompliance}%</span>
                               </div>
                             )}
                           </div>
@@ -2630,7 +2630,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         {/* Type de fraude */}
                         {proof.aiAnalysis.fraudType && proof.aiAnalysis.fraudType !== 'none' && (
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Type de fraude</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Type de fraude</p>
                             <p className="text-[11px] font-bold text-red-600">{proof.aiAnalysis.fraudType.replace(/_/g, ' ')}</p>
                           </div>
                         )}
@@ -2638,7 +2638,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         {/* Détails des éléments de fraude */}
                         {proof.aiAnalysis.fraudEvidenceDetails && proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Éléments suspects</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Éléments suspects</p>
                             <ul className="space-y-1">
                               {proof.aiAnalysis.fraudEvidenceDetails.map((detail, idx) => (
                                 <li key={idx} className="text-[10px] text-red-600 font-medium flex gap-2">
@@ -2652,7 +2652,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
                         {proof.aiAnalysis.reason && (
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Motif IA</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Motif IA</p>
                             <p className="text-[11px] text-gray-600 font-medium leading-snug">{proof.aiAnalysis.reason}</p>
                           </div>
                         )}
@@ -2665,12 +2665,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     )}
 
                     <div className="flex gap-3 mt-auto">
-                      <button onClick={() => setRejectingProof(proof)} className="flex-1 bg-gray-50 hover:bg-red-50 text-red-600 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all">
+                      <button onClick={() => setRejectingProof(proof)} className="flex-1 bg-gray-50 hover:bg-red-50 text-red-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
                         Refuser
                       </button>
                       <button
                         onClick={() => { setValidatingProof(proof); setViewsInput(proof.aiAnalysis?.viewsCount?.toString() || '0'); }}
-                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg transition-all"
+                        className="flex-1 bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-lg transition-all"
                       >
                         Valider
                       </button>
@@ -2680,7 +2680,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               ))}
             {allProofs.filter(p => p.status === 'pending').length === 0 && (
               <div className="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-100">
-                <p className="text-gray-400 font-black uppercase text-xs tracking-widest">Aucune preuve en attente</p>
+                <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune preuve en attente</p>
               </div>
             )}
           </div>
@@ -2696,7 +2696,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex justify-between items-start mb-6">
-              <div className="bg-indigo-100 w-12 h-12 rounded-2xl flex items-center justify-center text-indigo-600">
+              <div className="bg-[#D9ECEC] w-12 h-12 rounded-2xl flex items-center justify-center text-[#128686]">
                 <UserPlus size={24} />
               </div>
               <button onClick={() => setShowAddMemberModal(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600">
@@ -2713,13 +2713,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   value={newMemberEmail}
                   onChange={(e) => setNewMemberEmail(e.target.value)}
                   placeholder="email@utilisateur.com"
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#128686] outline-none"
                 />
               </div>
               <button
                 onClick={handleAddStaffMember}
                 disabled={isAddingMember || !newMemberEmail}
-                className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+                className="w-full bg-[#128686] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
               >
                 {isAddingMember ? <Loader2 className="animate-spin" size={20} /> : "Confirmer la promotion"}
                 <ArrowRight size={16} />
@@ -2759,7 +2759,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
                 Motif du refus <span className="text-red-400">*</span>
               </label>
               <textarea
@@ -2774,7 +2774,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <button
               onClick={handleRejectProof}
               disabled={isRejecting || !rejectionReason.trim()}
-              className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
             >
               {isRejecting ? <Loader2 className="animate-spin" size={18} /> : <X size={16} />}
               {isRejecting ? 'Traitement...' : 'Confirmer le refus'}
@@ -2795,8 +2795,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl space-y-5">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center shrink-0">
-                  <Check size={22} className="text-indigo-600" />
+                <div className="w-12 h-12 rounded-2xl bg-[#D9ECEC] flex items-center justify-center shrink-0">
+                  <Check size={22} className="text-[#128686]" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">Valider la preuve</h3>
@@ -2804,23 +2804,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Nombre de vues confirmées</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Nombre de vues confirmées</label>
                 <input
                   type="number"
                   value={viewsInput}
                   onChange={(e) => setViewsInput(e.target.value)}
-                  className="w-full bg-gray-50 border-2 border-indigo-100 rounded-2xl p-4 text-center text-3xl font-black focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full bg-gray-50 border-2 border-[#128686]/20 rounded-2xl p-4 text-center text-3xl font-bold focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
                   autoFocus
                 />
               </div>
-              <div className="bg-indigo-50 rounded-2xl p-4 flex items-center justify-between">
+              <div className="bg-[#E7F4F4] rounded-2xl p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Rémunération calculée</p>
-                  <p className="text-2xl font-black text-indigo-700 mt-0.5">{computedEarnings.toLocaleString()} <span className="text-sm">FCFA</span></p>
+                  <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Rémunération calculée</p>
+                  <p className="text-2xl font-bold text-[#0E6B6B] mt-0.5">{computedEarnings.toLocaleString()} <span className="text-sm">FCFA</span></p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Taux / vue</p>
-                  <p className="text-sm font-black text-indigo-600">{cpv} FCFA</p>
+                  <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Taux / vue</p>
+                  <p className="text-sm font-bold text-[#128686]">{cpv} FCFA</p>
                 </div>
               </div>
 
@@ -2835,7 +2835,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <button
                 onClick={handleConfirmValidation}
                 disabled={isValidating || !viewsInput || parseInt(viewsInput) <= 0}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
               >
                 {isValidating ? <Loader2 className="animate-spin" size={18} /> : <Check size={16} />}
                 {isValidating ? 'Traitement...' : `Valider · +${computedEarnings.toLocaleString()} FCFA`}

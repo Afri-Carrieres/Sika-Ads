@@ -215,9 +215,9 @@ const NotificationBell: React.FC = () => {
         };
       case 'campaign':
         return {
-          icon: <Megaphone size={18} className="text-indigo-500" />,
-          bg: 'bg-indigo-50/50 hover:bg-indigo-50',
-          border: 'border-indigo-100'
+          icon: <Megaphone size={18} className="text-[#128686]" />,
+          bg: 'bg-[#E7F4F4]/50 hover:bg-[#E7F4F4]',
+          border: 'border-[#128686]/20'
         };
       case 'rejected':
         return {
@@ -227,15 +227,15 @@ const NotificationBell: React.FC = () => {
         };
       case 'announcement':
         return {
-          icon: <Megaphone size={18} className="text-purple-500" />,
-          bg: 'bg-purple-50/50 hover:bg-purple-50',
-          border: 'border-purple-100'
+          icon: <Megaphone size={18} className="text-[#0E6B6B]" />,
+          bg: 'bg-[#0E6B6B]/10 hover:bg-[#0E6B6B]/20',
+          border: 'border-[#0E6B6B]/20'
         };
       default:
         return {
-          icon: <Info size={18} className="text-blue-500" />,
-          bg: 'bg-blue-50/50 hover:bg-blue-50',
-          border: 'border-blue-100'
+          icon: <Info size={18} className="text-[#2BA8A8]" />,
+          bg: 'bg-[#2BA8A8]/10 hover:bg-[#2BA8A8]/20',
+          border: 'border-[#2BA8A8]/20'
         };
     }
   };
@@ -244,7 +244,7 @@ const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all relative ${unreadCount > 0 ? 'ring-2 ring-indigo-100' : ''}`}
+        className={`p-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-all relative ${unreadCount > 0 ? 'ring-2 ring-[#9ED0D0]' : ''}`}
       >
         <Bell size={20} className={unreadCount > 0 ? 'animate-bounce' : ''} />
         {unreadCount > 0 && (
@@ -260,7 +260,7 @@ const NotificationBell: React.FC = () => {
             <h3 className="font-bold text-gray-900 flex items-center gap-2">
               Notifications
               {unreadCount > 0 && (
-                <span className="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded-full">
+                <span className="bg-[#D9ECEC] text-[#0E6B6B] text-[10px] px-2 py-0.5 rounded-full">
                   {unreadCount} nouvelles
                 </span>
               )}
@@ -271,7 +271,7 @@ const NotificationBell: React.FC = () => {
                   e.stopPropagation();
                   markAllAsRead();
                 }}
-                className="text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 transition-colors"
+                className="text-[10px] font-bold uppercase tracking-widest text-[#128686] hover:text-[#0A4F50] transition-colors"
               >
                 Tout lire
               </button>
@@ -299,7 +299,7 @@ const NotificationBell: React.FC = () => {
                       e.stopPropagation();
                       handleMarkAsRead(notif);
                     }}
-                    className={`p-4 cursor-pointer transition-all border-l-4 ${!notif.read ? `${style.bg} ${style.border} border-l-indigo-500` : 'bg-white hover:bg-gray-50 border-l-transparent border-transparent'}`}
+                    className={`p-4 cursor-pointer transition-all border-l-4 ${!notif.read ? `${style.bg} ${style.border} border-l-[#128686]` : 'bg-white hover:bg-gray-50 border-l-transparent border-transparent'}`}
                   >
                     <div className="flex gap-3">
                       <div className="mt-1 shrink-0">{style.icon}</div>

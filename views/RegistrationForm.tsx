@@ -209,7 +209,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
     <div className="min-h-screen flex flex-col lg:grid lg:grid-cols-[0.75fr_1.05fr]">
       
       {/* LEFT PANEL — brand / progress */}
-      <div className="hidden flex-col justify-between overflow-hidden bg-[#0F172A] px-10 py-6 text-white lg:flex xl:px-14">
+      <div className="hidden flex-col justify-between overflow-hidden bg-[#062127] px-10 py-6 text-white lg:flex xl:px-14">
 
         {/* Logo */}
         <div className="flex justify-start place-items-start">
@@ -247,12 +247,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                       {isDone ? <CheckCircle2 size={18} /> : <Icon size={18} />}
                     </div>
                     <div>
-                      <p className="text-white font-black font-display leading-tight text-sm">{s.t}</p>
+                      <p className="text-white font-bold font-display leading-tight text-sm">{s.t}</p>
                       <p className="text-[11px] text-white/55 font-medium">{s.sub}</p>
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-[#f55d05]' : isDone ? 'text-emerald-300' : 'text-white/35'
+                    className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-[#f55d05]' : isDone ? 'text-emerald-300' : 'text-white/35'
                       }`}
                   >
                     {isActive ? 'En cours' : isDone ? 'OK' : `0${s.n}`}
@@ -291,7 +291,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
         <div className="flex-1 flex items-center justify-center px-6 pb-10 lg:px-14">
           <div className="w-full max-w-md">
-            <p className="text-[11px] font-black uppercase tracking-widest text-[#f55d05] mb-2">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-[#f55d05] mb-2">
               Étape {step} / 3
             </p>
             <h2 className="text-3xl font-bold text-gray-900 leading-tight font-display">
@@ -331,12 +331,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
                   <div className="relative flex items-center">
                     <div className="flex-grow border-t border-gray-200"></div>
-                    <span className="flex-shrink-0 mx-4 text-xs font-black uppercase tracking-widest text-gray-400">Ou</span>
+                    <span className="flex-shrink-0 mx-4 text-xs font-bold uppercase tracking-widest text-gray-400">Ou</span>
                     <div className="flex-grow border-t border-gray-200"></div>
                   </div>
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Adresse Email</span>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <input
@@ -351,7 +351,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <label className="block">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Mot de passe</span>
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
@@ -365,7 +365,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                       </div>
                     </label>
                     <label className="block">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Confirmer</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Confirmer</span>
                       <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
@@ -421,7 +421,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               {step === 2 && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nom & Prénoms complets</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Nom & Prénoms complets</span>
                     <div className="relative">
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <input
@@ -436,21 +436,21 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Sexe</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Sexe</span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setGender('M')}
-                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'M' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
+                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'M' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-[#128686]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
                         >Homme</button>
                         <button
                           onClick={() => setGender('F')}
-                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'F' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-indigo-100' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
+                          className={`flex-1 py-4 rounded-2xl font-bold text-sm transition-all border ${gender === 'F' ? 'bg-[#f55d05] text-white border-[#f56505e3] shadow-lg shadow-[#128686]/20' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}
                         >Femme</button>
                       </div>
                     </div>
 
                     <label className="block">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Tranche d'âge</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Tranche d'âge</span>
                       <div className="relative">
                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <select
@@ -467,7 +467,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                   </div>
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Ville de résidence</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Ville de résidence</span>
                     <div className="relative">
                       <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <select
@@ -486,28 +486,28 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               {/* STEP 3: Payment Info */}
               {step === 3 && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div className="bg-indigo-50/60 p-5 rounded-2xl border border-indigo-100 flex items-start gap-3">
-                    <ShieldCheck className="text-indigo-600 shrink-0" size={22} />
-                    <p className="text-xs text-indigo-900 font-medium leading-relaxed">
+                  <div className="bg-[#E7F4F4]/60 p-5 rounded-2xl border border-[#128686]/20 flex items-start gap-3">
+                    <ShieldCheck className="text-[#128686] shrink-0" size={22} />
+                    <p className="text-xs text-[#0B2B33] font-medium leading-relaxed">
                       Vos informations de paiement sont sécurisées. Vous pourrez les modifier à tout moment dans vos paramètres.
                     </p>
                   </div>
 
                   <div className="space-y-3">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Moyen de paiement préféré</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Moyen de paiement préféré</span>
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         onClick={() => setPaymentMethod('Mixx')}
-                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Mixx' ? 'border-[#f55d05] bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Mixx' ? 'border-[#f55d05] bg-[#E7F4F4]/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                       >
                         <div className="w-11 h-11 rounded-xl overflow-hidden relative shadow-sm border border-white shrink-0">
                           <div className="absolute inset-0 bg-[#00338d] flex items-center justify-center">
-                            <span className="text-yellow-400 font-black italic text-[11px] select-none">mixx</span>
-                            <div className="absolute bottom-1 right-1 bg-yellow-400 w-3 h-3 rounded-full flex items-center justify-center text-[#00338d] font-black italic text-[5px]">TG</div>
+                            <span className="text-yellow-400 font-bold italic text-[11px] select-none">mixx</span>
+                            <div className="absolute bottom-1 right-1 bg-yellow-400 w-3 h-3 rounded-full flex items-center justify-center text-[#00338d] font-bold italic text-[5px]">TG</div>
                           </div>
                         </div>
                         <div>
-                          <span className="font-black text-gray-900 block leading-tight text-sm">Mixx by YAS</span>
+                          <span className="font-bold text-gray-900 block leading-tight text-sm">Mixx by YAS</span>
                           <span className="text-[10px] text-gray-400 font-bold uppercase">YAS</span>
                         </div>
                         {paymentMethod === 'Mixx' && <CheckCircle2 className="absolute top-3 right-3 text-[#f55d05]" size={16} />}
@@ -515,17 +515,17 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
                       <button
                         onClick={() => setPaymentMethod('Moov')}
-                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Moov' ? 'border-[#f55d05] bg-indigo-50/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                        className={`relative p-5 rounded-2xl border-2 transition-all text-left flex flex-row gap-3 overflow-hidden ${paymentMethod === 'Moov' ? 'border-[#f55d05] bg-[#E7F4F4]/50' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                       >
                         <div className="w-11 h-11 rounded-xl overflow-hidden relative shadow-sm border border-white shrink-0">
                           <div className="absolute inset-0 bg-[#0066cc] flex items-center justify-center">
                             <div className="bg-[#f37021] w-7 h-7 rotate-45 flex items-center justify-center shadow-lg border-2 border-white/20">
-                              <div className="-rotate-45 text-[5px] text-white font-black text-center leading-[1.1] scale-90">MOOV<br />Money</div>
+                              <div className="-rotate-45 text-[5px] text-white font-bold text-center leading-[1.1] scale-90">MOOV<br />Money</div>
                             </div>
                           </div>
                         </div>
                         <div>
-                          <span className="font-black text-gray-900 block leading-tight text-sm">Moov Africa</span>
+                          <span className="font-bold text-gray-900 block leading-tight text-sm">Moov Africa</span>
                           <span className="text-[10px] text-gray-400 font-bold uppercase">Moov Money</span>
                         </div>
                         {paymentMethod === 'Moov' && <CheckCircle2 className="absolute top-3 right-3 text-[#f55d05]" size={16} />}
@@ -534,7 +534,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                   </div>
 
                   <label className="block">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Numéro Mobile Money pour les retraits</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Numéro Mobile Money pour les retraits</span>
                     <div className="relative">
                       <Wallet className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <input
@@ -561,7 +561,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               {step > 1 && (
                 <button
                   onClick={handlePrevStep}
-                  className="px-5 py-4 bg-gray-50 border border-gray-200 text-gray-500 rounded-2xl font-black hover:bg-gray-100 transition-all"
+                  className="px-5 py-4 bg-gray-50 border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-100 transition-all"
                 >
                   <ArrowLeft size={20} />
                 </button>
@@ -575,7 +575,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                   (step === 3 && (!paymentMethod || !momoNumber))
                 }
                 onClick={handleNextStep}
-                className="flex-1 py-4 bg-[#f55d05] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-indigo-200 hover:bg-[#f56505e3] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
+                className="flex-1 py-4 bg-[#f55d05] text-white rounded-2xl font-bold uppercase tracking-widest text-sm shadow-xl shadow-[#062127]/30 hover:bg-[#f56505e3] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
               >
                 {loading ? <Loader2 className="animate-spin" size={22} /> : (
                   <>
