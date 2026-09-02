@@ -220,7 +220,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
         {/* Headline + steps */}
         <div className="relative min-w-x">
-          <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-black text-white font-display">
+          <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-bold text-white font-display">
             Partagez !<br />
             <span className="text-[#128785]">Soyez payé.</span>
           </h1>
@@ -294,7 +294,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
             <p className="text-[11px] font-black uppercase tracking-widest text-[#f55d05] mb-2">
               Étape {step} / 3
             </p>
-            <h2 className="text-3xl font-black text-gray-900 leading-tight font-display">
+            <h2 className="text-3xl font-bold text-gray-900 leading-tight font-display">
               {step === 1 && "Créez votre compte"}
               {step === 2 && "Parlez-nous de vous"}
               {step === 3 && "Configurez vos paiements"}

@@ -328,7 +328,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                   </div>
 
                   <div className="p-8 flex-1 flex flex-col">
-                    <h3 className={`text-xl font-black mb-2 leading-tight ${isCompleted ? 'text-gray-400' : 'text-gray-900'}`}>{campaign.title}</h3>
+                    <h3 className={`text-xl font-bold mb-2 leading-tight ${isCompleted ? 'text-gray-400' : 'text-gray-900'}`}>{campaign.title}</h3>
                     <p className="text-sm text-gray-500 line-clamp-2 mb-8 font-medium leading-relaxed">{campaign.description}</p>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
@@ -453,7 +453,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
             <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-500 mb-6">
               <Lock size={32} />
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">Limite Journalière Atteinte</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Limite Journalière Atteinte</h3>
             <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">
               Pour donner la chance à tout le monde de gagner, nous limitons la participation à <strong>3 campagnes par jour</strong>.
               <br /><br />

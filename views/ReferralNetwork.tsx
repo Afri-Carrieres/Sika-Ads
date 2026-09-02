@@ -93,7 +93,7 @@ const ReferralNetwork: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Mon Réseau</h2>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Mon Réseau</h2>
           <p className="text-gray-500 text-sm font-medium">Gérez votre équipe et suivez vos commissions.</p>
         </div>
         <button
@@ -210,7 +210,7 @@ const ReferralNetwork: React.FC = () => {
                 <div className="bg-indigo-100 w-12 h-12 rounded-2xl flex items-center justify-center text-indigo-600 mb-4">
                   <UserPlus size={24} />
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Inviter un ami</h3>
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Inviter un ami</h3>
                 <p className="text-gray-500 text-sm mt-1">Partagez votre lien pour gagner des bonus.</p>
               </div>
               <button onClick={() => setIsModalOpen(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600">

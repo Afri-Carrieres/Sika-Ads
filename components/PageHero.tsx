@@ -25,7 +25,7 @@ const PageHero: React.FC<PageHeroProps> = ({ badge, title, subtitle, accent = 't
           >
             {badge}
           </span>
-          <h1 className="font-heading text-4xl md:text-6xl font-black text-white leading-tight mb-6">{title}</h1>
+          <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight mb-6">{title}</h1>
           {subtitle && (
             <p className="text-lg text-slate-400 leading-relaxed max-w-2xl font-medium">{subtitle}</p>
           )}

@@ -122,7 +122,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
             </div>
 
             <div className="mt-8 max-w-xl">
-              <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-black text-white font-display">
+              <h1 className="text-4xl xl:text-[2.6rem] leading-[1.08] font-bold text-white font-display">
                 Monétisez vos statuts,<br />
                 <span className="text-[#128785]">pilotez vos gains.</span>
               </h1>
@@ -167,7 +167,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
 
           <div className="mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center py-10">
             <div className="mb-8">
-              <h2 className="text-3xl font-black tracking-tight text-slate-950">Bon retour</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-slate-950">Bon retour</h2>
               <p className="mt-3 text-sm font-medium leading-6 text-slate-500">
                 Connectez-vous pour gérer vos campagnes, vos preuves et vos retraits.
               </p>
@@ -236,7 +236,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
                 <ShieldCheck size={21} />
               </div>
               <p className="text-xs font-black uppercase tracking-widest text-slate-400">Réinitialisation</p>
-              <h3 className="mt-1 text-2xl font-black text-slate-950">Modifier votre mot de passe</h3>
+              <h3 className="mt-1 text-2xl font-bold text-slate-950">Modifier votre mot de passe</h3>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-500">Entrez votre email. Un lien de réinitialisation vous sera envoyé.</p>
             </div>
             <form onSubmit={handleSendReset} className="space-y-4 p-6">

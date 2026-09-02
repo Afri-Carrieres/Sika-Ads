@@ -222,7 +222,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 leading-tight">Nouvelle Campagne</h1>
+            <h1 className="text-3xl font-bold text-gray-900 leading-tight">Nouvelle Campagne</h1>
             <p className="text-gray-500 mt-1 font-medium text-sm md:text-base">Configurez votre publicité en 2 étapes.</p>
           </div>
           <button onClick={onCancel} className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-gray-600 transition-all shadow-sm">
@@ -497,7 +497,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
               <div className="relative z-10 space-y-8">
                 <div>
                   <p className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Simulateur</p>
-                  <h3 className="text-2xl font-black tracking-tight">Résumé</h3>
+                  <h3 className="text-2xl font-bold tracking-tight">Résumé</h3>
                 </div>
 
                 <div className="space-y-6">

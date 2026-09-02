@@ -354,7 +354,7 @@ const ProfilePage: React.FC = () => {
 
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Mon Profil</h1>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Mon Profil</h1>
           <p className="text-sm text-gray-500 font-medium">Gérez vos informations personnelles et votre compte.</p>
         </div>
 
@@ -401,7 +401,7 @@ const ProfilePage: React.FC = () => {
 
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-xl font-black text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight truncate">{displayName || 'Utilisateur'}</h2>
                 <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${userData?.role === UserRole.ADMIN ? 'bg-orange-50 text-orange-700 border-orange-200' : userData?.role === UserRole.MODERATOR ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
                   {userData?.role === UserRole.ADMIN ? 'Admin' : userData?.role === UserRole.MODERATOR ? 'Modérateur' : 'Ambassadeur'}
                 </span>
@@ -599,7 +599,7 @@ const ProfilePage: React.FC = () => {
               </button>
             </div>
 
-            <h3 className="text-xl font-black text-gray-900 mb-2">Suppression définitive ?</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Suppression définitive ?</h3>
             <p className="text-gray-500 text-sm font-medium mb-6 leading-relaxed">
               Pour confirmer la suppression, veuillez tapez <span className="font-bold text-gray-900">SUPPRIMER</span> dans le champ ci-dessous.
             </p>

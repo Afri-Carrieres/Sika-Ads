@@ -259,7 +259,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
           Retour aux campagnes
         </button>
         <div className="bg-white rounded-[2rem] border border-gray-100 p-10 text-center">
-          <h2 className="text-xl font-black text-gray-900 mb-2">Campagne introuvable</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Campagne introuvable</h2>
           <p className="text-sm text-gray-500 font-medium">Cette campagne n'existe plus ou n'est pas disponible.</p>
         </div>
       </div>
@@ -292,7 +292,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
             <div className="absolute bottom-8 left-8 right-8 text-white">
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-indigo-200 mb-3">Partage de campagne</p>
-              <h2 className="text-3xl md:text-4xl font-black leading-tight mb-3">{campaign.title}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-3">{campaign.title}</h2>
               <p className="text-white/80 text-sm font-medium max-w-2xl leading-relaxed">{campaign.description}</p>
             </div>
           </div>

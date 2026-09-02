@@ -43,7 +43,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
               {/* Sidebar Navigation (Sticky) */}
               <div className="lg:col-span-1 border-r border-slate-100 pr-8 hidden lg:block">
                   <div className="sticky top-28 space-y-6">
-                      <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
                       <ul className="space-y-4 text-sm font-bold text-slate-600">
                           <li><a href="#objet" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">1. Objet de la plateforme</a></li>
                           <li><a href="#eligibilite" className="hover:text-indigo-600 transition-colors block py-2 border-b border-slate-50">2. Éligibilité des ambassadeurs</a></li>
@@ -66,7 +66,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   <div id="objet" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
                           <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">01</span>
-                          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Objet de la Plateforme</h2>
+                          <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Objet de la Plateforme</h2>
                       </div>
                       <p className="text-slate-600 leading-relaxed font-medium">
                         SikaAds Togo est une application de mise en relation entre des annonceurs (entreprises souhaitant promouvoir des produits/services) et des nano-influenceurs ("Ambassadeurs") qui partagent des contenus en statut WhatsApp ou en story Instagram et Facebook, et perçoivent une rémunération après vérification et validation de leurs vues.
@@ -77,7 +77,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   <div id="eligibilite" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
                           <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">02</span>
-                          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Éligibilité des Ambassadeurs</h2>
+                          <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Éligibilité des Ambassadeurs</h2>
                       </div>
                       <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-4">
                           <p className="text-slate-600 leading-relaxed font-medium">
@@ -93,20 +93,20 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   <div id="remuneration" className="space-y-6 scroll-mt-28">
                       <div className="flex items-center gap-3">
                         <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">03</span>
-                        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Rémunération & Paiements</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Rémunération & Paiements</h2>
                       </div>
                       <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                         <div className="flex items-start gap-4">
                             <CheckCircle size={20} className="text-green-500 shrink-0 mt-1" />
                             <div>
-                                <h4 className="font-black text-slate-900 mb-2 uppercase text-xs tracking-widest">Calcul des gains</h4>
+                                <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-widest">Calcul des gains</h4>
                                 <p className="text-sm text-slate-600 leading-relaxed italic">Les gains sont indexés sur la qualité et la quantité de l'audience réelle constatée. Chaque campagne définit ses propres tarifs (Forfait ou Par Vues).</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4 border-t border-slate-200 pt-6">
                             <Lock size={20} className="text-indigo-500 shrink-0 mt-1" />
                             <div>
-                                <h4 className="font-black text-slate-900 mb-2 uppercase text-xs tracking-widest">Retraits (Seuil)</h4>
+                                <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-widest">Retraits (Seuil)</h4>
                                 <p className="text-sm text-slate-600 leading-relaxed italic">Le seuil minimum pour effectuer un retrait est fixé à <strong>2 000 FCFA</strong>. Les paiements sont traités via T-Money ou Flooz dans un délai de 24 à 72 heures ouvrées.</p>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                       <div className="relative z-10 space-y-8">
                           <div className="flex items-center gap-4 text-red-600">
                              <div className="bg-red-600 p-2 rounded-xl text-white shadow-lg"><ShieldAlert size={28} /></div>
-                             <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight leading-none">Tolérance Zéro Anti-Fraude</h2>
+                             <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-tight leading-none">Tolérance Zéro Anti-Fraude</h2>
                           </div>
 
                           <p className="text-red-900 text-lg font-bold leading-relaxed italic">
@@ -136,7 +136,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                                 <div key={i} className="flex gap-3 bg-white/40 p-4 rounded-2xl border border-red-200 group-hover:bg-white/60 transition-all">
                                     <X size={18} className="text-red-600 shrink-0 mt-1" />
                                     <div>
-                                        <h5 className="font-black text-red-900 text-xs mb-0.5">{rule.title}</h5>
+                                        <h5 className="font-bold text-red-900 text-xs mb-0.5">{rule.title}</h5>
                                         <p className="text-[10px] text-red-700 font-bold opacity-70 uppercase">{rule.desc}</p>
                                     </div>
                                 </div>
@@ -145,7 +145,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
 
                           <div className="bg-red-900 p-8 rounded-3xl text-white space-y-6 relative overflow-hidden">
                               <div className="absolute bottom-0 right-0 opacity-10"><Lock size={120} /></div>
-                              <h4 className="text-xl font-black text-center uppercase tracking-tighter">Notre Technologie IA</h4>
+                              <h4 className="text-xl font-bold text-center uppercase tracking-tighter">Notre Technologie IA</h4>
                               <p className="text-sm font-medium leading-relaxed opacity-90 italic">
                                   Nos algorithmes analysent les métadonnées de chaque image soumise (EXIF, Pixels, Profondeur). Nous détectons automatiquement 99% des tentatives de fraude visuelle.
                               </p>
@@ -160,7 +160,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
                   <div id="resiliation" className="space-y-6 scroll-mt-28 pb-10">
                       <div className="flex items-center gap-3">
                         <span className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">05</span>
-                        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Résiliation de Compte</h2>
+                        <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">Résiliation de Compte</h2>
                       </div>
                       <p className="text-slate-600 leading-relaxed font-medium">
                           Vous pouvez fermer votre compte SikaAds à tout moment via l'application. SikaAds se réserve le droit de suspendre tout compte inactif pendant plus de 12 mois.
@@ -173,7 +173,7 @@ const TermsView: React.FC<TermsViewProps> = ({ onNavigate, onStart }) => {
 
       {/* Bottom CTA */}
       <section className="py-24 bg-slate-50 text-center container mx-auto px-6 rounded-[4rem] mb-10">
-          <h3 className="text-3xl font-black text-slate-900 mb-8 max-w-xl mx-auto">
+          <h3 className="text-3xl font-bold text-slate-900 mb-8 max-w-xl mx-auto">
               En utilisant SikaAds, vous participez à une communauté de confiance.
           </h3>
           <button onClick={onStart} className="px-12 py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-black hover:scale-105 transition-all">

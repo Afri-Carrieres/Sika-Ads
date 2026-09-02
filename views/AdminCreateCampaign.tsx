@@ -159,7 +159,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                 <AlertTriangle size={24} className="text-white" />
             </div>
             <div>
-                <h3 className="font-black uppercase tracking-widest text-sm">Mode Administrateur</h3>
+                <h3 className="font-bold uppercase tracking-widest text-sm">Mode Administrateur</h3>
                 <p className="text-xs text-red-100 font-medium">Vous créez une campagne VIP qui sera immédiatement active.</p>
             </div>
         </div>
@@ -170,7 +170,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
       </div>
 
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight">Nouvelle Campagne VIP</h2>
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Nouvelle Campagne VIP</h2>
         <button onClick={onCancel} className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-gray-600 shadow-sm transition-all">
             <X size={20} />
         </button>
@@ -404,7 +404,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                              <Crown size={16} className="text-yellow-400" />
                              <p className="text-indigo-300 text-[10px] font-black uppercase tracking-[0.2em]">Aperçu VIP</p>
                         </div>
-                        <h3 className="text-2xl font-black tracking-tight">{title || "Titre Campagne"}</h3>
+                        <h3 className="text-2xl font-bold tracking-tight">{title || "Titre Campagne"}</h3>
                     </div>
 
                     <div className="space-y-6">

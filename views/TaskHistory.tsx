@@ -497,7 +497,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3">
                 <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600"><BrainCircuit size={20} /></div>
-                <div><h3 className="text-xl font-black text-gray-900 tracking-tight">Analyse Intelligente</h3><p className="text-xs text-gray-500 font-medium">{analysisProof.campaignName}</p></div>
+                <div><h3 className="text-xl font-bold text-gray-900 tracking-tight">Analyse Intelligente</h3><p className="text-xs text-gray-500 font-medium">{analysisProof.campaignName}</p></div>
               </div>
               <button onClick={() => setAnalysisProof(null)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
             </div>
@@ -517,7 +517,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
               </div>
               {analysisProof.aiAnalysis.viewsCount > 0 && <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100"><span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Vues Détectées</span><span className="text-lg font-black text-gray-900">{analysisProof.aiAnalysis.viewsCount} vues</span></div>}
               <div className="space-y-2">
-                <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest flex items-center gap-2"><FileText size={14} className="text-gray-400" />Rapport détaillé</h4>
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2"><FileText size={14} className="text-gray-400" />Rapport détaillé</h4>
                 <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 text-sm text-gray-700 leading-relaxed font-medium">"{analysisProof.aiAnalysis.reason}"</div>
               </div>
               <button onClick={() => setAnalysisProof(null)} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 active:scale-95 transition-all">Fermer</button>
@@ -534,7 +534,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
             <div className="p-8 md:p-10 space-y-8">
               <div className="flex items-center gap-3">
                 <div className="bg-indigo-600 p-2 rounded-xl text-white"><Upload size={20} /></div>
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">Nouvelle Preuve</h3>
+                <h3 className="text-xl font-bold text-gray-900 tracking-tight">Nouvelle Preuve</h3>
               </div>
               <div className="space-y-6">
                 <label className="block">
@@ -615,7 +615,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
             <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto text-red-500 mb-6">
               <Trash2 size={32} />
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">Êtes-vous sûr ?</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Êtes-vous sûr ?</h3>
             <p className="text-gray-500 text-sm font-medium mb-8 leading-relaxed">
               Voulez-vous vraiment supprimer cette preuve ? Cette action est irréversible.
             </p>

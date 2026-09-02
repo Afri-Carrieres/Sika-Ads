@@ -42,7 +42,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-2xl font-black text-gray-900 leading-tight">Vérifiez votre email</h2>
+          <h2 className="text-2xl font-bold text-gray-900 leading-tight">Vérifiez votre email</h2>
           <p className="text-gray-500 font-medium leading-relaxed">
             Nous vous avons envoyé un email de vérification à <br/>
             <span className="text-indigo-600 font-bold">{email || 'votre adresse email'}</span>.

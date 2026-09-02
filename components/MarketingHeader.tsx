@@ -37,7 +37,7 @@ const MarketingHeader: React.FC<MarketingHeaderProps> = ({ onNavigate, onStart, 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <button
             onClick={() => onNavigate('landing')}
-            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 rounded-lg"
+            className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] rounded-lg"
           >
             <img className="w-36 sm:w-40 h-auto object-contain" src="/Header-LogoSika-Ads.png" alt="Logo Sika Ads" />
           </button>
@@ -45,7 +45,7 @@ const MarketingHeader: React.FC<MarketingHeaderProps> = ({ onNavigate, onStart, 
           <nav className="hidden md:flex items-center gap-8" aria-label="Navigation principale">
             {NAV_ITEMS.map((item) =>
               item.view === active ? (
-                <span key={item.view} aria-current="page" className="text-sm font-bold text-[#128785]">
+                <span key={item.view} aria-current="page" className="text-sm font-bold text-[#128686]">
                   {item.label}
                 </span>
               ) : (
@@ -63,8 +63,8 @@ const MarketingHeader: React.FC<MarketingHeaderProps> = ({ onNavigate, onStart, 
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={onStart}
-              style={{ backgroundColor: '#ea580c' }}
-              className="flex gap-1 items-center justify-center py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+              style={{ backgroundColor: '#F65E06' }}
+              className="flex gap-1 items-center justify-center py-2 px-4 rounded-xl text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686]"
             >
               Commencer
               <LogInIcon className="w-4" />
@@ -73,10 +73,10 @@ const MarketingHeader: React.FC<MarketingHeaderProps> = ({ onNavigate, onStart, 
 
           <button
             onClick={() => setMenuOpen(true)}
-            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-100 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686]"
             aria-label="Ouvrir le menu"
           >
-            <Menu className="w-6 h-6 text-[#ea580c]" />
+            <Menu className="w-6 h-6 text-[#F65E06]" />
           </button>
         </div>
       </header>

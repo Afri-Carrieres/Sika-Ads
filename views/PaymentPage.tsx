@@ -234,7 +234,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
 
             {/* Title */}
             <div>
-              <h3 className="text-4xl font-black text-gray-900 leading-tight">Demande de paiement!</h3>
+              <h3 className="text-4xl font-bold text-gray-900 leading-tight">Demande de paiement!</h3>
               <p className="text-gray-600 font-medium mt-3 leading-relaxed text-sm">
                 Veuillez valider votre paiement sur votre portable. Ensuite recharger la page
               </p>
@@ -274,7 +274,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
               {resultPopup.type !== "error" ? <CheckCircle2 size={40} /> : <AlertCircle size={40} />}
             </div>
             <div>
-              <h3 className="text-2xl font-black text-gray-900 leading-tight">{resultPopup.title}</h3>
+              <h3 className="text-2xl font-bold text-gray-900 leading-tight">{resultPopup.title}</h3>
               <p className="text-gray-500 font-medium mt-2">{resultPopup.message}</p>
             </div>
 
@@ -324,7 +324,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                 <CreditCard size={12} />
                 Paiement Sécurisé
               </div>
-              <h1 className="text-3xl font-black text-gray-900 leading-tight">Checkout</h1>
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">Checkout</h1>
               <p className="text-gray-500 text-sm font-medium mt-1">Finalisez votre campagne SikaAds</p>
             </div>
 
@@ -422,7 +422,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                   <Loader2 size={22} className="shrink-0 mt-0.5 animate-spin" />
                 )}
                 <div>
-                  {status === "pending" && <h4 className="font-black text-sm uppercase tracking-wider mb-1">Ok!</h4>}
+                  {status === "pending" && <h4 className="font-bold text-sm uppercase tracking-wider mb-1">Ok!</h4>}
                   <p className={`text-xs font-bold leading-relaxed ${status === "pending" ? "opacity-90" : ""}`}>
                     {status === "pending"
                       ? "Veuillez valider votre paiement sur votre portable. Ensuite recharger la page."

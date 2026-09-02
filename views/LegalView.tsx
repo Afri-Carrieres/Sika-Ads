@@ -58,7 +58,7 @@ const SectionHeading: React.FC<{ n: number; title: string }> = ({ n, title }) =>
     <span className="w-8 h-8 shrink-0 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs">
       {String(n).padStart(2, '0')}
     </span>
-    <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{title}</h2>
+    <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{title}</h2>
   </div>
 );
 
@@ -143,7 +143,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
             {/* Sidebar (sticky, desktop) */}
             <div className="lg:col-span-1 border-r border-slate-100 pr-8 hidden lg:block">
               <div className="sticky top-28 space-y-6">
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Sommaire</h3>
                 <nav aria-label="Sommaire des mentions légales">
                   <ul className="space-y-2.5 text-sm font-bold text-slate-600 overflow-y-auto max-h-[60vh] pr-2 scrollbar-hide">
                     {TOC.map((item) => (
@@ -527,7 +527,7 @@ const LegalView: React.FC<LegalViewProps> = ({ onNavigate, onStart }) => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="bg-slate-50 text-center rounded-[4rem] py-16 px-6 sm:px-12">
-            <h2 className="font-heading text-3xl font-black text-slate-900 mb-4 max-w-xl mx-auto uppercase tracking-tight">
+            <h2 className="font-heading text-3xl font-bold text-slate-900 mb-4 max-w-xl mx-auto uppercase tracking-tight">
               Une question ?
             </h2>
             <p className="text-slate-600 font-medium mb-8 max-w-lg mx-auto">

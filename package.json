@@ -13,6 +13,8 @@
   "dependencies": {
     "@dataconnect/admin-generated": "file:src/dataconnect-admin-generated",
     "@dataconnect/generated": "file:src/dataconnect-generated",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
     "@google-cloud/firestore": "^9.0.0",
     "@google-cloud/storage": "^8.0.1",
     "@google/generative-ai": "^0.24.1",

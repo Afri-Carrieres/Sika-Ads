@@ -214,7 +214,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
               {/* Left column */}
               <div className="lg:col-span-2 space-y-8">
                 <div>
-                  <h2 className="font-heading text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight mb-4">
+                  <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 uppercase tracking-tight mb-4">
                     Nous sommes là pour vous aider
                   </h2>
                   <p className="text-slate-600 font-medium leading-relaxed">
@@ -272,7 +272,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                       <div className="w-20 h-20 mx-auto rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-6">
                         <CheckCircle2 size={40} className="text-emerald-500" />
                       </div>
-                      <h2 className="font-heading text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight mb-4">
+                      <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 uppercase tracking-tight mb-4">
                         Message envoyé !
                       </h2>
                       <p className="text-slate-600 font-medium leading-relaxed max-w-md mx-auto mb-3">
@@ -298,7 +298,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                     </div>
                   ) : (
                     <>
-                      <h2 className="font-heading text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight mb-6">
+                      <h2 className="font-heading text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-tight mb-6">
                         Contactez-nous
                       </h2>
 
@@ -353,7 +353,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
                         <h3
                           ref={headingRef}
                           tabIndex={-1}
-                          className="font-heading text-lg md:text-xl font-black text-slate-900 mb-1 focus:outline-none"
+                          className="font-heading text-lg md:text-xl font-bold text-slate-900 mb-1 focus:outline-none"
                         >
                           {stepTitles[step]}
                         </h3>
@@ -673,7 +673,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
         {/* ── FAQ ── */}
         <section className="py-16 sm:py-20 bg-slate-50">
           <div className="container mx-auto px-6 max-w-3xl">
-            <h2 className="font-heading text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight text-center mb-10">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 uppercase tracking-tight text-center mb-10">
               Questions fréquentes
             </h2>
             <div className="space-y-3">
@@ -716,7 +716,7 @@ const ContactView: React.FC<ContactViewProps> = ({ onNavigate, onStart }) => {
         <section className="py-24 bg-white">
           <div className="container mx-auto px-6">
             <div className="bg-slate-50 text-center rounded-[4rem] py-16 px-6 sm:px-12">
-              <h2 className="font-heading text-3xl font-black text-slate-900 mb-8 max-w-xl mx-auto uppercase tracking-tight">
+              <h2 className="font-heading text-3xl font-bold text-slate-900 mb-8 max-w-xl mx-auto uppercase tracking-tight">
                 Prêt à faire connaître votre marque ?
               </h2>
               <button

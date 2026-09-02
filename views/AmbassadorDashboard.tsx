@@ -303,7 +303,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
               <BellRing size={28} className="text-white" />
             </div>
             <div className="space-y-1 text-center md:text-left">
-              <h3 className="text-lg font-black tracking-tight leading-none flex items-center justify-center md:justify-start gap-2">
+              <h3 className="text-lg font-bold tracking-tight leading-none flex items-center justify-center md:justify-start gap-2">
                 Ne manquez plus aucun gain ! 💸
                 <Sparkles size={16} className="text-indigo-300" />
               </h3>
@@ -417,7 +417,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
                   <History size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-gray-900 tracking-tight leading-none">Historique Complet</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 tracking-tight leading-none">Historique Complet</h3>
                   <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">Suivi détaillé de vos gains SikaAds</p>
                 </div>
               </div>

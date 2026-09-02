@@ -129,13 +129,13 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
                 <Shield size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-black tracking-tight">SikaAds</h1>
+                <h1 className="text-xl font-bold tracking-tight">SikaAds</h1>
                 <p className="text-xs font-medium text-slate-400">Espace Administration</p>
               </div>
             </div>
 
             <div className="mt-12 max-w-xl">
-              <h2 className="text-4xl xl:text-[2.8rem] leading-[1.08] font-black">
+              <h2 className="text-4xl xl:text-[2.8rem] leading-[1.08] font-bold">
                 Acces<br />
                 <span className="text-red-400">Restreint</span>
               </h2>
@@ -185,7 +185,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/10 text-red-400">
                 <Shield size={28} />
               </div>
-              <h2 className="text-3xl font-black tracking-tight">Connexion Admin</h2>
+              <h2 className="text-3xl font-bold tracking-tight">Connexion Admin</h2>
               <p className="mt-3 text-sm font-medium leading-6 text-slate-400">
                 Identifiez-vous pour acceder au panneau d'administration.
               </p>

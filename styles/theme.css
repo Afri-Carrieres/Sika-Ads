@@ -4,34 +4,55 @@
 
 :root {
   --font-size: 16px;
-  --background: #f8faff;
-  --foreground: #0f1b35;
+
+  /* ── Sika Ads brand palette (source: Header-LogoSika-Ads.png) ── */
+  --sika-teal: #128686;
+  --sika-teal-dark: #0e6b6b;
+  --sika-teal-darker: #0a4f50;
+  --sika-teal-light: #2ba8a8;
+  --sika-teal-lighter: #e7f4f4;
+  --sika-teal-soft: rgba(18, 134, 134, 0.08);
+  --sika-orange: #f65e06;
+  --sika-orange-dark: #d14e04;
+  --sika-orange-darker: #a93d00;
+  --sika-orange-light: #fb7a28;
+  --sika-orange-soft: rgba(246, 94, 6, 0.1);
+  --sika-navy: #0a2e38;
+  --sika-navy-deep: #062127;
+  --sika-navy-soft: #103b47;
+  --sika-white: #ffffff;
+  --sika-gray: #5b6b74;
+  --sika-gray-light: #f3f7f6;
+
+  /* ── Semantic mapping ── */
+  --background: #f6faf9;
+  --foreground: #0b2b33;
   --card: #ffffff;
-  --card-foreground: #0f1b35;
+  --card-foreground: #0b2b33;
   --popover: #ffffff;
-  --popover-foreground: #0f1b35;
-  --primary: #1e3a8a;
+  --popover-foreground: #0b2b33;
+  --primary: #128686;
   --primary-foreground: #ffffff;
-  --secondary: #ea580c;
+  --secondary: #f65e06;
   --secondary-foreground: #ffffff;
-  --muted: #e8eef8;
-  --muted-foreground: #6b7280;
-  --accent: #10b981;
+  --muted: #eaf2f0;
+  --muted-foreground: #5b6b74;
+  --accent: #2ba8a8;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(30, 58, 138, 0.12);
+  --border: rgba(10, 46, 56, 0.12);
   --input: transparent;
-  --input-background: #eef2fb;
-  --switch-background: #a0b4d6;
+  --input-background: #eef4f3;
+  --switch-background: #9fc7c5;
   --font-weight-medium: 600;
   --font-weight-normal: 400;
-  --ring: #1e3a8a;
-  --chart-1: #ea580c;
-  --chart-2: #10b981;
-  --chart-3: #1e3a8a;
-  --chart-4: #f59e0b;
-  --chart-5: #6366f1;
+  --ring: #128686;
+  --chart-1: #f65e06;
+  --chart-2: #128686;
+  --chart-3: #0e6b6b;
+  --chart-4: #fb7a28;
+  --chart-5: #2ba8a8;
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -119,6 +140,23 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Sika Ads brand tokens */
+  --color-sika-teal: var(--sika-teal);
+  --color-sika-teal-dark: var(--sika-teal-dark);
+  --color-sika-teal-darker: var(--sika-teal-darker);
+  --color-sika-teal-light: var(--sika-teal-light);
+  --color-sika-teal-lighter: var(--sika-teal-lighter);
+  --color-sika-orange: var(--sika-orange);
+  --color-sika-orange-dark: var(--sika-orange-dark);
+  --color-sika-orange-darker: var(--sika-orange-darker);
+  --color-sika-orange-light: var(--sika-orange-light);
+  --color-sika-navy: var(--sika-navy);
+  --color-sika-navy-deep: var(--sika-navy-deep);
+  --color-sika-navy-soft: var(--sika-navy-soft);
+  --color-sika-white: var(--sika-white);
+  --color-sika-gray: var(--sika-gray);
+  --color-sika-gray-light: var(--sika-gray-light);
 }
 
 @layer base {

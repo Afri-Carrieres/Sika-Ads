@@ -209,7 +209,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 leading-tight">Mes Campagnes créées</h1>
+          <h1 className="text-2xl font-bold text-slate-900 leading-tight">Mes Campagnes créées</h1>
           <p className="text-slate-500 text-sm mt-1">Suivez les performances de vos campagnes publicitaires et gérez vos paiements.</p>
         </div>
         <button
@@ -317,7 +317,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                   {/* Body Content */}
                   <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
                     <div>
-                      <h3 className="font-extrabold text-slate-800 text-lg leading-snug line-clamp-2">{campaign.title}</h3>
+                      <h3 className="font-bold text-slate-800 text-lg leading-snug line-clamp-2">{campaign.title}</h3>
                       <p className="text-slate-500 text-xs mt-1">Créée le {new Date(campaign.createdAt).toLocaleDateString('fr-FR')}</p>
                       <p className="text-slate-600 text-sm mt-3 line-clamp-3">{campaign.description}</p>
                     </div>

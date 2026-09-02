@@ -25,7 +25,7 @@ const SuccessCampaign: React.FC<SuccessCampaignProps> = ({ campaignId, amount, o
         </div>
         
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">Presque fini !</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Presque fini !</h1>
           <p className="text-gray-500 font-medium">Votre demande de campagne a été enregistrée avec succès.</p>
         </div>
 

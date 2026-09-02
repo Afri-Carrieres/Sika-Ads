@@ -91,7 +91,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           <button
             onClick={onClose}
             aria-label="Fermer le menu"
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 cursor-pointer"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] cursor-pointer"
           >
             <X className="w-5 h-5 text-slate-700" />
           </button>
@@ -107,11 +107,11 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 onNavigate(href);
                 onClose();
               }}
-              className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-left text-sm font-semibold text-slate-700 hover:text-indigo-600 hover:bg-slate-50 active:bg-slate-100 transition-all group"
+              className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-left text-sm font-semibold text-slate-700 hover:text-[#0e6b6b] hover:bg-slate-50 active:bg-slate-100 transition-all group"
               type="button"
             >
               <span>{label}</span>
-              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+              <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#128686] group-hover:translate-x-0.5 transition-all" />
             </button>
           ))}
         </nav>
@@ -123,10 +123,10 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               onClose();
               onCtaClick();
             }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-xl text-sm font-bold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#128686] cursor-pointer"
             style={{
-              backgroundColor: '#ea580c',
-              boxShadow: '0 8px 24px rgba(234, 88, 12, 0.35)',
+              backgroundColor: '#F65E06',
+              boxShadow: '0 8px 24px rgba(246, 94, 6, 0.35)',
             }}
           >
             <span>{ctaText}</span>

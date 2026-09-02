@@ -224,7 +224,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
               <span className="h-2 w-2 rounded-full bg-green-400" />
               Disponible au Togo
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.05] text-white max-w-4xl">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] text-white max-w-4xl">
               Gagnez de l'argent avec vos statuts WhatsApp.
             </h1>
             <p className="mt-7 max-w-2xl text-lg md:text-xl leading-relaxed text-white/75">
@@ -299,7 +299,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                 <Wallet size={24} />
               </div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-700 mb-3">Ambassadeurs</p>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-950 mb-4">Transformez votre audience en revenu.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-950 mb-4">Transformez votre audience en revenu.</h2>
               <p className="text-gray-600 leading-relaxed mb-7">
                 Choisissez une campagne, partagez le contenu sur vos statuts, envoyez votre preuve et recevez vos gains apres validation.
               </p>
@@ -314,7 +314,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                 <Megaphone size={24} />
               </div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-green-700 mb-3">Annonceurs</p>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-950 mb-4">Faites parler de votre offre localement.</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-950 mb-4">Faites parler de votre offre localement.</h2>
               <p className="text-gray-600 leading-relaxed mb-7">
                 Lancez une campagne, fixez votre budget et touchez des clients potentiels via le bouche-a-oreille digital.
               </p>
@@ -331,7 +331,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
         <div className="container mx-auto px-5">
           <div className="max-w-2xl mb-12">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-700 mb-3">Parcours ambassadeur</p>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-950 mb-4">Simple, verifiable, paye.</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-950 mb-4">Simple, verifiable, paye.</h2>
             <p className="text-gray-600 leading-relaxed">
               Le parcours est concu pour etre clair des le depart : la campagne indique le gain, la preuve attendue et les conditions.
             </p>
@@ -346,7 +346,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                   </div>
                   <span className="text-sm font-black text-gray-300">0{index + 1}</span>
                 </div>
-                <h3 className="font-black text-gray-950 mb-2">{title}</h3>
+                <h3 className="font-bold text-gray-950 mb-2">{title}</h3>
                 <p className="text-sm leading-relaxed text-gray-600">{text}</p>
               </div>
             ))}
@@ -359,7 +359,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
             <div className="max-w-2xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-700 mb-3">Campagnes exemple</p>
-              <h2 className="text-3xl md:text-5xl font-black text-gray-950 mb-4">Des offres concretes, des gains visibles.</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-950 mb-4">Des offres concretes, des gains visibles.</h2>
               <p className="text-gray-600 leading-relaxed">
                 Les ambassadeurs voient le type de campagne, le gain attendu et le budget avant de participer.
               </p>
@@ -389,7 +389,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                       </span>
                     </div>
                     <div className="p-5">
-                      <h3 className="font-black text-gray-950 mb-5">{campaign.title}</h3>
+                      <h3 className="font-bold text-gray-950 mb-5">{campaign.title}</h3>
                       <div className="grid grid-cols-2 gap-3 mb-5">
                         <div className="rounded-lg bg-indigo-50 p-3">
                           <p className="text-[10px] font-black uppercase tracking-widest text-indigo-700">Gain</p>
@@ -417,7 +417,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
           <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-green-700 mb-3">Confiance</p>
-              <h2 className="text-3xl md:text-5xl font-black text-gray-950 mb-5">Un systeme pense pour eviter les abus.</h2>
+              <h2 className="text-3xl md:text-5xl font-bold text-gray-950 mb-5">Un systeme pense pour eviter les abus.</h2>
               <p className="text-gray-600 leading-relaxed">
                 SikaAds protege les annonceurs et les ambassadeurs avec des regles simples : preuves obligatoires, verification, validation avant paiement et historique des campagnes.
               </p>
@@ -428,7 +428,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                   <div className="w-10 h-10 rounded-lg bg-white text-green-700 flex items-center justify-center mb-4 border border-gray-100">
                     <Icon size={20} />
                   </div>
-                  <h3 className="font-black text-gray-950 mb-2">{title}</h3>
+                  <h3 className="font-bold text-gray-950 mb-2">{title}</h3>
                   <p className="text-sm leading-relaxed text-gray-600">{text}</p>
                 </div>
               ))}
@@ -442,7 +442,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.2em] text-green-300 mb-3">Pour les annonceurs</p>
-              <h2 className="text-3xl md:text-5xl font-black mb-5">Votre campagne circule dans les conversations qui comptent.</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-5">Votre campagne circule dans les conversations qui comptent.</h2>
               <p className="text-white/70 leading-relaxed mb-8 max-w-2xl">
                 Au lieu d'une publicite froide, votre offre est partagee par des ambassadeurs locaux dans leurs statuts. Vous gardez le controle du budget et des preuves.
               </p>
@@ -459,7 +459,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
                       <Icon size={21} />
                     </div>
                     <div>
-                      <h3 className="font-black mb-1">{title}</h3>
+                      <h3 className="font-bold mb-1">{title}</h3>
                       <p className="text-sm leading-relaxed text-white/70">{text}</p>
                     </div>
                   </div>
@@ -474,7 +474,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
         <div className="container mx-auto px-5">
           <div className="max-w-2xl mb-10">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-700 mb-3">Temoignages</p>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-950">Ils utilisent deja SikaAds.</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-950">Ils utilisent deja SikaAds.</h2>
           </div>
 
           <div className="relative rounded-lg border border-gray-200 bg-gray-50 p-6 md:p-10">
@@ -520,7 +520,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
         <div className="container mx-auto px-5 max-w-3xl">
           <div className="mb-10 text-center">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-700 mb-3">FAQ</p>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-950">Questions frequentes</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-950">Questions frequentes</h2>
           </div>
           <div className="rounded-lg border border-gray-200 bg-white px-6">
             <FAQItem question="Comment est-ce que je recois mon argent ?" answer="Vos gains sont transferes sur votre numero T-Money ou Flooz apres validation et demande de retrait. Le seuil minimum est de 2 000 FCFA." />
@@ -535,7 +535,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart, onAdvertise, user, s
       <section className="py-20 bg-white">
         <div className="container mx-auto px-5">
           <div className="rounded-lg bg-gray-950 px-6 py-12 md:p-14 text-center text-white">
-            <h2 className="text-3xl md:text-5xl font-black mb-5">Pret a essayer SikaAds ?</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mb-5">Pret a essayer SikaAds ?</h2>
             <p className="max-w-2xl mx-auto text-white/70 leading-relaxed mb-8">
               Rejoignez les ambassadeurs qui monetisent leur audience, ou lancez une campagne locale avec un budget maitrise.
             </p>

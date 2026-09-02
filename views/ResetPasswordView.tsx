@@ -149,7 +149,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
               <Loader2 className="animate-spin" size={24} />
             </div>
             <p className="text-xs font-black uppercase tracking-[0.25em] text-slate-400">Sécurité</p>
-            <h2 className="mt-2 text-2xl font-black text-slate-950">Vérification de la session</h2>
+            <h2 className="mt-2 text-2xl font-bold text-slate-950">Vérification de la session</h2>
             <p className="mt-3 text-sm font-medium leading-6 text-slate-500">Nous validons votre lien de réinitialisation. Cela ne prendra qu’un instant.</p>
           </div>
         </div>
@@ -168,7 +168,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
               </button>
             </div>
             <div className="mt-8 max-w-xl">
-              <h1 className="text-4xl font-black leading-[1.08] tracking-tight xl:text-[2.6rem] font-display">
+              <h1 className="text-4xl font-bold leading-[1.08] tracking-tight xl:text-[2.6rem] font-display">
                 Réinitialisez votre accès<br />
                 <span className="text-[#128785]">en toute sécurité.</span>
               </h1>
@@ -197,7 +197,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
               <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-100 text-[#128785] shadow-sm">
                 <ShieldCheck size={24} />
               </div>
-              <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-950">Nouveau mot de passe</h2>
+              <h2 className="mt-6 text-3xl font-bold tracking-tight text-slate-950">Nouveau mot de passe</h2>
               <p className="mt-3 text-sm font-medium leading-6 text-slate-500">
                 {email ? `Réinitialisation pour ${email}` : 'Choisissez un mot de passe robuste pour sécuriser votre compte.'}
               </p>
@@ -209,7 +209,7 @@ const ResetPasswordView: React.FC<ResetPasswordViewProps> = ({ onSuccess, onBack
                   <CheckCircle2 size={32} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-950">Succès !</h3>
+                  <h3 className="text-xl font-bold text-slate-950">Succès !</h3>
                   <p className="mt-2 text-sm font-bold leading-6 text-slate-600">Votre mot de passe a été modifié avec succès.</p>
                 </div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Redirection vers la connexion dans quelques secondes...</p>

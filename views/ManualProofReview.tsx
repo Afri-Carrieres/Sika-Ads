@@ -57,7 +57,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
             <Zap size={24} />
           </div>
-          <h1 className="text-3xl font-black">Révision Manuelle</h1>
+          <h1 className="text-3xl font-bold">Révision Manuelle</h1>
         </div>
         <p className="text-blue-100 font-medium">Preuves nécessitant une intervention humaine pour la validation finale</p>
       </div>
@@ -132,7 +132,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
       {manualReviewProofs.length === 0 ? (
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-12 text-center">
           <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-4" />
-          <h3 className="text-lg font-black text-gray-900 mb-2">Aucune preuve à examiner</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Aucune preuve à examiner</h3>
           <p className="text-gray-500 font-medium">Excellente nouvelle ! Toutes les preuves en révision manuelle ont été traitées.</p>
         </div>
       ) : (
@@ -152,7 +152,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-black text-lg text-gray-900">{proof.userName}</h3>
+                      <h3 className="font-bold text-lg text-gray-900">{proof.userName}</h3>
                       {proof.aiAnalysis?.fraudAlert && (
                         <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-black uppercase tracking-widest">
                           ⚠ Fraude
@@ -203,7 +203,7 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                   {/* Scores de confiance granulaires */}
                   {proof.aiAnalysis && (
                     <div className="bg-white rounded-2xl p-6 space-y-4">
-                      <h4 className="text-sm font-black text-gray-900 mb-4">Analyse IA détaillée</h4>
+                      <h4 className="text-sm font-bold text-gray-900 mb-4">Analyse IA détaillée</h4>
 
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="bg-gray-50 rounded-xl p-4">

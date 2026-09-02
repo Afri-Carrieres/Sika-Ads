@@ -141,7 +141,7 @@ const StrategyNotes: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Notes de Stratégie</h2>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Notes de Stratégie</h2>
           <p className="text-gray-500 text-sm font-medium">Sauvegardez vos meilleures accroches et idées marketing.</p>
         </div>
         <button 
@@ -210,7 +210,7 @@ const StrategyNotes: React.FC = () => {
                 <div className="bg-indigo-100 p-2 rounded-xl text-indigo-600">
                   {editingNote ? <Edit3 size={20} /> : <PenTool size={20} />}
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
                   {editingNote ? 'Modifier la note' : 'Nouvelle Idée'}
                 </h3>
               </div>

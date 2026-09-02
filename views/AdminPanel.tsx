@@ -998,7 +998,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">{confirmModal.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 tracking-tight">{confirmModal.title}</h3>
                 <p className="text-sm text-gray-600 font-medium mt-2 leading-relaxed">{confirmModal.message}</p>
               </div>
               <button
@@ -1043,7 +1043,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ── HEADER ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
             {view === 'overview' && `Espace ${isSuperAdmin ? 'Administrateur' : 'Modérateur'}`}
             {view === 'users' && 'Utilisateurs & Ambassadeurs'}
             {view === 'payouts' && 'Gestion des Finances'}
@@ -1405,7 +1405,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         <div className="space-y-6">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
                 <Megaphone className="text-indigo-600" />
                 Liste des Campagnes
               </h3>
@@ -1572,7 +1572,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <span className="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center">
                     <Pencil size={18} className="text-indigo-600" />
                   </span>
-                  <h2 className="font-black text-gray-900 text-lg">Modifier la campagne</h2>
+                  <h2 className="font-bold text-gray-900 text-lg">Modifier la campagne</h2>
                 </div>
                 <div className="space-y-3">
                   <div>
@@ -1646,7 +1646,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                       <BarChart2 size={18} className="text-blue-600" />
                     </span>
                     <div>
-                      <h2 className="font-black text-gray-900 text-lg">Statistiques</h2>
+                      <h2 className="font-bold text-gray-900 text-lg">Statistiques</h2>
                       <p className="text-xs text-gray-400 font-medium">{statsCampaign.title}</p>
                     </div>
                   </div>
@@ -1696,7 +1696,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <h2 className="font-black text-gray-900 text-xl">Supprimer la campagne ?</h2>
+                  <h2 className="font-bold text-gray-900 text-xl">Supprimer la campagne ?</h2>
                   <p className="text-sm text-gray-500 font-medium leading-relaxed">
                     Vous êtes sur le point de supprimer <span className="font-bold text-gray-700">"{deletingCampaign.title}"</span>. Cette action est irréversible.
                   </p>
@@ -1741,7 +1741,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         <div className="space-y-8">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
                 <ShieldCheck className="text-indigo-600" />
                 Membres de l'Équipe Administrative
               </h3>
@@ -1812,7 +1812,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="bg-indigo-600 text-white p-8 rounded-[2rem] shadow-xl shadow-indigo-100 flex items-center justify-between relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-indigo-200 text-[10px] font-black uppercase tracking-widest mb-1">Croissance Communauté</p>
-              <h3 className="text-5xl font-black tracking-tighter">Total Inscrits : {stats.totalInscrits}</h3>
+              <h3 className="text-5xl font-bold tracking-tighter">Total Inscrits : {stats.totalInscrits}</h3>
             </div>
             <Users size={80} className="text-white/10 absolute -right-4 -bottom-4 -rotate-12" />
           </div>
@@ -1951,7 +1951,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="xl:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
                 <div>
-                  <h3 className="font-black text-gray-900 tracking-tight">Top 10 des Ambassadeurs</h3>
+                  <h3 className="font-bold text-gray-900 tracking-tight">Top 10 des Ambassadeurs</h3>
                   <p className="text-xs text-gray-400 font-medium mt-1">Classés par gains totaux générés</p>
                 </div>
                 <div className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest">Performances</div>
@@ -1990,7 +1990,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             {/* Aide-mémoire Finance */}
             <div className="bg-indigo-900 rounded-[2.5rem] h-96 p-8 text-white space-y-8 relative overflow-hidden shadow-2xl">
               <div className="relative z-10">
-                <h3 className="text-2xl font-black mb-6 leading-tight">Comprendre vos Finances</h3>
+                <h3 className="text-2xl font-bold mb-6 leading-tight">Comprendre vos Finances</h3>
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">Formule Profit</p>
@@ -2052,7 +2052,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {/* Table des retraits */}
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
                 <Wallet className="text-indigo-600" />
                 Demandes de Retraits
               </h3>
@@ -2292,7 +2292,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {/* Table des paiements */}
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-              <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
                 <CreditCard className="text-indigo-600" />
                 Paiements des Campagnes Utilisateurs
               </h3>
@@ -2384,7 +2384,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <div className="bg-indigo-50 p-6 rounded-3xl text-indigo-600 mb-6">
                 <ShieldCheck size={48} />
               </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-2">Vérificateur de Statut GomboPlus</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Vérificateur de Statut GomboPlus</h3>
               <p className="text-gray-500 max-w-md font-medium">
                 Saisissez une référence de transaction pour interroger directement l'API GomboPlus et voir les détails.
               </p>
@@ -2415,7 +2415,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {gomboCheckResult && (
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
-                <h3 className="font-black text-gray-900 tracking-tight flex items-center gap-3">
+                <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
                   <Activity className="text-indigo-600" />
                   Détails de la Transaction
                 </h3>
@@ -2539,7 +2539,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </div>
                   <div className="flex-1 p-8 flex flex-col">
                     <div className="mb-4">
-                      <h3 className="font-black text-lg text-gray-900 leading-none">{proof.userName}</h3>
+                      <h3 className="font-bold text-lg text-gray-900 leading-none">{proof.userName}</h3>
                       <p className="text-xs text-indigo-600 font-black uppercase tracking-widest mt-2">{proof.campaignName}</p>
                       <p className="text-[10px] text-gray-400 font-medium mt-1">
                         {new Date(proof.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -2703,7 +2703,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 <X size={24} />
               </button>
             </div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">Ajouter un Modérateur</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Ajouter un Modérateur</h3>
             <p className="text-gray-500 text-sm font-medium mb-6">Saisissez l'adresse email d'un utilisateur existant pour l'élever au rang de Staff.</p>
             <div className="space-y-4">
               <div className="relative">
@@ -2754,7 +2754,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 <X size={22} className="text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-gray-900">Refuser la preuve</h3>
+                <h3 className="text-lg font-bold text-gray-900">Refuser la preuve</h3>
                 <p className="text-xs text-gray-400 font-medium">{rejectingProof.userName} · {rejectingProof.campaignName}</p>
               </div>
             </div>
@@ -2799,7 +2799,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <Check size={22} className="text-indigo-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-gray-900">Valider la preuve</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Valider la preuve</h3>
                   <p className="text-xs text-gray-400 font-medium">{validatingProof.userName} · {validatingProof.campaignName}</p>
                 </div>
               </div>

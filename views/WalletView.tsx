@@ -140,7 +140,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
             <CheckCircle2 size={56} />
           </div>
           <div className="space-y-2">
-            <h2 className="text-3xl font-black text-gray-900 leading-tight">Demande Reçue !</h2>
+            <h2 className="text-3xl font-bold text-gray-900 leading-tight">Demande Reçue !</h2>
             <p className="text-gray-500 font-medium">Votre retrait de <span className="text-indigo-600 font-bold">{numericAmount.toLocaleString()} FCFA</span> via {provider === 'yas' ? 'Mixx by YAS' : 'Moov Money'} est enregistré.</p>
           </div>
           <div className="bg-indigo-50 p-6 rounded-2xl flex items-center gap-4 text-left border border-indigo-100">
@@ -162,7 +162,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
     <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Mon Portefeuille</h2>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Mon Portefeuille</h2>
           <p className="text-gray-500 text-sm font-medium">Suivez vos gains et retirez votre cash instantanément.</p>
         </div>
         {!canWithdraw && (
@@ -179,7 +179,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
           <div className="bg-indigo-600 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-indigo-100 relative overflow-hidden group">
             <div className="relative z-10 space-y-1">
               <p className="text-indigo-200 text-[10px] font-black uppercase tracking-[0.25em]">Solde Disponible</p>
-              <h3 className="text-5xl font-black tracking-tighter">{userData.balance.toLocaleString()} <span className="text-2xl opacity-70">F CFA</span></h3>
+              <h3 className="text-5xl font-bold tracking-tighter">{userData.balance.toLocaleString()} <span className="text-2xl opacity-70">F CFA</span></h3>
             </div>
             <div className="pt-12 relative z-10 flex items-center justify-between">
               <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20">
@@ -194,7 +194,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
           </div>
 
           <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm space-y-4">
-            <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
               <History size={14} />
               Historique récent
             </h4>
@@ -233,7 +233,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
         <div className="lg:col-span-3">
           <div className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-sm space-y-10">
             <div className="space-y-2">
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">Demander un Retrait</h3>
+              <h3 className="text-xl font-bold text-gray-900 tracking-tight">Demander un Retrait</h3>
               <p className="text-sm text-gray-500 font-medium">Sélectionnez votre opérateur et le montant souhaité.</p>
             </div>
 
