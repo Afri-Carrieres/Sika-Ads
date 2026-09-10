@@ -13,13 +13,13 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   // --- Constants & Math Logic ---
   const CPV = 5; // Coût par vue
   const VIEWS_PER_AMBASSADOR = 20; // Estimation moyenne
-  const MIN_BUDGET = 2500;
+  const MIN_BUDGET = 1000;
   const MAX_BUDGET = 50000;
 
   const [category, setCategory] = useState('');
 
   const PACKS = [
-    { id: 'starter', label: 'Starter', price: 2500, color: 'bg-blue-50 border-blue-200 text-blue-400' },
+    { id: 'starter', label: 'Starter', price: 1000, color: 'bg-blue-50 border-blue-200 text-blue-400' },
     { id: 'boost', label: 'Boost', price: 5000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
     { id: 'business', label: 'Business', price: 25000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
     { id: 'pro', label: 'Pro', price: 50000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
@@ -29,7 +29,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   const [step, setStep] = useState(1); // 1: Budget, 2: Details
 
   // Budget State
-  const [budget, setBudget] = useState<number>(2500);
+  const [budget, setBudget] = useState<number>(1000);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [selectedPackId, setSelectedPackId] = useState<string | null>('starter');
   const [budgetError, setBudgetError] = useState<string>('');
