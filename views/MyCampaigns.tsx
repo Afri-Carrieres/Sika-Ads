@@ -111,6 +111,19 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
 
   const getStatusBadge = (campaign: Campaign) => {
     // 1. Check payment status first
+    const isFailed = campaign.paymentStatus === 'failed' || 
+                     campaign.campaignPaymentStatus === 'payment_failed' || 
+                     campaign.status === 'failed';
+
+    if (isFailed) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+          <XCircle size={12} />
+          Paiement échoué
+        </span>
+      );
+    }
+
     const isUnpaid = campaign.paymentStatus === 'pending_payment' || 
                     campaign.campaignPaymentStatus === 'pending_payment';
 
@@ -289,6 +302,9 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
               const validatedViews = campaign.viewsCurrent ?? 0;
               const target = campaign.targetViews || 1;
               const progress = Math.min(100, Math.round((validatedViews / target) * 100));
+              const isFailed = campaign.paymentStatus === 'failed' || 
+                               campaign.campaignPaymentStatus === 'payment_failed' || 
+                               campaign.status === 'failed';
               const isUnpaid = campaign.paymentStatus === 'pending_payment' || 
                               campaign.campaignPaymentStatus === 'pending_payment';
 
@@ -323,7 +339,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                     </div>
 
                     {/* Progress bar (vues validées vs objectif) */}
-                    {!isUnpaid && (
+                    {!isUnpaid && !isFailed && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                           <span className="flex items-center gap-1">
@@ -369,14 +385,18 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({ onRetryPayment, onNavigateToC
                     </div>
 
                     {/* Action buttons */}
-                    {isUnpaid && (
+                    {(isUnpaid || isFailed) && (
                       <div className="pt-4">
                         <button
                           onClick={() => onRetryPayment(campaign.id, campaign.paymentAmount || campaign.totalBudget)}
-                          className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2 shadow-md shadow-amber-500/10 transition duration-200 cursor-pointer"
+                          className={`w-full py-3 text-white font-extrabold rounded-xl text-sm flex items-center justify-center gap-2 shadow-md transition duration-200 cursor-pointer ${
+                            isFailed
+                              ? 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-rose-500/10'
+                              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-amber-500/10'
+                          }`}
                         >
                           <CreditCard size={16} />
-                          Finaliser le paiement
+                          {isFailed ? 'Réessayer le paiement' : 'Finaliser le paiement'}
                         </button>
                       </div>
                     )}

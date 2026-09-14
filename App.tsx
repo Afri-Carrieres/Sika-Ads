@@ -236,6 +236,10 @@ const App: React.FC = () => {
       }
 
       if (user && userData && view === 'app') {
+        if (!isStaff && userData.status !== 'active') {
+          setView('verification-pending');
+          return;
+        }
         // PROTECTION RENFORCEE: Redirection immediate si non-staff essaie d'acceder aux routes admin
         if (!isStaff && currentTab.startsWith('admin')) {
           console.warn('[SECURITY] Non-staff user attempted to access admin route:', currentTab);
@@ -382,7 +386,7 @@ const App: React.FC = () => {
       localStorage.setItem('sikaads_last_tab', 'dashboard');
       setView(redirectAfterLogin || 'app');
     }} onCancel={() => setView('landing')} onGoToLogin={() => setView('login')} />;
-    if (view === 'verification-pending') return <VerificationPending email={user?.email} onGoToLogin={handleGoToLogin} onResend={handleResendVerification} />;
+    if (view === 'verification-pending') return <VerificationPending email={user?.email} ageVerification={userData?.status !== 'active'} onGoToLogin={handleGoToLogin} onResend={handleResendVerification} />;
     if (view === 'reset-password') return <ResetPasswordView onSuccess={() => setView('login')} onBackToLogin={() => setView('login')} />;
     // Handler appelé après validation du formulaire campagne (avant paiement)
     const handleCampaignFormSuccess = async (campaignDraft: Omit<Campaign, 'id'>, amount: number) => {
@@ -531,21 +535,35 @@ const App: React.FC = () => {
 
     // Handler annulation paiement
     const handlePaymentCancel = async () => {
-      if (user?.email && pendingCampaignId) {
+      if (pendingCampaignId) {
         try {
-          await supabase.functions.invoke('send-email', {
-            body: {
-              to: user.email,
-              type: 'payment_failed',
-              data: {
-                advertiserName: userData?.name || user.user_metadata?.full_name || 'Annonceur',
-                campaignTitle: 'Campagne non payée',
-                error: 'Paiement annulé par l\'utilisateur',
+          await supabase.from('campaigns').update({
+            paymentStatus: 'failed',
+            campaignPaymentStatus: 'payment_failed',
+            status: 'failed',
+            paymentError: 'Paiement annulé par l\'utilisateur',
+            updatedAt: new Date().toISOString(),
+          }).eq('id', pendingCampaignId);
+        } catch (dbErr) {
+          console.warn("Erreur mise à jour annulation campagne:", dbErr);
+        }
+
+        if (user?.email) {
+          try {
+            await supabase.functions.invoke('send-email', {
+              body: {
+                to: user.email,
+                type: 'payment_failed',
+                data: {
+                  advertiserName: userData?.name || user.user_metadata?.full_name || 'Annonceur',
+                  campaignTitle: 'Campagne non payée',
+                  error: 'Paiement annulé par l\'utilisateur',
+                }
               }
-            }
-          });
-        } catch (emailErr) {
-          console.warn("Échec envoi email annulation paiement:", emailErr);
+            });
+          } catch (emailErr) {
+            console.warn("Échec envoi email annulation paiement:", emailErr);
+          }
         }
       }
       setShowPayment(false);

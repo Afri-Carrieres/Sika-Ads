@@ -17,7 +17,8 @@ import {
   Users,
   Landmark,
   EyeOff,
-  Eye
+  Eye,
+  FileText
 } from 'lucide-react';
 
 
@@ -48,6 +49,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
   // Step 3 Data (Payment)
   const [paymentMethod, setPaymentMethod] = useState<'Mixx' | 'Moov' | ''>('');
   const [momoNumber, setMomoNumber] = useState('');
+  const [identityDocument, setIdentityDocument] = useState<File | null>(null);
 
   const cities = ['Lomé', 'Kara', 'Sokodé', 'Kpalimé', 'Atakpamé', 'Dapaong', 'Autre'];
   const ageRanges = ['18-20', '21-30', '31-45', '45+'];
@@ -76,6 +78,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
       // Final step: Create user in Supabase
       setLoading(true);
       try {
+        if (!identityDocument) {
+          setError('Veuillez joindre une pièce d’identité pour vérifier votre majorité.');
+          setLoading(false);
+          return;
+        }
         // Generate referral code BEFORE signUp so it can be stored in user_metadata
         const referralCode = (name.substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
 
@@ -117,6 +124,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
         // ── Cas où email_confirmations est désactivé (user renvoyé immédiatement) ──
         const uid = user.id;
+        const documentPath = `${uid}/${crypto.randomUUID()}-${identityDocument.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const { error: uploadError } = await supabase.storage
+          .from('identity-documents')
+          .upload(documentPath, identityDocument, { upsert: false, contentType: identityDocument.type });
+        if (uploadError) throw uploadError;
 
         // --- CREATE USER PROFILE ---
         // ⚠️ Colonnes réelles de la table (voir migration 20260702_create_users.sql)
@@ -127,13 +139,15 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
           email,
           momoNumber,
           role: 'AMBASSADOR',
-          status: 'active',
+          status: 'pending_verification',
           balance: 0,
           totalEarned: 0,
           clicks: 0,
           referralCode: referralCode,
           referralCount: 0,
           referralEarnings: 0,
+          verification_document_path: documentPath,
+          verification_submitted_at: new Date().toISOString(),
         });
         if (dbErr) throw dbErr;
 
@@ -152,7 +166,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
         }
 
         // Redirect into the app (compte déjà vérifié, confirmations désactivées)
-        onComplete('dashboard');
+        onComplete('verification');
       } catch (err: any) {
         console.error("Registration error:", err);
         // Translate Supabase weak password error to French
@@ -171,22 +185,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
   };
 
   const handleGoogleSignup = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const { error: err } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/app`
-        }
-      });
-      if (err) throw err;
-    } catch (err: any) {
-      console.error("Google signup error:", err);
-      setError('Impossible de s\'inscrire avec Google: ' + err.message);
-    } finally {
-      setLoading(false);
-    }
+    setError('Pour vérifier votre majorité, inscrivez-vous avec votre email et joignez une pièce d’identité.');
   };
 
   const handlePrevStep = () => {
@@ -313,7 +312,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                 <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
                   <button
                     onClick={handleGoogleSignup}
-                    disabled={loading}
+                    disabled
                     className="w-full py-4 bg-white border border-gray-200 text-gray-700 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 active:scale-95"
                   >
                     {loading ? <Loader2 className="animate-spin text-gray-400" size={20} /> : (
@@ -546,6 +545,17 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                       />
                     </div>
                   </label>
+
+                  <label className="block">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Pièce d'identité</span>
+                    <div className="rounded-2xl border border-dashed border-[#128686]/40 bg-[#E7F4F4]/40 p-5">
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-[#128686] shrink-0" size={22} />
+                        <input type="file" accept="image/jpeg,image/png,application/pdf" onChange={(e) => setIdentityDocument(e.target.files?.[0] || null)} className="w-full text-sm font-medium text-gray-600 file:mr-3 file:rounded-xl file:border-0 file:bg-[#128686] file:px-3 file:py-2 file:font-bold file:text-white" />
+                      </div>
+                      <p className="mt-2 text-[10px] font-medium text-gray-500">JPG, PNG ou PDF, 5 Mo maximum. Le document est utilisé uniquement pour confirmer votre majorité.</p>
+                    </div>
+                  </label>
                 </div>
               )}
             </div>
@@ -572,7 +582,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                   loading ||
                   (step === 1 && (!email || !password || !pwdStrong || password !== confirmPassword)) ||
                   (step === 2 && (!name || !gender || !city || !ageRange)) ||
-                  (step === 3 && (!paymentMethod || !momoNumber))
+                  (step === 3 && (!paymentMethod || !momoNumber || !identityDocument))
                 }
                 onClick={handleNextStep}
                 className="flex-1 py-4 bg-[#f55d05] text-white rounded-2xl font-bold uppercase tracking-widest text-sm shadow-xl shadow-[#062127]/30 hover:bg-[#f56505e3] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"

@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, Download, Facebook, Loader2, Lock, MessageCircle, Instagram, PartyPopper } from 'lucide-react';
+import { ArrowLeft, Check, Download, Facebook, Loader2, Lock, MessageCircle, Instagram, PartyPopper, Share2, Copy } from 'lucide-react';
 import { supabase } from '../supabase';
 import { Campaign } from '../types';
-import { platform } from 'os';
 
 interface CampaignShareOptionProps {
   campaignId: string;
@@ -193,43 +192,96 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
   }
 };
 
-  const handleShare = (platform: 'whatsapp' | 'facebook' | 'instagram') => {
+  const [guideMessage, setGuideMessage] = useState<string | null>(null);
+
+  const fetchImageAsFile = async (url: string, title: string): Promise<File> => {
+    const safeName = title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'image';
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+    const blob = await response.blob();
+    const ext = blob.type.split('/')[1]?.split('+')[0] || 'jpg';
+    return new File([blob], `sikaads-${safeName}.${ext}`, { type: blob.type || 'image/jpeg' });
+  };
+
+  const handleShare = async (platform: 'native' | 'whatsapp' | 'facebook' | 'instagram') => {
     if (!campaign || isLimitReached || isCampaignUnavailable) return;
 
     setIsSharing(true);
+    setGuideMessage(null);
 
-    navigator.clipboard.writeText(shareText)
-      .then(() => {
-        setCopyFeedback(true);
-        setTimeout(() => setCopyFeedback(false), 3000);
-      })
-      .catch((err) => {
-        console.warn('Erreur copie presse-papiers:', err);
-      });
-
-    if (platform === 'instagram') {
-      downloadImage(campaign.imageUrl, campaign.title);
+    // Always copy text to clipboard as safety net
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 3000);
+    } catch (err) {
+      console.warn('Erreur copie presse-papiers:', err);
     }
 
-    let url = '';
-    if (platform === 'whatsapp') {
-      // Ensure platform is visible in the tracking link
-      const shareTextWithPlatform = shareText.replace('?platform=whatsapp', '?platform=whatsapp');
-      url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTextWithPlatform)}`;
-    } else if (platform === 'facebook') {
-      url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink + '&platform=facebook')}`;
-    } else if (platform === 'instagram') {
-      url = 'https://www.instagram.com/';
+    let sharedViaFile = false;
+
+    // Try Web Share API with image file if on supported mobile browser
+    try {
+      const imageFile = await fetchImageAsFile(campaign.imageUrl, campaign.title);
+      if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+        await navigator.share({
+          title: campaign.title,
+          text: shareText,
+          files: [imageFile],
+        });
+        sharedViaFile = true;
+        setGuideMessage("Image et texte partagés avec succès ! Revenez envoyer votre preuve de vues dans 24h.");
+      }
+    } catch (err: any) {
+      if (err?.name === 'AbortError') {
+        // User closed the share sheet without picking an app
+        setIsSharing(false);
+        return;
+      }
+      console.info('Partage natif avec fichier indisponible, basculement en mode guidé:', err);
     }
 
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
+    // Fallback if native file share wasn't used
+    if (!sharedViaFile) {
+      // 1. Auto-download the campaign image so user has it in gallery
+      await downloadImage(campaign.imageUrl, campaign.title);
+
+      // 2. Open destination network
+      let url = '';
+      if (platform === 'whatsapp') {
+        const shareTextWithPlatform = shareText.replace('?platform=whatsapp', '?platform=whatsapp');
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTextWithPlatform)}`;
+        setGuideMessage("L'image a été téléchargée dans vos photos et le texte a été copié ! Ouvrez votre statut WhatsApp, sélectionnez l'image et collez la légende.");
+      } else if (platform === 'facebook') {
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink + '&platform=facebook')}`;
+        setGuideMessage("L'image a été téléchargée et le texte copié ! Créez une Story Facebook avec l'image téléchargée.");
+      } else if (platform === 'instagram') {
+        url = 'https://www.instagram.com/';
+        setGuideMessage("L'image a été téléchargée et le texte copié ! Ouvrez Instagram Stories, sélectionnez l'image et collez la légende.");
+      } else {
+        setGuideMessage("L'image a été téléchargée dans vos photos et le texte a été copié !");
+      }
+
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
     }
 
-    // Record share event (non-blocking)
+    // Record share event in database (non-blocking)
     (async () => {
       try {
-        await supabase.from('campaign_share_events').insert([{ campaign_id: campaign.id, platforms: platform, user_id: referrerId }]);
+        await supabase.from('campaign_share_events').insert([{
+          campaign_id: campaign.id,
+          platforms: platform === 'native' ? 'whatsapp' : platform,
+          user_id: referrerId
+        }]);
       } catch (err) {
         console.warn('Erreur enregistrement partage:', err);
       }
@@ -274,27 +326,63 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
       </button>
 
       {shareSuccess && (
-        <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-green-100 flex items-center gap-4">
-          <div className="bg-green-500 text-white p-3 rounded-2xl shadow-lg shadow-green-100">
+        <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-green-100 flex items-start gap-4">
+          <div className="bg-green-500 text-white p-3 rounded-2xl shadow-lg shadow-green-100 shrink-0">
             <PartyPopper size={22} />
           </div>
           <div className="flex-1">
             <p className="text-sm font-bold text-gray-900">C'est parti !</p>
-            <p className="text-xs text-gray-500 font-bold mt-1">Lien copié. Partage ouvert. Revenez envoyer votre preuve de vues dans 24h.</p>
+            <p className="text-xs text-gray-600 font-medium mt-1">
+              {guideMessage || "Lien copié & partage ouvert. N'oubliez pas d'attacher l'image à votre statut/story ! Revenez envoyer votre preuve de vues dans 24h."}
+            </p>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-8 items-start">
-        <div className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm">
-          <div className="relative h-72 md:h-[420px]">
-            <img src={campaign.imageUrl} className="w-full h-full object-cover" alt={campaign.title} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#A9DADA] mb-3">Partage de campagne</p>
-              <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-3">{campaign.title}</h2>
-              <p className="text-white/80 text-sm font-medium max-w-2xl leading-relaxed">{campaign.description}</p>
+        <div className="bg-white rounded-[2rem] overflow-hidden border border-gray-100 shadow-sm flex flex-col">
+          {/* Image container */}
+          <div className="relative w-full h-72 md:h-[420px] bg-gray-100 overflow-hidden">
+            <img
+              src={campaign.imageUrl}
+              className="w-full h-full object-cover"
+              alt={campaign.title}
+            />
+          </div>
+
+          {/* Details below image */}
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-[#E7F4F4] text-[#128686]">
+                Partage de campagne
+              </span>
+              {campaign.category && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600">
+                  {campaign.category}
+                </span>
+              )}
             </div>
+
+            <h2 className="text-2xl md:text-3xl font-extrabold leading-tight text-gray-900">
+              {campaign.title}
+            </h2>
+
+            <p className="text-gray-600 text-sm md:text-base font-normal leading-relaxed whitespace-pre-line">
+              {campaign.description}
+            </p>
+
+            {campaign.targetUrl && (
+              <div className="pt-2">
+                <a
+                  href={campaign.targetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#128686] hover:underline"
+                >
+                  Visiter le lien cible →
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
@@ -319,6 +407,22 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
             </div>
           )}
 
+          {/* Primary Action Button: Mobile Native Share with Image */}
+          <button
+            onClick={() => handleShare('native')}
+            disabled={isSharing || isLimitReached || isCampaignUnavailable}
+            className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl bg-[#128686] text-white hover:bg-[#0e6c6c] transition-all shadow-lg shadow-[#128686]/20 font-bold text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSharing ? <Loader2 size={18} className="animate-spin" /> : <Share2 size={18} />}
+            Partager l'affiche & le lien
+          </button>
+
+          <div className="relative flex py-1 items-center">
+            <div className="flex-grow border-t border-gray-100"></div>
+            <span className="flex-shrink mx-3 text-[10px] uppercase font-bold text-gray-400 tracking-wider">ou par réseau</span>
+            <div className="flex-grow border-t border-gray-100"></div>
+          </div>
+
           <div className="space-y-3">
             <button
               onClick={() => handleShare('whatsapp')}
@@ -327,8 +431,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
             >
               <span className="flex items-center gap-3 text-sm font-bold text-green-800 uppercase tracking-widest">
                 <span className="bg-[#25D366] text-white p-3 rounded-xl">
-                    <img src="/icons-whatsapp.png" alt="WhatsApp" className='h-6 w-6'/>
-                  {/* {isSharing ? <Loader2 size={22} className="animate-spin" /> : <MessageCircle size={22} />} */}
+                  <img src="/icons-whatsapp.png" alt="WhatsApp" className='h-6 w-6'/>
                 </span>
                 Statut WhatsApp
               </span>

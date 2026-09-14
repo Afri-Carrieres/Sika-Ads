@@ -24,7 +24,7 @@ export interface User {
   name: string;
   email?: string;
   role: UserRole;
-  status: 'active' | 'blocked';
+  status: 'pending_verification' | 'active' | 'blocked' | 'rejected';
   balance: number;
   totalEarned: number;
   clicks: number;
@@ -32,6 +32,11 @@ export interface User {
   referralCode: string;
   referralCount: number;
   referralEarnings: number;
+  verification_document_path?: string | null;
+  verification_submitted_at?: string | null;
+  verification_reviewed_at?: string | null;
+  verification_reviewed_by?: string | null;
+  verification_rejection_reason?: string | null;
   dailyStats?: DailyStats;
 }
 
@@ -46,7 +51,7 @@ export interface Campaign {
   cpc: number;
   cpv: number;
   category: string;
-  status: 'pending' | 'active' | 'completed' | 'paused' | 'rejected';
+  status: 'pending' | 'active' | 'completed' | 'paused' | 'rejected' | 'failed';
   advertiserName?: string;
   advertiserPhone?: string;
   advertiserEmail?: string; // ✅ Email pour contact
@@ -74,6 +79,9 @@ export interface Campaign {
   maxAmbassadors?: number; // Nombre d'ambassadeurs estimés
   targetViews?: number; // Vues cibles calculées
   viewsCurrent?: number; // Vues actuelles
+  // ✅ Champs de paiement avancés
+  internalTransactionRef?: string; // Référence générée en interne (CMP-xxx)
+  paymentError?: string; // Message d'erreur en cas d'échec de paiement
 }
 
 export interface AIAnalysis {

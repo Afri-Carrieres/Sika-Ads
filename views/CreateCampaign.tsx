@@ -390,12 +390,14 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   </label> */}
 
                   <label className="block">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur (Maximun 300 caractères)</span>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]"
                       placeholder="Décrivez ce que l'ambassadeur doit mettre en avant..."
+                      maxLength={300}
+                      
                     />
                   </label>
 
