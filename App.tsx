@@ -43,6 +43,7 @@ import { useUserData } from './hooks/useUserData';
 import { deleteAllCampaigns } from './services/resetCampaigns';
 import { initializeDatabase } from './services/initDb';
 import { cleanupNonAdminUsers } from './services/cleanupUsers';
+import { validateCampaignPayment } from './services/gomboPlus';
 import { Clock, Loader2 } from 'lucide-react';
 
 type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'admin-login' | 'register' | 'verification-pending' | 'reset-password';
@@ -479,17 +480,13 @@ const App: React.FC = () => {
     const handlePaymentSuccess = async (payment: { reference: string; operator: string; recipientNumber: string }) => {
       if (!pendingCampaignId) return;
       try {
-        const { error } = await supabase.from('campaigns').update({
-          paymentStatus: 'paid',
-          paymentConfirmed: true, // ✅ CORRECTED: Should be TRUE when payment succeeds
-          campaignPaymentStatus: 'payment_received',
-          paymentReference: payment.reference,
-          paymentOperator: payment.operator,
-          status: 'active', // ✅ Activate campaign immediately
-          paymentConfirmedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }).eq('id', pendingCampaignId);
-        if (error) throw error;
+        // Activation côté serveur uniquement : le client ne peut pas activer sa campagne.
+        // validate-campaign-payment vérifie le statut réel de la transaction Gombo
+        // et met à jour paymentConfirmed/status via le service role.
+        await validateCampaignPayment({
+          campaignId: pendingCampaignId,
+          transactionReference: payment.reference,
+        });
 
         setSuccessData({ campaignId: pendingCampaignId, amount: pendingAmount });
 

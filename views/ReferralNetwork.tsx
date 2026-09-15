@@ -29,8 +29,8 @@ const ReferralNetwork: React.FC = () => {
       const { data, error } = await supabase
         .from('referrals')
         .select('*')
-        .eq('referrer_id', session.user.id)
-        .order('created_at', { ascending: false });
+        .eq('userId', session.user.id)
+        .order('createdAt', { ascending: false });
 
       if (error) {
         console.warn("Error fetching referrals:", error.message);
@@ -44,8 +44,8 @@ const ReferralNetwork: React.FC = () => {
           name: r.name,
           phone: r.phone || '',
           status: r.status || 'inactive',
-          earningsGenerated: r.earnings_generated ?? r.earningsGenerated ?? 0,
-          createdAt: r.created_at || r.createdAt || new Date().toISOString()
+          earningsGenerated: r.earningsGenerated ?? 0,
+          createdAt: r.createdAt || new Date().toISOString()
         } as Referral)));
         setLoading(false);
       }

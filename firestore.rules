@@ -185,7 +185,8 @@ service cloud.firestore {
     // ─────────────────────────────────────────────
     match /withdrawals/{withdrawalId} {
       allow read: if isStaff() || (isSignedIn() && resource.data.userId == uid());
-      allow create: if isSignedIn() && request.resource.data.userId == uid();
+      // Les retraits sont créés exclusivement par le backend (service account).
+      allow create: if false;
       allow update, delete: if isStaff();
     }
 

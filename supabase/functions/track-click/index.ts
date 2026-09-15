@@ -1,12 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://www.sika-ads.com",
+  "https://sikaads-7b9bc.web.app",
+  "https://sikaads-7b9bc.firebaseapp.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("Origin");
+  return {
+    "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : "https://www.sika-ads.com",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 serve(async (req: Request) => {
+  const corsHeaders = corsHeadersFor(req);
   try {
     const url = new URL(req.url);
     const ref = url.searchParams.get('ref') || null;
@@ -16,7 +28,7 @@ serve(async (req: Request) => {
     // Supabase auto-injects SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Edge Functions
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL') as string;
     const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') as string;
-    const FRONTEND_URL = Deno.env.get('FRONTEND_URL') || 'https://sika-ads.netlify.app';
+    const FRONTEND_URL = Deno.env.get('FRONTEND_URL') || 'https://www.sika-ads.com';
 
     if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
       console.error('Missing Supabase env vars');

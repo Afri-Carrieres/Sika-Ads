@@ -1,18 +1,14 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
 
 const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
 
 async function gomboFetch(path: string, body: Record<string, unknown>) {
   const publicKey = Deno.env.get('GOMBO_PUBLIC_KEY_SECRET');
   const privateKey = Deno.env.get('GOMBO_PRIVATE_KEY_SECRET');
-  
+
   if (!publicKey || !privateKey) {
     throw new Error('Missing GOMBO_PUBLIC_KEY_SECRET or GOMBO_PRIVATE_KEY_SECRET');
   }
@@ -45,25 +41,37 @@ async function gomboFetch(path: string, body: Record<string, unknown>) {
   return json;
 }
 
+function tokenize(value: unknown): Set<string> {
+  return new Set(
+    String(value || '')
+      .toUpperCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+  );
+}
+
 function isGomboSuccess(status: unknown, message?: unknown): boolean {
-  const s = (String(status || '') + ' ' + String(message || ''))
-    .toUpperCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  const keywords = ['SUCCESS', 'COMPLETED', 'COMPLETE', 'SUCCESSFUL', 'APPROVED', 'VALIDATED', 'SUCCES'];
-  return keywords.some((keyword) => s.includes(keyword));
+  const tokens = new Set([...tokenize(status), ...tokenize(message)]);
+  return ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'APPROVED', 'VALIDATED'].some(k => tokens.has(k));
 }
 
 function isGomboFailure(status: unknown, message?: unknown): boolean {
-  const s = (String(status || '') + ' ' + String(message || ''))
-    .toUpperCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-  const keywords = ['FAILED', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC'];
-  return keywords.some((keyword) => s.includes(keyword));
+  const tokens = new Set([...tokenize(status), ...tokenize(message)]);
+  return ['FAILED', 'FAILURE', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC', 'REJECTED'].some(k => tokens.has(k));
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -79,7 +87,7 @@ serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       global: { headers: { Authorization: authHeader } }
     });
@@ -113,6 +121,7 @@ serve(async (req: Request) => {
         .from('campaigns')
         .select('id')
         .eq('paymentReference', transaction_reference)
+        .eq('advertiserId', user.id)
         .limit(1);
 
       if (campaigns && campaigns.length > 0) {
@@ -133,6 +142,7 @@ serve(async (req: Request) => {
         .from('campaigns')
         .select('id')
         .eq('paymentReference', transaction_reference)
+        .eq('advertiserId', user.id)
         .limit(1);
 
       if (campaigns && campaigns.length > 0) {
@@ -153,7 +163,7 @@ serve(async (req: Request) => {
     });
   } catch (error) {
     console.error('gombo-check-transaction-status error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
