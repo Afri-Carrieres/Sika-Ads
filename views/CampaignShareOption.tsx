@@ -138,59 +138,77 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
     }
   };
 
-  // const downloadImage = (url: string, title: string) => {
-  //   const safeName = title
-  //     .toLowerCase()
-  //     .normalize('NFD')
-  //     .replace(/[\u0300-\u036f]/g, '')
-  //     .replace(/[^a-z0-9]+/g, '-')
-  //     .replace(/^-+|-+$/g, '')
-  //     .slice(0, 60) || 'image';
+  const buildSafeName = (title: string) =>
+    title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'image';
 
-  //   const link = document.createElement('a');
-  //   link.href = url;
-  //   link.target = '_blank';
-  //   link.rel = 'noopener noreferrer';
-  //   link.download = `sikaads-${safeName}`;
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
-
-  const downloadImage = async (url: string, title: string) => {
-  const safeName = title
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60) || 'image';
-
-  try {
+  const fetchImageBlob = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-    const blob = await response.blob();
+    return response.blob();
+  };
 
-    // Détecte l'extension à partir du type MIME (png, jpg, webp, svg…)
-    const ext = blob.type.split('/')[1]?.split('+')[0] || 'png';
+  const downloadImage = async (url: string, title: string) => {
+    const safeName = buildSafeName(title);
 
-    const blobUrl = URL.createObjectURL(blob);
+    try {
+      const blob = await fetchImageBlob(url);
 
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = `sikaads-${safeName}.${ext}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      // Détecte l'extension à partir du type MIME (png, jpg, webp, svg…)
+      const ext = blob.type.split('/')[1]?.split('+')[0] || 'png';
 
-    // Libère la mémoire une fois le téléchargement déclenché
-    URL.revokeObjectURL(blobUrl);
-  } catch (err) {
-    console.error('Échec du téléchargement de l\'image :', err);
-    // Optionnel : fallback → ouvrir l'image dans un nouvel onglet
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-};
+      const blobUrl = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `sikaads-${safeName}.${ext}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Libère la mémoire une fois le téléchargement déclenché
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Échec du téléchargement de l\'image :', err);
+      // Optionnel : fallback → ouvrir l'image dans un nouvel onglet
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // Tente d'ouvrir le partage natif (feuille de partage OS) avec l'image jointe,
+  // ce qui permet à l'ambassadeur de choisir directement "Statut" / "Story"
+  // dans WhatsApp, Instagram ou Facebook avec le visuel déjà attaché.
+  const shareImageNatively = async (imageUrl: string, title: string, text: string) => {
+    const nav = navigator as Navigator & {
+      canShare?: (data?: ShareData) => boolean;
+      share?: (data: ShareData) => Promise<void>;
+    };
+
+    if (!nav.share || !nav.canShare) return { supported: false, cancelled: false };
+
+    try {
+      const blob = await fetchImageBlob(imageUrl);
+      const ext = blob.type.split('/')[1]?.split('+')[0] || 'png';
+      const file = new File([blob], `sikaads-${buildSafeName(title)}.${ext}`, { type: blob.type });
+      const shareData: ShareData = { files: [file], text, title };
+
+      if (!nav.canShare(shareData)) return { supported: false, cancelled: false };
+
+      await nav.share(shareData);
+      return { supported: true, cancelled: false };
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return { supported: true, cancelled: true };
+      }
+      console.warn('Partage natif indisponible, repli sur le lien web:', err);
+      return { supported: false, cancelled: false };
+    }
+  };
 
   const [guideMessage, setGuideMessage] = useState<string | null>(null);
 
@@ -225,6 +243,28 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
       console.warn('Erreur copie presse-papiers:', err);
     }
 
+    // Sauvegarde toujours le visuel localement (utile aussi si le partage natif échoue).
+    downloadImage(campaign.imageUrl, campaign.title);
+
+    const { supported: sharedNatively, cancelled } = await shareImageNatively(
+      campaign.imageUrl,
+      campaign.title,
+      shareText
+    );
+
+    if (cancelled) {
+      setIsSharing(false);
+      return;
+    }
+
+    if (!sharedNatively) {
+      let url = '';
+      if (platform === 'whatsapp') {
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      } else if (platform === 'facebook') {
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink + '&platform=facebook')}`;
+      } else if (platform === 'instagram') {
+        url = 'https://www.instagram.com/';
     let sharedViaFile = false;
 
     // Try Web Share API with image file if on supported mobile browser

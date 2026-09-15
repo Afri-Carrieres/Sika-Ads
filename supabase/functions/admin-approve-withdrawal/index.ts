@@ -1,11 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
 
 const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
 
@@ -38,6 +34,13 @@ async function gomboFetch(path: string, body: Record<string, unknown>) {
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
@@ -78,21 +81,26 @@ serve(async (req: Request) => {
       });
     }
 
-    const { data: withdrawal, error: wErr } = await supabase
-      .from('withdrawals').select('*').eq('id', withdrawalId).single();
+    const claim = await supabase
+      .from('withdrawals')
+      .update({
+        status: 'processing',
+        processingAt: new Date().toISOString(),
+        processingBy: user.id,
+      })
+      .eq('id', withdrawalId)
+      .in('status', ['pending', 'pending_approval'])
+      .select('*')
+      .maybeSingle();
 
-    if (wErr || !withdrawal) {
-      return new Response(JSON.stringify({ error: 'Withdrawal not found' }), {
-        status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
-
-    const wStatus = String(withdrawal.status || '').toLowerCase();
-    if (wStatus !== 'pending' && wStatus !== 'pending_approval') {
+    if (claim.error) throw claim.error;
+    if (!claim.data) {
       return new Response(JSON.stringify({ error: 'Withdrawal already processed' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
+
+    const withdrawal = claim.data;
 
     const amount = Number(withdrawal.amount || 0);
     const phone = String(withdrawal.phone || '').trim();
@@ -100,6 +108,7 @@ serve(async (req: Request) => {
     const country = String(withdrawal.country || 'TG').toUpperCase();
 
     if (!amount || !phone || !operator) {
+      await supabase.from('withdrawals').update({ status: 'failed', failureReason: 'invalid_withdrawal_data' }).eq('id', withdrawalId);
       return new Response(JSON.stringify({ error: 'Invalid withdrawal data' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
@@ -110,7 +119,16 @@ serve(async (req: Request) => {
         .from('users').select('balance').eq('id', withdrawal.userId).single();
 
       const balance = Number(userData?.balance || 0);
-      if (balance < amount) {
+
+      const { data: debited, error: debitErr } = await supabase
+        .from('users')
+        .update({ balance: balance - amount })
+        .eq('id', withdrawal.userId)
+        .gte('balance', amount)
+        .select('id');
+
+      if (debitErr) throw debitErr;
+      if (!debited || debited.length === 0) {
         await supabase.from('withdrawals').update({
           status: 'failed', failureReason: 'insufficient_balance'
         }).eq('id', withdrawalId);
@@ -119,15 +137,10 @@ serve(async (req: Request) => {
         });
       }
 
-      await supabase.from('users').update({ balance: balance - amount }).eq('id', withdrawal.userId);
       await supabase.from('withdrawals').update({
         balanceDebited: true, debitedAt: new Date().toISOString()
       }).eq('id', withdrawalId);
     }
-
-    await supabase.from('withdrawals').update({
-      status: 'processing', processingAt: new Date().toISOString(), processingBy: user.id
-    }).eq('id', withdrawalId);
 
     try {
       const transaction_ref = `WTH-${withdrawalId.substring(0, 8)}-${Date.now()}`;
@@ -165,7 +178,7 @@ serve(async (req: Request) => {
     }
   } catch (error) {
     console.error('admin-approve-withdrawal error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }

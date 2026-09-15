@@ -2,6 +2,7 @@ import {defineSecret} from "firebase-functions/params";
 
 export const GOMBO_PUBLIC_KEY_SECRET = defineSecret("GOMBO_PUBLIC_KEY_SECRET");
 export const GOMBO_PRIVATE_KEY_SECRET = defineSecret("GOMBO_PRIVATE_KEY_SECRET");
+export const GOMBO_WEBHOOK_SECRET = defineSecret("GOMBO_WEBHOOK_SECRET");
 
 const GOMBO_BASE_URL = "https://api.gomboplus.com/api";
 
@@ -82,8 +83,6 @@ export async function createMobileDeposit(params: {
         ...(params.callback_url ? {callback_url: params.callback_url} : {}),
     };
 
-    console.log("GOMBO_PAYLOAD", JSON.stringify(payload));
-
     return gomboFetch<GomboDepositResponse>("mobile-services/mobile-deposit/", {
         method: "POST",
         body: payload as Record<string, JsonValue>,
@@ -136,8 +135,6 @@ export async function createMobileWithdrawal(params: {
         transaction_ref: params.transaction_ref,
         ...(params.callback_url ? {callback_url: params.callback_url} : {}),
     };
-
-    console.log("GOMBO_WITHDRAWAL_PAYLOAD", JSON.stringify(payload));
 
     return gomboFetch<GomboWithdrawalResponse>("mobile-services/mobile-withdrawal/", {
         method: "POST",

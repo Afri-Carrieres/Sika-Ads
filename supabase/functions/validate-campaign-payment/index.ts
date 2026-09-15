@@ -1,11 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = [
+  'https://www.sika-ads.com',
+  'https://sikaads-7b9bc.web.app',
+  'https://sikaads-7b9bc.firebaseapp.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
 const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
 
@@ -38,6 +40,22 @@ async function gomboFetch(path: string, body: Record<string, unknown>): Promise<
   return { ...json, _httpStatus: res.status, _httpOk: res.ok };
 }
 
+function tokenize(value: unknown): Set<string> {
+  return new Set(
+    String(value || '')
+      .toUpperCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+  );
+}
+
+function isGomboSuccess(status: unknown, message?: unknown): boolean {
+  const tokens = new Set([...tokenize(status), ...tokenize(message)]);
+  return ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'APPROVED', 'VALIDATED'].some(k => tokens.has(k));
 function isGomboNotFound(resObj: Record<string, unknown>): boolean {
   const msg = String(resObj.message || '').toLowerCase();
   const httpStatus = Number(resObj._httpStatus || 0);
@@ -79,6 +97,13 @@ function isTransactionFailure(txnStatus: string): boolean {
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
@@ -234,7 +259,7 @@ serve(async (req: Request) => {
     });
   } catch (error) {
     console.error('validate-campaign-payment error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }

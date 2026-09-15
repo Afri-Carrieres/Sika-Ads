@@ -24,6 +24,9 @@ export function useAuthRedirect({ onRecovery }: UseAuthRedirectOptions = {}) {
 
     supabase.auth.setSession({ access_token, refresh_token }).then(({ error }) => {
       if (error) {
+        // Nettoie les tokens de l'URL même en cas d'échec (évite fuite dans l'historique)
+        const cleanHash = hash.substring(0, secondHashIndex); // "#/"
+        window.history.replaceState(null, '', window.location.pathname + window.location.search + cleanHash);
         console.error('Erreur setSession:', error.message);
         return;
       }
