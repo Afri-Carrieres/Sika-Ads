@@ -121,7 +121,8 @@ serve(async (req: Request) => {
       });
     }
 
-    const transaction_ref = `CMP-${campaignId.substring(0, 8)}-${Date.now()}`;
+    const baseRef = `CMP-${campaignId.substring(0, 8)}-${Date.now()}`;
+    // Do NOT add the prefix here — Gombo adds GOMBOYAS-/GOMBOMOOV- automatically
     const callback_url = Deno.env.get('GOMBO_WEBHOOK_URL') || '';
 
     const result = await gomboFetch('mobile-services/mobile-deposit/', {
@@ -131,22 +132,29 @@ serve(async (req: Request) => {
       recipient_number,
       operator: operator.toLowerCase(),
       country: country.toUpperCase(),
-      transaction_ref,
+      transaction_ref: baseRef,   // e.g. CMP-a0fa1fb8-1789382177362
       callback_url,
     });
 
     const resObj = result as Record<string, unknown>;
-    const reference = resObj.reference || (operator === 'moov' ? `GOMBOMOOV-${transaction_ref}` : `GOMBOYAS-${transaction_ref}`);
 
+    // Gombo returns the final reference with its own prefix (GOMBOYAS-xxx or GOMBOMOOV-xxx).
+    // Use it as the canonical reference. Only fall back to a local prefix if Gombo doesn't return one.
+    const operatorPrefix = operator.toLowerCase() === 'moov' ? 'GOMBOMOOV' : 'GOMBOYAS';
+    const reference = String(resObj.reference || `${operatorPrefix}-${baseRef}`).trim();
+
+    // Store reference exactly as Gombo knows it — used for polling and validation
     await supabase
       .from('campaigns')
       .update({
-        paymentReference: reference,
+        paymentReference: reference,         // e.g. GOMBOYAS-CMP-a0fa1fb8-xxx  (from Gombo)
         paymentOperator: operator,
+        internalTransactionRef: baseRef,     // e.g. CMP-a0fa1fb8-xxx (our bare ref)
       })
       .eq('id', campaignId);
 
-    return new Response(JSON.stringify(result), {
+    // Return the canonical reference so the frontend polls with the correct ref
+    return new Response(JSON.stringify({ ...resObj, reference, transaction_ref: baseRef }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });

@@ -13,13 +13,13 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   // --- Constants & Math Logic ---
   const CPV = 5; // Coût par vue
   const VIEWS_PER_AMBASSADOR = 20; // Estimation moyenne
-  const MIN_BUDGET = 2500;
+  const MIN_BUDGET = 1000;
   const MAX_BUDGET = 50000;
 
   const [category, setCategory] = useState('');
 
   const PACKS = [
-    { id: 'starter', label: 'Starter', price: 2500, color: 'bg-blue-50 border-blue-200 text-blue-400' },
+    { id: 'starter', label: 'Starter', price: 1000, color: 'bg-blue-50 border-blue-200 text-blue-400' },
     { id: 'boost', label: 'Boost', price: 5000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
     { id: 'business', label: 'Business', price: 25000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
     { id: 'pro', label: 'Pro', price: 50000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
@@ -29,7 +29,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   const [step, setStep] = useState(1); // 1: Budget, 2: Details
 
   // Budget State
-  const [budget, setBudget] = useState<number>(2500);
+  const [budget, setBudget] = useState<number>(1000);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [selectedPackId, setSelectedPackId] = useState<string | null>('starter');
   const [budgetError, setBudgetError] = useState<string>('');
@@ -390,12 +390,14 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   </label> */}
 
                   <label className="block">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Consignes pour l'ambassadeur (Maximun 300 caractères)</span>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 focus:ring-2 focus:ring-[#128686] outline-none font-medium text-gray-700 transition-all focus:bg-white min-h-[100px]"
                       placeholder="Décrivez ce que l'ambassadeur doit mettre en avant..."
+                      maxLength={300}
+                      
                     />
                   </label>
 

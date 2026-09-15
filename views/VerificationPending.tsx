@@ -6,9 +6,10 @@ interface VerificationPendingProps {
   email?: string | null;
   onGoToLogin: () => void;
   onResend?: () => Promise<void>;
+  ageVerification?: boolean;
 }
 
-const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoToLogin, onResend }) => {
+const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoToLogin, onResend, ageVerification = false }) => {
   const [resendState, setResendState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [resendError, setResendError] = useState('');
 
@@ -42,16 +43,16 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-gray-900 leading-tight">Vérifiez votre email</h2>
+          <h2 className="text-2xl font-bold text-gray-900 leading-tight">{ageVerification ? 'Vérification de votre majorité' : 'Vérifiez votre email'}</h2>
           <p className="text-gray-500 font-medium leading-relaxed">
-            Nous vous avons envoyé un email de vérification à <br/>
+            {ageVerification ? 'Votre inscription est en attente de validation par notre administration.' : 'Nous vous avons envoyé un email de vérification à'} <br/>
             <span className="text-[#128686] font-bold">{email || 'votre adresse email'}</span>.
-            <br/>Cliquez sur le lien dans l'email pour activer votre compte.
+            {!ageVerification && <><br/>Cliquez sur le lien dans l'email pour activer votre compte.</>}
           </p>
         </div>
 
         <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 text-sm text-gray-400 font-medium italic">
-          "Vérifiez votre dossier spam si vous ne voyez pas l'email dans quelques minutes."
+          {ageVerification ? 'Un administrateur vérifiera votre pièce d’identité avant l’activation de votre compte.' : 'Vérifiez votre dossier spam si vous ne voyez pas l’email dans quelques minutes.'}
         </div>
 
         {/* Feedback renvoi email */}
@@ -69,7 +70,7 @@ const VerificationPending: React.FC<VerificationPendingProps> = ({ email, onGoTo
         )}
 
         {/* Bouton Renvoyer */}
-        {onResend && (
+        {onResend && !ageVerification && (
           <button
             onClick={handleResend}
             disabled={resendState === 'loading' || resendState === 'success'}

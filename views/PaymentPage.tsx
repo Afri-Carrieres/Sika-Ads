@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, Phone, ArrowLeft, Loader2, Coins, ShieldCheck, CreditCard, RefreshCw } from "lucide-react";
+import { supabase } from "../supabase";
 import {
   gomboCheckTransactionStatus,
   gomboCreateMobileDeposit,
@@ -47,6 +48,20 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
 
   useEffect(() => stopPolling, []);
 
+  const markCampaignAsFailedInDb = async (reason?: string) => {
+    try {
+      await supabase.from("campaigns").update({
+        paymentStatus: "failed",
+        campaignPaymentStatus: "payment_failed",
+        status: "failed",
+        paymentError: reason || "Paiement non validé ou annulé",
+        updatedAt: new Date().toISOString(),
+      }).eq("id", campaignId);
+    } catch (err) {
+      console.warn("Erreur mise à jour statut campagne failed:", err);
+    }
+  };
+
   const startPolling = (txnRef: string) => {
     const startedAt = Date.now();
     stopPolling();
@@ -58,6 +73,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
         const timeoutMessage =
           "Délai dépassé. Si vous avez confirmé sur votre téléphone, réessayez la vérification.";
         setMessage(timeoutMessage);
+        markCampaignAsFailedInDb("Délai dépassé (2 minutes)");
         setResultPopup({
           type: "error",
           title: "Délai dépassé",
@@ -72,8 +88,9 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           transaction_reference: txnRef,
         });
 
-        // Robust check for French and English status strings
-        const s = String(res.status || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        // Check both res.status (normalized by our edge fn) and res.transactionStatus (raw from Gombo content)
+        const s = String(res.status || res.transactionStatus || "")
+          .toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
         if (["completed", "success", "successful", "approved", "complete"].includes(s)) {
           stopPolling();
@@ -86,7 +103,7 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
             transactionReference: txnRef,
           }).catch((err) => {
             console.warn("Campaign validation skipped:", err?.message);
-            // Continue anyway - webhook may have already validated
+            // Continue anyway - edge fn may have already updated the status
           });
 
           setResultPopup({
@@ -103,14 +120,16 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           setStatus("failed");
           const failureMessage = String(res.message || "Paiement échoué ou annulé.");
           setMessage(failureMessage);
+          markCampaignAsFailedInDb(failureMessage);
           setResultPopup({
             type: "error",
             title: "Paiement échoué",
             message: failureMessage,
           });
         }
+        // Any other status ("pending", unknown) → keep polling silently
       } catch {
-        // keep polling
+        // Network error → keep polling
       }
     }, 4000);
   };
@@ -124,7 +143,8 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
         transaction_reference: txnRef,
       });
 
-      const s = String(res.status || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const s = String(res.status || res.transactionStatus || "")
+        .toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
       if (["completed", "success", "successful", "approved", "complete"].includes(s)) {
         setStatus("success");
@@ -149,10 +169,12 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
         });
       } else if (["failed", "cancelled", "canceled", "echoue", "annule"].includes(s)) {
         setStatus("failed");
+        const failureMessage = String(res.message || "Paiement échoué ou annulé.");
+        markCampaignAsFailedInDb(failureMessage);
         setResultPopup({
           type: "error",
           title: "Paiement échoué",
-          message: String(res.message || "Paiement échoué ou annulé."),
+          message: failureMessage,
         });
       } else {
         setResultPopup({

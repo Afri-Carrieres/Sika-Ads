@@ -442,12 +442,39 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   };
 
   const handleToggleUserBlock = async (userId: string, currentStatus: string) => {
-    if (!isSuperAdmin) return;
+    if (!isSuperAdmin || !['active', 'blocked'].includes(currentStatus)) return;
     const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
     try {
       await supabase.from('users').update({ status: newStatus }).eq('id', userId);
       showFeedback(newStatus === 'active' ? "Utilisateur débloqué" : "Utilisateur bloqué", "info");
     } catch (e) { showFeedback("Erreur", "error"); }
+  };
+
+  const openVerificationDocument = async (path: string) => {
+    const { data, error } = await supabase.storage.from('identity-documents').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      showFeedback('Impossible d’ouvrir le document.', 'error');
+      return;
+    }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleVerificationDecision = async (user: User, decision: 'active' | 'rejected') => {
+    if (!isSuperAdmin || !user.verification_document_path) return;
+    const reason = decision === 'rejected' ? window.prompt('Motif du refus (facultatif) :') || null : null;
+    const { error } = await supabase.from('users').update({
+      status: decision,
+      verification_reviewed_at: new Date().toISOString(),
+      verification_reviewed_by: currentAdminData?.id,
+      verification_rejection_reason: reason,
+    }).eq('id', user.id).eq('status', 'pending_verification');
+    if (error) {
+      showFeedback('Erreur lors de la validation.', 'error');
+      return;
+    }
+    await supabase.storage.from('identity-documents').remove([user.verification_document_path]);
+    showFeedback(decision === 'active' ? 'Compte vérifié et activé.' : 'Vérification refusée.', 'success');
+    fetchAllUsers();
   };
 
   const handleDeleteUser = (user: User) => {
@@ -470,6 +497,83 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         }
       }
     );
+  };
+
+  const handleAdminVerifyCampaignPayment = async (campaign: Campaign) => {
+    const txnRef = campaign.paymentReference || (campaign as any).internalTransactionRef;
+    if (!txnRef) {
+      showFeedback("Aucune référence de transaction enregistrée pour cette campagne.", "error");
+      return;
+    }
+    setSyncingCampaigns(prev => new Set(prev).add(campaign.id));
+    try {
+      const res = await gomboCheckTransactionStatus({
+        transaction_reference: txnRef
+      });
+      const s = String(res.status || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (["completed", "success", "successful", "approved", "complete"].includes(s)) {
+        await supabase.from('campaigns').update({
+          paymentStatus: 'paid',
+          campaignPaymentStatus: 'payment_received',
+          paymentConfirmed: true,
+          status: 'active',
+          paymentConfirmedAt: new Date().toISOString(),
+          paymentConfirmedBy: currentAdminData?.id || 'admin',
+          updatedAt: new Date().toISOString()
+        }).eq('id', campaign.id);
+        showFeedback(`Paiement vérifié avec succès ! La campagne "${campaign.title}" est activée.`, "success");
+      } else if (["failed", "cancelled", "canceled", "echoue", "annule"].includes(s)) {
+        await supabase.from('campaigns').update({
+          paymentStatus: 'failed',
+          campaignPaymentStatus: 'payment_failed',
+          status: 'failed',
+          paymentError: String(res.message || 'Paiement échoué'),
+          updatedAt: new Date().toISOString()
+        }).eq('id', campaign.id);
+        showFeedback(`Le paiement a été confirmé comme échoué par Gombo. Statut mis à jour.`, "info");
+      } else {
+        showFeedback(`Statut Gombo actuel : ${res.status || 'En attente'}. ${res.message || ''}`, "info");
+      }
+      fetchAllCampaigns();
+    } catch (e: any) {
+      showFeedback(`Erreur lors de la vérification : ${e?.message || 'Inconnue'}`, "error");
+    } finally {
+      setSyncingCampaigns(prev => {
+        const next = new Set(prev);
+        next.delete(campaign.id);
+        return next;
+      });
+    }
+  };
+
+
+  const handleAdminForcePaymentStatus = async (campaignId: string, newStatus: 'paid' | 'failed') => {
+    try {
+      if (newStatus === 'paid') {
+        await supabase.from('campaigns').update({
+          paymentStatus: 'paid',
+          campaignPaymentStatus: 'payment_received',
+          paymentConfirmed: true,
+          status: 'active',
+          paymentConfirmedAt: new Date().toISOString(),
+          paymentConfirmedBy: currentAdminData?.id || 'admin',
+          updatedAt: new Date().toISOString()
+        }).eq('id', campaignId);
+        showFeedback("Paiement validé manuellement. Campagne activée.");
+      } else {
+        await supabase.from('campaigns').update({
+          paymentStatus: 'failed',
+          campaignPaymentStatus: 'payment_failed',
+          status: 'failed',
+          paymentError: 'Marqué comme échoué manuellement par un administrateur',
+          updatedAt: new Date().toISOString()
+        }).eq('id', campaignId);
+        showFeedback("Paiement marqué comme échoué.", "info");
+      }
+      fetchAllCampaigns();
+    } catch (e: any) {
+      showFeedback("Erreur lors de la mise à jour.", "error");
+    }
   };
 
   const deleteProof = async (proof: Proof) => {
@@ -1860,13 +1964,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <p className="font-bold text-gray-900 text-sm">{user.balance?.toLocaleString() || 0} F</p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${user.status === 'active' ? 'bg-green-100 text-green-700' : user.status === 'pending_verification' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
                           }`}>
-                          {user.status === 'active' ? 'ACTIF' : 'BLOQUÉ'}
+                          {user.status === 'active' ? 'ACTIF' : user.status === 'pending_verification' ? 'À VÉRIFIER' : user.status === 'rejected' ? 'REFUSÉ' : 'BLOQUÉ'}
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          {user.status === 'pending_verification' && user.verification_document_path && (
+                            <>
+                              <button onClick={() => openVerificationDocument(user.verification_document_path!)} className="p-3 text-[#128686] hover:bg-[#E7F4F4] rounded-xl transition-all" title="Ouvrir la pièce d’identité">
+                                <Eye size={18} />
+                              </button>
+                              <button onClick={() => handleVerificationDecision(user, 'active')} className="p-3 text-green-600 hover:bg-green-50 rounded-xl transition-all" title="Valider la majorité">
+                                <CheckCircle2 size={18} />
+                              </button>
+                              <button onClick={() => handleVerificationDecision(user, 'rejected')} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Refuser la vérification">
+                                <X size={18} />
+                              </button>
+                            </>
+                          )}
                           {user.email && (
                             <button
                               onClick={() => handleResetPassword(user.email!)}
@@ -2308,7 +2425,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <th className="px-8 py-6">Date Création</th>
                     <th className="px-8 py-6">Statut Paiement</th>
                     <th className="px-8 py-6">Reference de Transaction</th>
-                    {/* <th className="px-8 py-6 text-right">Actions</th> */}
+                    <th className="px-8 py-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -2349,13 +2466,49 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <td className="px-8 py-6">
                           <p className="text-xs font-bold text-gray-500">{campaign.paymentReference || '—'}</p>
                         </td>
-                        {/* Actions placeholder - migrated to Supabase */}
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {campaign.paymentReference && (
+                              <button
+                                onClick={() => handleAdminVerifyCampaignPayment(campaign)}
+                                disabled={syncingCampaigns.has(campaign.id)}
+                                className="p-2 bg-[#E7F4F4] text-[#128686] hover:bg-[#D9ECEC] rounded-xl transition-all disabled:opacity-50 flex items-center gap-1 text-xs font-bold"
+                                title="Vérifier le statut auprès de GomboPlus"
+                              >
+                                {syncingCampaigns.has(campaign.id) ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : (
+                                  <RefreshCcw size={14} />
+                                )}
+                                <span className="hidden sm:inline">Vérifier</span>
+                              </button>
+                            )}
+                            {campaign.paymentStatus !== 'paid' && (
+                              <button
+                                onClick={() => handleAdminForcePaymentStatus(campaign.id, 'paid')}
+                                className="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-xl transition-all"
+                                title="Forcer la validation du paiement"
+                              >
+                                <CheckCircle2 size={16} />
+                              </button>
+                            )}
+                            {campaign.paymentStatus !== 'failed' && (
+                              <button
+                                onClick={() => handleAdminForcePaymentStatus(campaign.id, 'failed')}
+                                className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all"
+                                title="Marquer comme paiement échoué"
+                              >
+                                <X size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
                   {allCampaigns.filter(c => c.createdBy === 'user' || c.createdBy === undefined).length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-8 py-12 text-center">
+                      <td colSpan={8} className="px-8 py-12 text-center">
                         <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune campagne utilisateur en attente</p>
                       </td>
                     </tr>

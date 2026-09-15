@@ -76,7 +76,7 @@ export const useUserData = (): UserDataHook => {
               email: user.email,
               momoNumber: meta.momoNumber || '',
               role: 'AMBASSADOR',
-              status: 'active',
+              status: 'pending_verification',
               balance: 0,
               totalEarned: 0,
               clicks: 0,
