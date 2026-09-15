@@ -1,15 +1,18 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
 
 const MIN_WITHDRAWAL = 2000;
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
@@ -47,6 +50,11 @@ serve(async (req: Request) => {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
+    if (!Number.isInteger(numAmount)) {
+      return new Response(JSON.stringify({ error: 'amount_must_be_integer' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
     if (numAmount < MIN_WITHDRAWAL) {
       return new Response(JSON.stringify({ error: 'below_minimum_withdrawal' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -78,11 +86,6 @@ serve(async (req: Request) => {
     }
 
     const balance = Number(userData.balance || 0);
-    if (balance < numAmount) {
-      return new Response(JSON.stringify({ error: 'insufficient_balance' }), {
-        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
 
     const withdrawalId = `${user.id}_${clientReqId}`;
 
@@ -110,19 +113,28 @@ serve(async (req: Request) => {
       throw insertErr;
     }
 
-    const { error: updateErr } = await supabase
+    const { data: debited, error: updateErr } = await supabase
       .from('users')
       .update({ balance: balance - numAmount })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      .gte('balance', numAmount)
+      .select('id');
 
     if (updateErr) throw updateErr;
+
+    if (!debited || debited.length === 0) {
+      await supabase.from('withdrawals').delete().eq('id', withdrawalId);
+      return new Response(JSON.stringify({ error: 'insufficient_balance' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
 
     return new Response(JSON.stringify({ withdrawalId }), {
       status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   } catch (error) {
     console.error('request-withdrawal error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }

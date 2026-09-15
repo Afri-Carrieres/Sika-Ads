@@ -8,11 +8,11 @@ service firebase.storage {
     }
 
     // Dossier des visuels de campagnes
-    match /campaign_visuals/{allPaths=**} {
+    match /campaign_visuals/{userId}/{allPaths=**} {
       // Tout le monde peut voir les visuels des campagnes
       allow read: if true;
-      // Seuls les utilisateurs connectés peuvent uploader (Admin ou Annonceur)
-      allow write: if isSignedIn();
+      // Seul le propriétaire du dossier peut écrire (backend/admin via SDK bypassent les règles)
+      allow write: if isSignedIn() && request.auth.uid == userId;
     }
 
     // Dossier des preuves de partage
@@ -29,9 +29,9 @@ service firebase.storage {
       allow write: if isSignedIn() && request.auth.uid == userId;
     }
 
-    // Règle par défaut : accès restreint pour le reste
+    // Règle par défaut : tout le reste est refusé (deny by default)
     match /{allPaths=**} {
-      allow read, write: if isSignedIn();
+      allow read, write: if false;
     }
   }
 }

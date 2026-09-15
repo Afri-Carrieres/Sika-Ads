@@ -1,11 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = [
+  'https://www.sika-ads.com',
+  'https://sikaads-7b9bc.web.app',
+  'https://sikaads-7b9bc.firebaseapp.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
 const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
 
@@ -46,6 +48,13 @@ async function gomboFetch(path: string, body: Record<string, unknown>) {
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -151,7 +160,7 @@ serve(async (req: Request) => {
     });
   } catch (error) {
     console.error('gombo-create-mobile-deposit error:', error);
-    return new Response(JSON.stringify({ error: String(error) }), {
+    return new Response(JSON.stringify({ error: 'internal_error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });

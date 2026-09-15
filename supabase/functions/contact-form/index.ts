@@ -1,9 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+const ALLOWED_ORIGINS = [
+  "https://www.sika-ads.com",
+  "https://sikaads-7b9bc.web.app",
+  "https://sikaads-7b9bc.firebaseapp.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+let corsHeaders: Record<string, string> = {
+  "Access-Control-Allow-Origin": "https://www.sika-ads.com",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+function recomputeCors(req: Request): void {
+  const origin = req.headers.get("Origin");
+  corsHeaders = {
+    "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : "https://www.sika-ads.com",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 const CONTACT_EMAIL = "team@sika-ads.com";
 
@@ -77,6 +93,8 @@ const baseLayout = (content: string) => `
 </html>`;
 
 serve(async (req: Request) => {
+  recomputeCors(req);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

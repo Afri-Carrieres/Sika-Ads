@@ -1,7 +1,5 @@
 import { supabase } from '../supabase';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ProofValidationResult {
@@ -34,11 +32,6 @@ interface EdgeFunctionResponse {
 }
 
 // 1. Initialisation (Singleton)
-const RODIUMAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-
-// if (!RODIUMAI_API_KEY) {
-//   console.info("Analyse IA via Edge Function Supabase; la clé n’est pas nécessaire côté navigateur.");
-// }
 
 const fallbackAnalysis = (imageUrl: string): ProofValidationResult => {
   const url = imageUrl.toLowerCase();

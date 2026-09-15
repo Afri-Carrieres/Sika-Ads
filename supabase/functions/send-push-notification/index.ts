@@ -35,12 +35,30 @@ const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY');
 const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY');
 const VAPID_SUBJECT = Deno.env.get('VAPID_SUBJECT') || 'mailto:contact@sika-ads.com';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+const ALLOWED_ORIGINS = [
+  'https://www.sika-ads.com',
+  'https://sikaads-7b9bc.web.app',
+  'https://sikaads-7b9bc.firebaseapp.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+let corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': 'https://www.sika-ads.com',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Content-Type': 'application/json',
 };
+
+function recomputeCors(req: Request): void {
+  const origin = req.headers.get('Origin');
+  corsHeaders = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Content-Type': 'application/json',
+  };
+}
 
 function jsonResponse(body: Record<string, unknown>, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: corsHeaders });
@@ -81,6 +99,8 @@ async function sendWebPushNotification(
 }
 
 Deno.serve(async (req: Request) => {
+  recomputeCors(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -88,6 +108,28 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
     return jsonResponse({ error: 'Méthode non autorisée' }, 405);
   }
+
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return jsonResponse({ error: 'missing_authorization' }, 401);
+  }
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    global: { headers: { Authorization: authHeader } },
+  });
+
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return jsonResponse({ error: 'unauthorized' }, 401);
+  }
+
+  const { data: callerProfile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  const isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
 
   try {
     const body = await req.json();
@@ -119,20 +161,31 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'userId ou userIds requis si broadcast n\'est pas activé' }, 400);
     }
 
+    if (isBroadcast && !isStaff) {
+      return jsonResponse({ error: 'admin_required' }, 403);
+    }
+
+    let effectiveTargetIds = targetUserIds;
+    if (!isStaff) {
+      const unauthorized = targetUserIds.some((id) => id !== user.id);
+      if (unauthorized) {
+        return jsonResponse({ error: 'admin_required' }, 403);
+      }
+      effectiveTargetIds = [user.id];
+    }
+
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
       console.error('[send-push] VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY non configurés');
       return jsonResponse({ error: 'VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY non configurés' }, 500);
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
     const query = supabase.from('push_subscriptions').select('id, fcm_token');
-    const subscriptionsQuery = isBroadcast ? query : query.in('userId', targetUserIds);
+    const subscriptionsQuery = isBroadcast ? query : query.in('userId', effectiveTargetIds);
     const { data: subscriptions, error: dbError } = await subscriptionsQuery;
 
     if (dbError) {
       console.error('[send-push] Erreur DB:', dbError);
-      return jsonResponse({ error: dbError.message }, 500);
+      return jsonResponse({ error: 'internal_error' }, 500);
     }
 
     if (!subscriptions || subscriptions.length === 0) {
@@ -184,7 +237,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error('[send-push] Erreur inattendue:', error);
     return jsonResponse(
-      { error: error instanceof Error ? error.message : 'Erreur interne' },
+      { error: 'internal_error' },
       500
     );
   }

@@ -102,7 +102,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
             emailRedirectTo: `${window.location.origin}/app?tab=dashboard`
           }
         });
-        console.log("Supabase Auth signUp response:", { data, signUpErr });
         if (signUpErr) throw signUpErr;
 
         const user = data.user;
@@ -139,14 +138,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
         // Redirect into the app (compte déjà vérifié, confirmations désactivées)
         onComplete('verification');
       } catch (err: any) {
-        console.error("Registration error:", err);
         // Translate Supabase weak password error to French
         if (err.code === 'weak_password' || err.name === 'AuthWeakPasswordError') {
           setError('Mot de passe trop faible. Il doit contenir au moins 8 caractères avec une majuscule, une minuscule, un chiffre et un caractère spécial (ex: Monpasse1!).');
-        } else if (err.message?.includes('User already registered')) {
-          setError('Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.');
         } else {
-          setError(`Erreur: ${err.message || 'Une erreur est survenue lors de l\'inscription.'}`);
+          setError('Impossible de créer le compte avec ces informations. Si vous avez déjà un compte, connectez-vous ou réinitialisez votre mot de passe.');
         }
         setLoading(false);
       }
@@ -156,7 +152,21 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
   };
 
   const handleGoogleSignup = async () => {
-    setError('Pour vérifier votre majorité, inscrivez-vous avec votre email et joignez une pièce d’identité.');
+    setLoading(true);
+    setError('');
+    try {
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/app`
+        }
+      });
+      if (err) throw err;
+    } catch {
+      setError('Impossible de s\'inscrire avec Google. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePrevStep = () => {

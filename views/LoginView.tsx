@@ -53,9 +53,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });
       if (err) throw err;
       onSuccess();
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Email ou mot de passe incorrect.');
+    } catch {
+      setError('Email ou mot de passe incorrect.');
     } finally {
       setLoading(false);
     }
@@ -70,9 +69,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
         options: { redirectTo: `${window.location.origin}/app` },
       });
       if (err) throw err;
-    } catch (err: any) {
-      console.error('Google login error:', err);
-      setError('Impossible de se connecter avec Google: ' + err.message);
+    } catch {
+      setError('Impossible de se connecter avec Google. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -102,9 +100,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onSuccess, onGoBack, onGoToRegist
       });
       if (apiErr) throw apiErr;
       setResetSuccess('Email de réinitialisation envoyé. Vérifiez votre boîte mail.');
-    } catch (apiErr: any) {
-      console.error('Password reset error:', apiErr);
-      setResetError("Impossible d'envoyer l'email de réinitialisation: " + apiErr.message);
+    } catch {
+      setResetError("Impossible d'envoyer l'email de réinitialisation. Veuillez réessayer.");
     } finally {
       setResetLoading(false);
     }

@@ -1,11 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS'
-};
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
 
 const GOMBO_BASE_URL = 'https://api.gomboplus.com/api';
 
@@ -73,6 +69,28 @@ function isTransactionSuccess(txnStatus: string): boolean {
     .some((k) => s.includes(k));
 }
 
+function tokenize(value: unknown): Set<string> {
+  return new Set(
+    String(value || '')
+      .toUpperCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+  );
+}
+
+function isGomboSuccess(status: unknown, message?: unknown): boolean {
+  const tokens = new Set([...tokenize(status), ...tokenize(message)]);
+  return ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'APPROVED', 'VALIDATED'].some(k => tokens.has(k));
+}
+
+function isGomboFailure(status: unknown, message?: unknown): boolean {
+  const tokens = new Set([...tokenize(status), ...tokenize(message)]);
+  return ['FAILED', 'FAILURE', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC', 'REJECTED'].some(k => tokens.has(k));
+  
 function isTransactionFailure(txnStatus: string): boolean {
   const s = txnStatus.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return ['FAILED', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC']
@@ -96,6 +114,13 @@ function isGomboNotFound(resObj: Record<string, unknown>): boolean {
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders: Record<string, string> = {
+    'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : 'https://www.sika-ads.com',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -170,6 +195,7 @@ serve(async (req: Request) => {
         .from('campaigns')
         .select('id')
         .eq('paymentReference', transaction_reference)
+        .eq('advertiserId', user.id)
         .limit(1);
       if (byRef && byRef.length > 0) return byRef[0].id;
 
@@ -201,6 +227,13 @@ serve(async (req: Request) => {
           .eq('id', campaignId);
         console.log(`[gombo-check] Campaign ${campaignId} → ACTIVE (payment confirmed)`);
       }
+    } else if (isGomboFailure(resObj.status, resObj.message)) {
+      const { data: campaigns } = await supabase
+        .from('campaigns')
+        .select('id')
+        .eq('paymentReference', transaction_reference)
+        .eq('advertiserId', user.id)
+        .limit(1);
 
       return new Response(JSON.stringify({
         ...cleanRes,

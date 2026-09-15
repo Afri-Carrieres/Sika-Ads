@@ -1,10 +1,14 @@
 // import { log } from "console";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://www.sika-ads.com",
+  "https://sikaads-7b9bc.web.app",
+  "https://sikaads-7b9bc.firebaseapp.com",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
 
 // ─────────────────────────────────────────────
 //  IDENTITÉ VISUELLE SIKAADS
@@ -95,15 +99,65 @@ const statBox = (label: string, value: string, color = BRAND.teal) => `
 `;
 
 // ─────────────────────────────────────────────
+//  HTML ESCAPE HELPER
+// ─────────────────────────────────────────────
+
+function escapeHtml(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ─────────────────────────────────────────────
 //  SERVER REQUEST HANDLER
 // ─────────────────────────────────────────────
 
 serve(async (req: Request) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders: Record<string, string> = {
+    "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : "https://www.sika-ads.com",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
+    const authHeader = req.headers.get("Authorization");
+
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "missing_authorization" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !authData?.user) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const callerId = authData.user.id;
+
+    const { data: callerProfile } = await supabase
+      .from('users').select('role').eq('id', callerId).single();
+    const isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
+
     const resendApiKey = Deno.env.get("RESEND_API_KEY_SECRET");
 
     if (!resendApiKey) {
@@ -116,8 +170,6 @@ serve(async (req: Request) => {
     const payload = await req.json();
     
     let { to, type, data } = payload;
-    console.log('payload', payload);
-    
    
     if (!to && payload.email) {
       to = payload.email;
@@ -128,13 +180,24 @@ serve(async (req: Request) => {
     if (payload.name && !data.name) {
       data.name = payload.name;
     }
-    console.log('to', to);
-    console.log('type', type);
-    console.log('data', data);
+    console.log('send-email: sending', type);
 
-    if (!to || !type) {
+    const toTrimmed = String(to || '').trim().toLowerCase();
+    const callerEmail = String(authData.user.email || '').trim().toLowerCase();
+
+    if (!toTrimmed || !type) {
       return new Response(JSON.stringify({ error: "Missing required fields ('to' or 'type')" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Anti-relay : un utilisateur non staff ne peut envoyer un email qu'à
+    // sa propre adresse (empêche l'exploitation de cette fonction comme
+    // relais de spam/impersonation de SikaAds).
+    if (!isStaff && toTrimmed !== callerEmail) {
+      return new Response(JSON.stringify({ error: "forbidden" }), {
+        status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -147,10 +210,10 @@ serve(async (req: Request) => {
     // ─────────────────────────────────────────────
 
     if (type === "verification" || type === "welcome") {
-      subject = `Bienvenue sur SikaAds Togo, ${data.name || "Ambassadeur"} ! 🎉`;
+      subject = `Bienvenue sur SikaAds Togo, ${escapeHtml(data.name || "Ambassadeur")} ! 🎉`;
       htmlContent = baseLayout(`
         <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};text-align:center;">
-          Bienvenue, ${data.name || "Ambassadeur"} !
+          Bienvenue, ${escapeHtml(data.name || "Ambassadeur")} !
         </h2>
         <p style="margin:0 0 24px;color:#555555;font-size:16px;line-height:24px;text-align:center;">
           Ton compte <strong>SikaAds Togo</strong> a été créé avec succès. Tu fais maintenant partie de notre réseau d'ambassadeurs !
@@ -180,20 +243,20 @@ serve(async (req: Request) => {
         </div>
       `);
     } else if (type === "campaign_confirmed" || type === "paid") {
-      subject = `Confirmation de paiement: ${data.campaignTitle}`;
+      subject = `Confirmation de paiement: ${escapeHtml(data.campaignTitle)}`;
       htmlContent = baseLayout(`
         <div style="text-align:center;margin-bottom:28px;">
           <div style="display:inline-block;background:#d1fae5;border-radius:50%;padding:20px;margin-bottom:16px;">
             <span style="font-size:36px;">💳</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};">Paiement reçu !</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${data.advertiserName || "Annonceur"}</strong>,</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${escapeHtml(data.advertiserName || "Annonceur")}</strong>,</p>
           <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Le paiement de votre campagne a été validé avec succès.</p>
         </div>
 
         <div style="padding:20px;background:${BRAND.teal}10;border-radius:12px;margin-bottom:16px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Campagne</p>
-          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:${BRAND.teal};">${data.campaignTitle}</p>
+          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:${BRAND.teal};">${escapeHtml(data.campaignTitle)}</p>
         </div>
 
         <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:24px;">
@@ -215,7 +278,7 @@ serve(async (req: Request) => {
         </div>
       `);
     } else if (type === "campaign_created") {
-      subject = `📣 Votre campagne "${data.campaignTitle}" est en cours de validation`;
+      subject = `📣 Votre campagne "${escapeHtml(data.campaignTitle)}" est en cours de validation`;
       htmlContent = baseLayout(`
         <div style="text-align:center;margin-bottom:28px;">
           <div style="display:inline-block;background:${BRAND.teal}15;border-radius:50%;padding:20px;margin-bottom:16px;">
@@ -223,20 +286,20 @@ serve(async (req: Request) => {
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};">Campagne créée !</h2>
           <p style="margin:0;color:#6b7280;font-size:14px;">
-            Bonjour ${data.advertiserName || "Annonceur"}, votre campagne est en attente de validation du paiement.
+            Bonjour ${escapeHtml(data.advertiserName || "Annonceur")}, votre campagne est en attente de validation du paiement.
           </p>
         </div>
 
         <div style="padding:20px;background:${BRAND.teal}10;border-radius:12px;margin-bottom:16px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Titre de la campagne</p>
-          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:${BRAND.teal};">${data.campaignTitle}</p>
+          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:${BRAND.teal};">${escapeHtml(data.campaignTitle)}</p>
         </div>
 
         <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:24px;">
           <tr>
             ${statBox('Budget', `${Number(data.budget || data.amount || 0).toLocaleString()} F`, BRAND.teal)}
             <td width="16"></td>
-            ${statBox('Pack', data.pack || 'Standard', BRAND.orange)}
+            ${statBox('Pack', escapeHtml(data.pack || 'Standard'), BRAND.orange)}
             <td width="16"></td>
             ${statBox('Statut', 'En attente', '#f59e0b')}
           </tr>
@@ -257,14 +320,14 @@ serve(async (req: Request) => {
             <span style="font-size:36px;">💸</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};">Demande de retrait reçue</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${data.userName || "Ambassadeur"}, ta demande est en cours de traitement.</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${escapeHtml(data.userName || "Ambassadeur")}, ta demande est en cours de traitement.</p>
         </div>
 
         <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:24px;">
           <tr>
             ${statBox('Montant', `${Number(data.amount || 0).toLocaleString()} F`, BRAND.orange)}
             <td width="16"></td>
-            ${statBox('Opérateur', data.provider || 'Mobile Money', BRAND.teal)}
+            ${statBox('Opérateur', escapeHtml(data.provider || 'Mobile Money'), BRAND.teal)}
             <td width="16"></td>
             ${statBox('Statut', 'En attente', '#f59e0b')}
           </tr>
@@ -274,7 +337,7 @@ serve(async (req: Request) => {
           <table width="100%">
             <tr>
               <td style="color:#6b7280;font-size:13px;">Numéro de réception</td>
-              <td style="text-align:right;font-weight:800;color:#111827;font-size:13px;">${data.phone || ''}</td>
+              <td style="text-align:right;font-weight:800;color:#111827;font-size:13px;">${escapeHtml(data.phone || '')}</td>
             </tr>
             <tr>
               <td style="color:#6b7280;font-size:13px;padding-top:10px;">Délai de traitement</td>
@@ -297,8 +360,8 @@ serve(async (req: Request) => {
             <span style="font-size:36px;">🎉</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};">Retrait Envoyé !</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${data.userName || "Ambassadeur"}</strong>,</p>
-          <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Votre demande de retrait de <strong>${Number(data.amount || 0).toLocaleString()} FCFA</strong> a été validée et le virement a été effectué vers votre compte <strong>${(data.provider || "").toUpperCase()} (${data.phone || ""})</strong>.</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${escapeHtml(data.userName || "Ambassadeur")}</strong>,</p>
+          <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Votre demande de retrait de <strong>${Number(data.amount || 0).toLocaleString()} FCFA</strong> a été validée et le virement a été effectué vers votre compte <strong>${escapeHtml((data.provider || "").toUpperCase())} (${escapeHtml(data.phone || "")})</strong>.</p>
         </div>
 
         <div style="padding:24px;background:#f0fdf4;border-radius:12px;text-align:center;">
@@ -322,7 +385,7 @@ serve(async (req: Request) => {
             <span style="font-size:36px;">⚠️</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:#b91c1c;">Retrait Rejeté</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${data.userName || "Ambassadeur"}</strong>,</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour <strong>${escapeHtml(data.userName || "Ambassadeur")}</strong>,</p>
           <p style="margin:0 0 20px;color:#6b7280;font-size:14px;">Votre demande de retrait de <strong>${Number(data.amount || 0).toLocaleString()} FCFA</strong> a été rejetée. Le montant a été recrédité sur votre solde SikaAds.</p>
         </div>
 
@@ -348,7 +411,7 @@ serve(async (req: Request) => {
             <span style="font-size:36px;">✅</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:${BRAND.teal};">Preuve validée !</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Félicitations ${data.userName || "Ambassadeur"}, ta preuve a été approuvée.</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Félicitations ${escapeHtml(data.userName || "Ambassadeur")}, ta preuve a été approuvée.</p>
         </div>
 
         <table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:24px;">
@@ -361,7 +424,7 @@ serve(async (req: Request) => {
 
         <div style="padding:20px;background:${BRAND.teal}10;border-radius:12px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Campagne</p>
-          <p style="margin:6px 0 0;font-size:16px;font-weight:800;color:${BRAND.teal};">${data.campaignTitle || "Campagne"}</p>
+          <p style="margin:6px 0 0;font-size:16px;font-weight:800;color:${BRAND.teal};">${escapeHtml(data.campaignTitle || "Campagne")}</p>
         </div>
 
         <div style="text-align:center;">
@@ -369,24 +432,24 @@ serve(async (req: Request) => {
         </div>
       `);
     } else if (type === "rejected") {
-      subject = `❌ Preuve refusée · ${data.campaignTitle || "Campagne"}`;
+      subject = `❌ Preuve refusée · ${escapeHtml(data.campaignTitle || "Campagne")}`;
       htmlContent = baseLayout(`
         <div style="text-align:center;margin-bottom:28px;">
           <div style="display:inline-block;background:#fee2e2;border-radius:50%;padding:20px;margin-bottom:16px;">
             <span style="font-size:36px;">❌</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:#b91c1c;">Preuve refusée</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${data.userName || "Ambassadeur"}, ta preuve n'a pas pu être validée.</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${escapeHtml(data.userName || "Ambassadeur")}, ta preuve n'a pas pu être validée.</p>
         </div>
 
         <div style="padding:20px;background:${BRAND.teal}10;border-radius:12px;margin-bottom:16px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Campagne</p>
-          <p style="margin:6px 0 0;font-size:16px;font-weight:800;color:${BRAND.teal};">${data.campaignTitle || "Campagne"}</p>
+          <p style="margin:6px 0 0;font-size:16px;font-weight:800;color:${BRAND.teal};">${escapeHtml(data.campaignTitle || "Campagne")}</p>
         </div>
 
         <div style="padding:20px;background:#fef2f2;border-radius:12px;border-left:4px solid #ef4444;margin-bottom:16px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.8px;">Motif du refus</p>
-          <p style="margin:8px 0 0;font-size:14px;color:#374151;line-height:1.6;">${data.reason || "Non précisé"}</p>
+          <p style="margin:8px 0 0;font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(data.reason || "Non précisé")}</p>
         </div>
 
         <div style="padding:16px;background:#fffbeb;border-radius:12px;">
@@ -411,8 +474,8 @@ serve(async (req: Request) => {
       const rows = Object.entries(data.details || {})
         .map(([k, v]) => `
           <tr>
-            <td style="padding:8px 0;color:#6b7280;font-size:13px;border-bottom:1px solid #f3f4f6;">${k}</td>
-            <td style="padding:8px 0;text-align:right;font-weight:800;color:#111827;font-size:13px;border-bottom:1px solid #f3f4f6;">${v}</td>
+            <td style="padding:8px 0;color:#6b7280;font-size:13px;border-bottom:1px solid #f3f4f6;">${escapeHtml(k)}</td>
+            <td style="padding:8px 0;text-align:right;font-weight:800;color:#111827;font-size:13px;border-bottom:1px solid #f3f4f6;">${escapeHtml(v)}</td>
           </tr>
         `).join('');
 
@@ -425,25 +488,25 @@ serve(async (req: Request) => {
         </div>
       `);
     } else if (type === "campaign_failed") {
-      subject = `❌ Échec du paiement pour votre campagne : ${data.campaignTitle}`;
+      subject = `❌ Échec du paiement pour votre campagne : ${escapeHtml(data.campaignTitle)}`;
       htmlContent = baseLayout(`
         <div style="text-align:center;margin-bottom:28px;">
           <div style="display:inline-block;background:#fee2e2;border-radius:50%;padding:20px;margin-bottom:16px;">
             <span style="font-size:36px;">❌</span>
           </div>
           <h2 style="margin:0 0 8px;font-size:26px;font-weight:bold;color:#b91c1c;">Échec du paiement</h2>
-          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${data.advertiserName || "Annonceur"}, nous avons rencontré un problème avec votre paiement.</p>
+          <p style="margin:0;color:#6b7280;font-size:14px;">Bonjour ${escapeHtml(data.advertiserName || "Annonceur")}, nous avons rencontré un problème avec votre paiement.</p>
         </div>
 
         <div style="padding:20px;background:#fef2f2;border-radius:12px;margin-bottom:16px;border-left:4px solid #ef4444;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Campagne</p>
-          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:#b91c1c;">${data.campaignTitle}</p>
+          <p style="margin:6px 0 0;font-size:18px;font-weight:900;color:#b91c1c;">${escapeHtml(data.campaignTitle)}</p>
         </div>
 
         ${data.error ? `
         <div style="padding:16px;background:#f9fafb;border-radius:12px;margin-bottom:16px;">
           <p style="margin:0;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.8px;">Détails de l'erreur</p>
-          <p style="margin:4px 0 0;font-size:14px;color:#374151;">${data.error}</p>
+          <p style="margin:4px 0 0;font-size:14px;color:#374151;">${escapeHtml(data.error)}</p>
         </div>
         ` : ""}
 
@@ -472,7 +535,7 @@ serve(async (req: Request) => {
       from = `SikaAds Togo <${rawFrom}>`;
     }
 
-    console.log(`📧 Sending email to ${to} (From: ${from}, Subject: ${subject}) via Resend`);
+    console.log('Sending email via Resend');
 
     const resendResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -491,7 +554,7 @@ serve(async (req: Request) => {
     const resendData = await resendResponse.json();
 
     if (!resendResponse.ok) {
-      console.error("❌ Resend API error:", resendData);
+      console.error('❌ Resend API error:', resendResponse.status);
       return new Response(JSON.stringify({ error: "Erreur lors de l'envoi de l'email via Resend API" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -502,9 +565,9 @@ serve(async (req: Request) => {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err: any) {
-    console.error("❌ Error sending email:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+  } catch {
+    console.error("❌ Error sending email");
+    return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

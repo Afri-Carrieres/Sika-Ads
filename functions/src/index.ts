@@ -1,10 +1,13 @@
 import {setGlobalOptions} from "firebase-functions/v2";
 import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {onCall, onRequest, HttpsError} from "firebase-functions/v2/https";
+import type {Request} from "firebase-functions/v2/https";
+import type {Response} from "express";
 import {initializeApp} from "firebase-admin/app";
 import {FieldValue, getFirestore} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
 import * as logger from "firebase-functions/logger";
+import * as crypto from "node:crypto";
 
 // ✅ Import email functions (secrets are auto-managed)
 import {
@@ -30,6 +33,7 @@ import {
     createMobileWithdrawal,
     GOMBO_PUBLIC_KEY_SECRET,
     GOMBO_PRIVATE_KEY_SECRET,
+    GOMBO_WEBHOOK_SECRET,
 } from "./gomboPlus";
 
 initializeApp();
@@ -37,7 +41,19 @@ const db = getFirestore();
 
 setGlobalOptions({maxInstances: 10});
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "danielattoh79@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+
+// In-memory per-email rate limiter for password reset / email verification (60s window).
+const EMAIL_RATE_LIMIT_MS = 60_000;
+const lastAuthEmailSentAt: Map<string, number> = new Map();
+
+function isAuthEmailThrottled(email: string): boolean {
+    const now = Date.now();
+    const last = lastAuthEmailSentAt.get(email) ?? 0;
+    if (now - last < EMAIL_RATE_LIMIT_MS) return true;
+    lastAuthEmailSentAt.set(email, now);
+    return false;
+}
 
 // ✅ Secrets must be explicitly listed in the functions options
 const commonOptions = {
@@ -54,6 +70,7 @@ const gomboOptions = {
         RESEND_FROM_SECRET,
         GOMBO_PUBLIC_KEY_SECRET,
         GOMBO_PRIVATE_KEY_SECRET,
+        GOMBO_WEBHOOK_SECRET,
     ],
 };
 
@@ -68,7 +85,7 @@ export const onUserCreated = onDocumentCreated(
             }
             logger.info("onUserCreated: Sending welcome email", {
                 userId: event.params.userId,
-                email: user.email,
+                email: "<redacted>",
                 name: user.name,
             });
             await sendWelcomeEmail(String(user.email), String(user.name));
@@ -110,7 +127,7 @@ export const onProofStatusChanged = onDocumentUpdated(
                 const cpv = Number(after.cpv ?? 20);
                 logger.info("onProofStatusChanged: Sending proof validated email", {
                     userId,
-                    email,
+                    email: "<redacted>",
                     views,
                     earnings: views * cpv,
                 });
@@ -120,7 +137,7 @@ export const onProofStatusChanged = onDocumentUpdated(
             if (after.status === "rejected") {
                 logger.info("onProofStatusChanged: Sending proof rejected email", {
                     userId,
-                    email,
+                    email: "<redacted>",
                     campaignTitle,
                 });
                 await sendProofRejectedEmail(
@@ -159,7 +176,7 @@ export const onProofCreated = onDocumentCreated(
                 campaignTitle: proof.campaignTitle || proof.campaignName,
             });
 
-            await sendAdminNotificationEmail(ADMIN_EMAIL, "proof", {
+            if (ADMIN_EMAIL) await sendAdminNotificationEmail(ADMIN_EMAIL, "proof", {
                 "Ambassadeur": userName,
                 "Campagne": String(proof.campaignTitle || proof.campaignName || "Inconnue"),
                 "Vues soumises": Number(proof.viewsCount ?? 0).toLocaleString(),
@@ -248,7 +265,9 @@ export const onWithdrawalCreated = onDocumentCreated(
                     );
                 });
             } catch (e) {
-                console.error("onWithdrawalCreated debit error:", e);
+                logger.error("onWithdrawalCreated debit error:", {
+                    error: e instanceof Error ? e.message : String(e),
+                });
             }
         }
 
@@ -279,7 +298,7 @@ export const onWithdrawalCreated = onDocumentCreated(
             if (userEmail) {
                 logger.info("onWithdrawalCreated: Sending withdrawal request email", {
                     withdrawalId,
-                    userEmail,
+                    userEmail: "<redacted>",
                     userName,
                     amount,
                 });
@@ -288,7 +307,7 @@ export const onWithdrawalCreated = onDocumentCreated(
         } catch (error) {
             logger.error("onWithdrawalCreated: Failed to send user email", {
                 withdrawalId,
-                userEmail,
+                userEmail: "<redacted>",
                 error: error instanceof Error ? error.message : String(error),
             });
         }
@@ -300,7 +319,7 @@ export const onWithdrawalCreated = onDocumentCreated(
                 amount,
                 provider,
             });
-            await sendAdminNotificationEmail(ADMIN_EMAIL, "withdrawal", {
+            if (ADMIN_EMAIL) await sendAdminNotificationEmail(ADMIN_EMAIL, "withdrawal", {
                 "Ambassadeur": userName || "-",
                 "Montant": `${amount.toLocaleString()} FCFA`,
                 "Opérateur": provider || "-",
@@ -412,6 +431,11 @@ export const requestPasswordReset = onCall(
             throw new HttpsError("invalid-argument", "missing_email");
         }
 
+        // Naive per-email throttle (60s window) to prevent email bombing.
+        if (isAuthEmailThrottled(email)) {
+            throw new HttpsError("resource-exhausted", "too_many_requests");
+        }
+
         try {
             // Generate the link. We redirect to our custom reset page.
             // Using a simple query param 'mode=resetPassword' for the custom frontend logic.
@@ -430,11 +454,12 @@ export const requestPasswordReset = onCall(
             await sendPasswordResetEmail(email, name, link);
             return {success: true};
         } catch (e: unknown) {
-            console.error("requestPasswordReset error:", e);
+            logger.error("requestPasswordReset error:", e instanceof Error ? e.message : String(e));
+            // Never reveal whether the email exists (avoids account enumeration).
             if (typeof e === "object" && e !== null && "code" in e && (e as {code: string}).code === "auth/user-not-found") {
                 return {success: true};
             }
-            throw new HttpsError("internal", typeof e === "object" && e !== null && "message" in e ? String((e as { message: string }).message) : "failed_to_send_reset_email");
+            throw new HttpsError("internal", "failed_to_send_reset_email");
         }
     }
 );
@@ -442,9 +467,16 @@ export const requestPasswordReset = onCall(
 export const requestEmailVerification = onCall(
     {...commonOptions},
     async (req) => {
+        if (!req.auth) throw new HttpsError("unauthenticated", "login_required");
+
         const email = String(req.data?.email ?? "").trim().toLowerCase();
         if (!email) {
             throw new HttpsError("invalid-argument", "missing_email");
+        }
+
+        // Naive per-email throttle (60s window) to prevent email bombing.
+        if (isAuthEmailThrottled(email)) {
+            throw new HttpsError("resource-exhausted", "too_many_requests");
         }
 
         try {
@@ -463,8 +495,12 @@ export const requestEmailVerification = onCall(
             await sendEmailVerificationEmail(email, name, link);
             return {success: true};
         } catch (e: unknown) {
-            console.error("requestEmailVerification error:", e);
-            throw new HttpsError("internal", typeof e === "object" && e !== null && "message" in e ? String((e as { message: string }).message) : "failed_to_send_verification_email");
+            logger.error("requestEmailVerification error:", e instanceof Error ? e.message : String(e));
+            // Never reveal whether the email exists (avoids account enumeration).
+            if (typeof e === "object" && e !== null && "code" in e && (e as {code: string}).code === "auth/user-not-found") {
+                return {success: false, reason: "not_found"};
+            }
+            throw new HttpsError("internal", "failed_to_send_verification_email");
         }
     }
 );
@@ -517,7 +553,7 @@ export const onCampaignCreated = onDocumentCreated(
             );
         }
 
-        await sendAdminNotificationEmail(ADMIN_EMAIL, "campaign", {
+        if (ADMIN_EMAIL) await sendAdminNotificationEmail(ADMIN_EMAIL, "campaign", {
             "Campagne": title || "-",
             "Annonceur": String(campaign.advertiserName || "-"),
             "Budget": `${totalBudget.toLocaleString()} FCFA`,
@@ -633,8 +669,8 @@ export const gomboCreateMobileDeposit = onCall(
             if (e instanceof HttpsError) {
                 throw e;
             }
-            console.error("Gombo Create Error:", e);
-            throw new HttpsError("internal", `gombo_create_failed: error`, {error: String(e)});
+            logger.error("Gombo Create Error:", e instanceof Error ? e.message : String(e));
+            throw new HttpsError("internal", "gombo_create_failed");
         }
     }
 );
@@ -716,8 +752,8 @@ export const gomboCheckTransactionStatus = onCall(
                 reference: transaction_reference,
                 error: errorMsg,
             });
-            // Expose the real error message to the client for debugging
-            throw new HttpsError("internal", `gombo_api_error: ${errorMsg}`);
+            // Keep detailed info server-side only; return a generic message to the client.
+            throw new HttpsError("internal", "gombo_api_error");
         }
         /* eslint-enable camelcase */
     }
@@ -800,7 +836,7 @@ export const validateCampaignPayment = onCall(
                 campaignId,
                 error: e instanceof Error ? e.message : String(e),
             });
-            throw new HttpsError("internal", "validation_failed", {error: String(e)});
+            throw new HttpsError("internal", "validation_failed");
         }
     }
 );
@@ -832,148 +868,170 @@ function isGomboFailure(status: unknown, message?: unknown): boolean {
     const failureKeywords = ["FAILED", "CANCELLED", "CANCELED", "ECHOUA", "ECHOUER", "ECHOUE", "ANNULE", "ECHEC"];
     return failureKeywords.some((keyword) => s.includes(keyword));
 }
+
+// Inner handler for gomboWebhook (business logic extracted for clarity).
+async function gomboWebhookHandler(req: Request, res: Response) {
+    /* eslint-disable camelcase */
+    const body = req.body || {};
+    const {
+        status,
+        transaction_ref,
+        reference,
+        transaction_reference,
+        status_message,
+        message,
+        error,
+    } = body;
+
+    // Try all possible reference formats
+    const refToUse = transaction_reference || transaction_ref || reference || body.txn_ref || body.ref;
+    const statusToCheck = String(status || message || "").trim();
+    const messageToCheck = String(status_message || message || error || "").trim();
+
+    logger.info("gomboWebhook: Extracted values", {
+        refToUse,
+        statusToCheck,
+        messageToCheck,
+    });
+
+    if (!refToUse) {
+        logger.warn("gomboWebhook: Missing reference in body");
+        res.status(400).json({error: "missing_reference"});
+        return;
+    }
+
+    logger.info("gomboWebhook: Processing status", {refToUse, status: statusToCheck, message: messageToCheck});
+
+    if (isGomboSuccess(statusToCheck, messageToCheck)) {
+        try {
+            let campaignDoc;
+            const campaignQuery = await db.collection("campaigns")
+                .where("paymentReference", "==", refToUse)
+                .limit(1)
+                .get();
+
+            if (campaignQuery.empty) {
+                logger.warn("gomboWebhook: Campaign not found for reference", {refToUse});
+                // Also try array-contains variant
+                const campaignQueryByRef = await db.collection("campaigns")
+                    .where("paymentReference", "array-contains", refToUse)
+                    .limit(1)
+                    .get();
+                if (campaignQueryByRef.empty) {
+                    logger.error("gomboWebhook: Campaign still not found after retry", {refToUse});
+                    res.status(404).json({error: "campaign_not_found", reference: refToUse});
+                    return;
+                }
+                campaignDoc = campaignQueryByRef.docs[0];
+            } else {
+                campaignDoc = campaignQuery.docs[0];
+            }
+            const campaignId = campaignDoc.id;
+
+            await campaignDoc.ref.update({
+                paymentStatus: "paid",
+                campaignPaymentStatus: "payment_received",
+                status: "active",
+                paymentConfirmed: true,
+                paymentConfirmedAt: FieldValue.serverTimestamp(),
+                paymentConfirmedBy: "gombo_webhook_auto",
+                updatedAt: FieldValue.serverTimestamp(),
+            });
+
+            logger.info("gomboWebhook: Successfully updated campaign (SUCCESS)", {
+                campaignId,
+                reference: refToUse,
+            });
+            res.status(200).json({success: true, campaignId, reference: refToUse});
+        } catch (updateError) {
+            logger.error("gomboWebhook: Update failed", {
+                error: updateError instanceof Error ? updateError.message : String(updateError),
+                reference: refToUse,
+            });
+            res.status(500).json({error: "update_failed"});
+        }
+    } else if (isGomboFailure(statusToCheck, messageToCheck)) {
+        try {
+            const campaignQuery = await db.collection("campaigns")
+                .where("paymentReference", "==", refToUse)
+                .limit(1)
+                .get();
+
+            if (!campaignQuery.empty) {
+                const campaignDoc = campaignQuery.docs[0];
+                await campaignDoc.ref.update({
+                    paymentStatus: "failed",
+                    campaignPaymentStatus: "payment_failed",
+                    paymentError: String(messageToCheck || statusToCheck || "Unknown error"),
+                    updatedAt: FieldValue.serverTimestamp(),
+                });
+                logger.info("gomboWebhook: Updated campaign (FAILED)", {
+                    campaignId: campaignDoc.id,
+                    reference: refToUse,
+                });
+            }
+            res.status(200).json({success: false, reference: refToUse, error: "payment_failed"});
+        } catch (failureError) {
+            logger.error("gomboWebhook: Failure update failed", {
+                error: failureError instanceof Error ? failureError.message : String(failureError),
+            });
+            res.status(500).json({error: "update_failed"});
+        }
+    } else {
+        logger.info("gomboWebhook: Ignoring non-terminal status", {
+            refToUse,
+            statusToCheck,
+            messageToCheck,
+        });
+        res.status(202).json({accepted: true, reference: refToUse, message: "Status pending"});
+    }
+    /* eslint-enable camelcase */
+}
+
 export const gomboWebhook = onRequest(
     {...gomboOptions},
     async (req, res) => {
-        // ✅ Log complet pour le débogage
-        console.log("--- GOMBO CALLBACK RECEIVED ---");
-        console.log("Full Request:", {
-            method: req.method,
-            headers: req.headers,
-            body: req.body,
-            query: req.query,
-        });
-
-        logger.info("gomboWebhook: Received notification", {
-            method: req.method,
-            body: req.body,
-            url: req.url,
-        });
-
         if (req.method !== "POST") {
             logger.warn("gomboWebhook: Invalid method", {method: req.method});
             res.status(405).send("Method Not Allowed");
             return;
         }
 
-        /* eslint-disable camelcase */
-        const body = req.body || {};
-        const {
-            status,
-            transaction_ref,
-            reference,
-            transaction_reference,
-            status_message,
-            message,
-            error,
-        } = body;
-
-        // Essayer tous les formats possibles de référence
-        const refToUse = transaction_reference || transaction_ref || reference || body.txn_ref || body.ref;
-        const statusToCheck = String(status || message || "").trim();
-        const messageToCheck = String(status_message || message || error || "").trim();
-
-        logger.info("gomboWebhook: Extracted values", {
-            refToUse,
-            statusToCheck,
-            messageToCheck,
-            allBody: JSON.stringify(body),
-        });
-
-        if (!refToUse) {
-            logger.warn("gomboWebhook: Missing reference in body", {body});
-            res.status(400).json({error: "missing_reference", received: body});
+        // --- HTTP signature verification (HMAC-SHA256) ---
+        // HMAC is computed over JSON.stringify(req.body), matching the canonical
+        // serialization that Gombo signs. This avoids raw-body capture complexity
+        // while remaining deterministic and testable.
+        const secret = process.env.GOMBO_WEBHOOK_SECRET;
+        if (!secret) {
+            logger.error("gomboWebhook: Webhook secret not configured");
+            res.status(500).json({error: "webhook_not_configured"});
             return;
         }
-
-        logger.info("gomboWebhook: Processing status", {refToUse, status: statusToCheck, message: messageToCheck});
-
-        if (isGomboSuccess(statusToCheck, messageToCheck)) {
-            try {
-                let campaignDoc;
-                const campaignQuery = await db.collection("campaigns")
-                    .where("paymentReference", "==", refToUse)
-                    .limit(1)
-                    .get();
-
-                if (campaignQuery.empty) {
-                    logger.warn("gomboWebhook: Campaign not found for reference", {refToUse});
-                    // On cherche aussi avec les variantes
-                    const campaignQueryByRef = await db.collection("campaigns")
-                        .where("paymentReference", "array-contains", refToUse)
-                        .limit(1)
-                        .get();
-                    if (campaignQueryByRef.empty) {
-                        logger.error("gomboWebhook: Campaign still not found after retry", {refToUse, body});
-                        res.status(404).json({error: "campaign_not_found", reference: refToUse});
-                        return;
-                    }
-                    campaignDoc = campaignQueryByRef.docs[0];
-                } else {
-                    campaignDoc = campaignQuery.docs[0];
-                }
-                const campaignId = campaignDoc.id;
-
-                await campaignDoc.ref.update({
-                    paymentStatus: "paid",
-                    campaignPaymentStatus: "payment_received",
-                    status: "active",
-                    paymentConfirmed: true,
-                    paymentConfirmedAt: FieldValue.serverTimestamp(),
-                    paymentConfirmedBy: "gombo_webhook_auto",
-                    updatedAt: FieldValue.serverTimestamp(),
-                });
-
-                logger.info("gomboWebhook: Successfully updated campaign (SUCCESS)", {
-                    campaignId,
-                    reference: refToUse,
-                    payload: body,
-                });
-                res.status(200).json({success: true, campaignId, reference: refToUse});
-            } catch (updateError) {
-                logger.error("gomboWebhook: Update failed", {
-                    error: updateError instanceof Error ? updateError.message : String(updateError),
-                    reference: refToUse,
-                });
-                res.status(500).json({error: "update_failed", details: String(updateError)});
-            }
-        } else if (isGomboFailure(statusToCheck, messageToCheck)) {
-            try {
-                const campaignQuery = await db.collection("campaigns")
-                    .where("paymentReference", "==", refToUse)
-                    .limit(1)
-                    .get();
-
-                if (!campaignQuery.empty) {
-                    const campaignDoc = campaignQuery.docs[0];
-                    await campaignDoc.ref.update({
-                        paymentStatus: "failed",
-                        campaignPaymentStatus: "payment_failed",
-                        paymentError: String(messageToCheck || statusToCheck || "Unknown error"),
-                        updatedAt: FieldValue.serverTimestamp(),
-                    });
-                    logger.info("gomboWebhook: Updated campaign (FAILED)", {
-                        campaignId: campaignDoc.id,
-                        reference: refToUse,
-                    });
-                }
-                res.status(200).json({success: false, reference: refToUse, error: "payment_failed"});
-            } catch (failureError) {
-                logger.error("gomboWebhook: Failure update failed", {
-                    error: failureError instanceof Error ? failureError.message : String(failureError),
-                });
-                res.status(500).json({error: "update_failed", details: String(failureError)});
-            }
-        } else {
-            logger.info("gomboWebhook: Ignoring non-terminal status", {
-                refToUse,
-                statusToCheck,
-                messageToCheck,
-                body,
-            });
-            res.status(202).json({accepted: true, reference: refToUse, message: "Status pending"});
+        const signature = req.get("x-gombo-signature");
+        if (!signature) {
+            logger.warn("gomboWebhook: Missing signature header");
+            res.status(401).json({error: "missing_signature"});
+            return;
         }
-        /* eslint-enable camelcase */
+        const rawBody = JSON.stringify(req.body ?? {});
+        const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+        const provided = String(signature).trim().toLowerCase();
+        let sigOk = false;
+        try {
+            const a = Buffer.from(expected, "hex");
+            const b = Buffer.from(provided, "hex");
+            sigOk = a.length === b.length && crypto.timingSafeEqual(a, b);
+        } catch {
+            sigOk = false;
+        }
+        if (!sigOk) {
+            logger.warn("gomboWebhook: Invalid signature");
+            res.status(401).json({error: "invalid_signature"});
+            return;
+        }
+        // --- End signature verification ---
+
+        await gomboWebhookHandler(req, res);
     }
 );
 
@@ -1155,7 +1213,10 @@ export const adminApproveWithdrawal = onCall(
             return {success: true, reference: res.reference || transaction_ref};
             /* eslint-enable camelcase */
         } catch (e: unknown) {
-            console.error("Withdrawal Approval Error:", e);
+            const errorMsgForCleanup = typeof e === "object" && e !== null
+                ? String((e as { message?: string }).message || (e as { code?: string }).code || e)
+                : String(e);
+            logger.error("Withdrawal Approval Error:", errorMsgForCleanup);
 
             if (e instanceof HttpsError) {
                 throw e;
@@ -1170,15 +1231,11 @@ export const adminApproveWithdrawal = onCall(
                     if (status !== "processing") return;
                     if (String(data.processingBy || "") !== String(adminId || "")) return;
 
-                    const errorMsg = typeof e === "object" && e !== null
-                        ? String((e as { message?: string }).message || (e as { code?: string }).code || e)
-                        : String(e);
-
                     tx.set(
                         withdrawalRef,
                         {
                             status: "pending",
-                            lastError: errorMsg,
+                            lastError: errorMsgForCleanup,
                             lastErrorAt: FieldValue.serverTimestamp(),
                             processingAt: FieldValue.delete(),
                             processingBy: FieldValue.delete(),
@@ -1188,11 +1245,12 @@ export const adminApproveWithdrawal = onCall(
                     );
                 });
             } catch (inner) {
-                console.error("Withdrawal Approval Error (cleanup):", inner);
+                logger.error("Withdrawal Approval Error (cleanup):", {
+                    error: inner instanceof Error ? inner.message : String(inner),
+                });
             }
 
-            const withdrawalErrorMsg = typeof e === "object" && e !== null && "message" in e ? String((e as { message: string }).message) : String(e);
-            throw new HttpsError("internal", `withdrawal_failed: ${withdrawalErrorMsg}`, {error: String(e)});
+            throw new HttpsError("internal", "withdrawal_failed");
         }
     }
 );

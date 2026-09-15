@@ -25,21 +25,6 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
-  const [attempts, setAttempts] = useState(0);
-  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
-
-  const MAX_ATTEMPTS = 3;
-  const LOCKOUT_MS = 120_000;
-
-  const isLockedOut = (): boolean => {
-    if (!lockoutUntil) return false;
-    if (Date.now() >= lockoutUntil) {
-      setLockoutUntil(null);
-      setAttempts(0);
-      return false;
-    }
-    return true;
-  };
 
   const verifyStaffRole = async (): Promise<boolean> => {
     setVerifying(true);
@@ -66,26 +51,13 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isLockedOut()) {
-      const remaining = Math.ceil(((lockoutUntil || 0) - Date.now()) / 1000);
-      setError(`Trop de tentatives. Reessayez dans ${remaining}s.`);
-      return;
-    }
-
     setLoading(true);
     setError('');
 
     try {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });
       if (err) {
-        const newAttempts = attempts + 1;
-        setAttempts(newAttempts);
-        if (newAttempts >= MAX_ATTEMPTS) {
-          setLockoutUntil(Date.now() + LOCKOUT_MS);
-          setError(`Acces restreint. Compte verrouille pour 2 minutes.`);
-        } else {
-          setError(`Identifiants incorrects. (${MAX_ATTEMPTS - newAttempts} essais restants)`);
-        }
+        setError('Identifiants incorrects.');
         return;
       }
 
@@ -147,7 +119,7 @@ const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onGoBack }) 
             <div className="mt-10 space-y-4">
               {[
                 { icon: ShieldCheck, title: 'Authentification securisee', desc: 'Verification du role en temps reel' },
-                { icon: ShieldAlert, title: 'Protection renforcee', desc: 'Verrouillage apres 3 tentatives echouees' },
+                { icon: ShieldAlert, title: 'Protection renforcee', desc: 'Limitation des tentatives cote serveur' },
                 { icon: Lock, title: 'Session protegee', desc: 'Donnees chiffrees de bout en bout' },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4">
