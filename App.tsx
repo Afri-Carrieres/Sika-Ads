@@ -535,35 +535,21 @@ const App: React.FC = () => {
 
     // Handler annulation paiement
     const handlePaymentCancel = async () => {
-      if (pendingCampaignId) {
+      if (user?.email && pendingCampaignId) {
         try {
-          await supabase.from('campaigns').update({
-            paymentStatus: 'failed',
-            campaignPaymentStatus: 'payment_failed',
-            status: 'failed',
-            paymentError: 'Paiement annulé par l\'utilisateur',
-            updatedAt: new Date().toISOString(),
-          }).eq('id', pendingCampaignId);
-        } catch (dbErr) {
-          console.warn("Erreur mise à jour annulation campagne:", dbErr);
-        }
-
-        if (user?.email) {
-          try {
-            await supabase.functions.invoke('send-email', {
-              body: {
-                to: user.email,
-                type: 'payment_failed',
-                data: {
-                  advertiserName: userData?.name || user.user_metadata?.full_name || 'Annonceur',
-                  campaignTitle: 'Campagne non payée',
-                  error: 'Paiement annulé par l\'utilisateur',
-                }
+          await supabase.functions.invoke('send-email', {
+            body: {
+              to: user.email,
+              type: 'payment_failed',
+              data: {
+                advertiserName: userData?.name || user.user_metadata?.full_name || 'Annonceur',
+                campaignTitle: 'Campagne non payée',
+                error: 'Paiement annulé par l\'utilisateur',
               }
-            });
-          } catch (emailErr) {
-            console.warn("Échec envoi email annulation paiement:", emailErr);
-          }
+            }
+          });
+        } catch (emailErr) {
+          console.warn("Échec envoi email annulation paiement:", emailErr);
         }
       }
       setShowPayment(false);

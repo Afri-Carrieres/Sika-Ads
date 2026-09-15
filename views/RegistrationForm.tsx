@@ -78,11 +78,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
       // Final step: Create user in Supabase
       setLoading(true);
       try {
-        if (!identityDocument) {
-          setError('Veuillez joindre une pièce d’identité pour vérifier votre majorité.');
-          setLoading(false);
-          return;
-        }
+        // Upload de la pièce d'identité temporairement désactivé pendant les tests.
+        // La vérification pourra être réactivée lorsque le bucket et les policies seront prêts.
         // Generate referral code BEFORE signUp so it can be stored in user_metadata
         const referralCode = (name.substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
 
@@ -122,34 +119,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
           return;
         }
 
-        // ── Cas où email_confirmations est désactivé (user renvoyé immédiatement) ──
-        const uid = user.id;
-        const documentPath = `${uid}/${crypto.randomUUID()}-${identityDocument.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-        const { error: uploadError } = await supabase.storage
-          .from('identity-documents')
-          .upload(documentPath, identityDocument, { upsert: false, contentType: identityDocument.type });
-        if (uploadError) throw uploadError;
-
-        // --- CREATE USER PROFILE ---
-        // ⚠️ Colonnes réelles de la table (voir migration 20260702_create_users.sql)
-        // gender, city, ageRange, paymentMethod, createdAt ne sont PAS dans le schéma → omis
-        const { error: dbErr } = await supabase.from('users').insert({
-          id: uid,
-          name,
-          email,
-          momoNumber,
-          role: 'AMBASSADOR',
-          status: 'pending_verification',
-          balance: 0,
-          totalEarned: 0,
-          clicks: 0,
-          referralCode: referralCode,
-          referralCount: 0,
-          referralEarnings: 0,
-          verification_document_path: documentPath,
-          verification_submitted_at: new Date().toISOString(),
-        });
-        if (dbErr) throw dbErr;
+        // Le trigger PostgreSQL cree le profil public cote serveur.
+        // Cela fonctionne meme si la confirmation email laisse la session a null.
 
         // Send verification email via Supabase Edge Function (non-blocking)
         try {
@@ -546,7 +517,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                     </div>
                   </label>
 
-                  <label className="block">
+                  {/* <label className="block">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Pièce d'identité</span>
                     <div className="rounded-2xl border border-dashed border-[#128686]/40 bg-[#E7F4F4]/40 p-5">
                       <div className="flex items-center gap-3">
@@ -555,7 +526,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                       </div>
                       <p className="mt-2 text-[10px] font-medium text-gray-500">JPG, PNG ou PDF, 5 Mo maximum. Le document est utilisé uniquement pour confirmer votre majorité.</p>
                     </div>
-                  </label>
+                  </label> */}
                 </div>
               )}
             </div>
@@ -582,7 +553,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                   loading ||
                   (step === 1 && (!email || !password || !pwdStrong || password !== confirmPassword)) ||
                   (step === 2 && (!name || !gender || !city || !ageRange)) ||
-                  (step === 3 && (!paymentMethod || !momoNumber || !identityDocument))
+                  (step === 3 && (!paymentMethod || !momoNumber))
                 }
                 onClick={handleNextStep}
                 className="flex-1 py-4 bg-[#f55d05] text-white rounded-2xl font-bold uppercase tracking-widest text-sm shadow-xl shadow-[#062127]/30 hover:bg-[#f56505e3] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"

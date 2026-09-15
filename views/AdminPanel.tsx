@@ -499,83 +499,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     );
   };
 
-  const handleAdminVerifyCampaignPayment = async (campaign: Campaign) => {
-    const txnRef = campaign.paymentReference || (campaign as any).internalTransactionRef;
-    if (!txnRef) {
-      showFeedback("Aucune référence de transaction enregistrée pour cette campagne.", "error");
-      return;
-    }
-    setSyncingCampaigns(prev => new Set(prev).add(campaign.id));
-    try {
-      const res = await gomboCheckTransactionStatus({
-        transaction_reference: txnRef
-      });
-      const s = String(res.status || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (["completed", "success", "successful", "approved", "complete"].includes(s)) {
-        await supabase.from('campaigns').update({
-          paymentStatus: 'paid',
-          campaignPaymentStatus: 'payment_received',
-          paymentConfirmed: true,
-          status: 'active',
-          paymentConfirmedAt: new Date().toISOString(),
-          paymentConfirmedBy: currentAdminData?.id || 'admin',
-          updatedAt: new Date().toISOString()
-        }).eq('id', campaign.id);
-        showFeedback(`Paiement vérifié avec succès ! La campagne "${campaign.title}" est activée.`, "success");
-      } else if (["failed", "cancelled", "canceled", "echoue", "annule"].includes(s)) {
-        await supabase.from('campaigns').update({
-          paymentStatus: 'failed',
-          campaignPaymentStatus: 'payment_failed',
-          status: 'failed',
-          paymentError: String(res.message || 'Paiement échoué'),
-          updatedAt: new Date().toISOString()
-        }).eq('id', campaign.id);
-        showFeedback(`Le paiement a été confirmé comme échoué par Gombo. Statut mis à jour.`, "info");
-      } else {
-        showFeedback(`Statut Gombo actuel : ${res.status || 'En attente'}. ${res.message || ''}`, "info");
-      }
-      fetchAllCampaigns();
-    } catch (e: any) {
-      showFeedback(`Erreur lors de la vérification : ${e?.message || 'Inconnue'}`, "error");
-    } finally {
-      setSyncingCampaigns(prev => {
-        const next = new Set(prev);
-        next.delete(campaign.id);
-        return next;
-      });
-    }
-  };
-
-
-  const handleAdminForcePaymentStatus = async (campaignId: string, newStatus: 'paid' | 'failed') => {
-    try {
-      if (newStatus === 'paid') {
-        await supabase.from('campaigns').update({
-          paymentStatus: 'paid',
-          campaignPaymentStatus: 'payment_received',
-          paymentConfirmed: true,
-          status: 'active',
-          paymentConfirmedAt: new Date().toISOString(),
-          paymentConfirmedBy: currentAdminData?.id || 'admin',
-          updatedAt: new Date().toISOString()
-        }).eq('id', campaignId);
-        showFeedback("Paiement validé manuellement. Campagne activée.");
-      } else {
-        await supabase.from('campaigns').update({
-          paymentStatus: 'failed',
-          campaignPaymentStatus: 'payment_failed',
-          status: 'failed',
-          paymentError: 'Marqué comme échoué manuellement par un administrateur',
-          updatedAt: new Date().toISOString()
-        }).eq('id', campaignId);
-        showFeedback("Paiement marqué comme échoué.", "info");
-      }
-      fetchAllCampaigns();
-    } catch (e: any) {
-      showFeedback("Erreur lors de la mise à jour.", "error");
-    }
-  };
-
   const deleteProof = async (proof: Proof) => {
     try {
       const { error: storageError } = await supabase.storage
@@ -2425,7 +2348,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     <th className="px-8 py-6">Date Création</th>
                     <th className="px-8 py-6">Statut Paiement</th>
                     <th className="px-8 py-6">Reference de Transaction</th>
-                    <th className="px-8 py-6 text-right">Actions</th>
+                    {/* <th className="px-8 py-6 text-right">Actions</th> */}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -2466,49 +2389,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         <td className="px-8 py-6">
                           <p className="text-xs font-bold text-gray-500">{campaign.paymentReference || '—'}</p>
                         </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {campaign.paymentReference && (
-                              <button
-                                onClick={() => handleAdminVerifyCampaignPayment(campaign)}
-                                disabled={syncingCampaigns.has(campaign.id)}
-                                className="p-2 bg-[#E7F4F4] text-[#128686] hover:bg-[#D9ECEC] rounded-xl transition-all disabled:opacity-50 flex items-center gap-1 text-xs font-bold"
-                                title="Vérifier le statut auprès de GomboPlus"
-                              >
-                                {syncingCampaigns.has(campaign.id) ? (
-                                  <Loader2 size={14} className="animate-spin" />
-                                ) : (
-                                  <RefreshCcw size={14} />
-                                )}
-                                <span className="hidden sm:inline">Vérifier</span>
-                              </button>
-                            )}
-                            {campaign.paymentStatus !== 'paid' && (
-                              <button
-                                onClick={() => handleAdminForcePaymentStatus(campaign.id, 'paid')}
-                                className="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-xl transition-all"
-                                title="Forcer la validation du paiement"
-                              >
-                                <CheckCircle2 size={16} />
-                              </button>
-                            )}
-                            {campaign.paymentStatus !== 'failed' && (
-                              <button
-                                onClick={() => handleAdminForcePaymentStatus(campaign.id, 'failed')}
-                                className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all"
-                                title="Marquer comme paiement échoué"
-                              >
-                                <X size={16} />
-                              </button>
-                            )}
-                          </div>
-                        </td>
+                        {/* Actions placeholder - migrated to Supabase */}
                       </tr>
                     );
                   })}
                   {allCampaigns.filter(c => c.createdBy === 'user' || c.createdBy === undefined).length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-8 py-12 text-center">
+                      <td colSpan={7} className="px-8 py-12 text-center">
                         <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune campagne utilisateur en attente</p>
                       </td>
                     </tr>
