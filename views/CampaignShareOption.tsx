@@ -234,7 +234,6 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
     setIsSharing(true);
     setGuideMessage(null);
 
-    // Always copy text to clipboard as safety net
     try {
       await navigator.clipboard.writeText(shareText);
       setCopyFeedback(true);
@@ -243,10 +242,7 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
       console.warn('Erreur copie presse-papiers:', err);
     }
 
-    // Sauvegarde toujours le visuel localement (utile aussi si le partage natif échoue).
-    downloadImage(campaign.imageUrl, campaign.title);
-
-    const { supported: sharedNatively, cancelled } = await shareImageNatively(
+    const { supported, cancelled } = await shareImageNatively(
       campaign.imageUrl,
       campaign.title,
       shareText
@@ -257,81 +253,41 @@ const CampaignShareOption: React.FC<CampaignShareOptionProps> = ({ campaignId, o
       return;
     }
 
-    if (!sharedNatively) {
+    if (!supported) {
+      await downloadImage(campaign.imageUrl, campaign.title);
+
       let url = '';
       if (platform === 'whatsapp') {
         url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+        setGuideMessage("L'image a été téléchargée et le texte a été copié. Ouvrez votre statut WhatsApp et sélectionnez l'image.");
       } else if (platform === 'facebook') {
-        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink + '&platform=facebook')}`;
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${trackingLink}&platform=facebook`)}`;
+        setGuideMessage("L'image a été téléchargée et le texte a été copié. Créez ensuite votre Story Facebook.");
       } else if (platform === 'instagram') {
         url = 'https://www.instagram.com/';
-    let sharedViaFile = false;
-
-    // Try Web Share API with image file if on supported mobile browser
-    try {
-      const imageFile = await fetchImageAsFile(campaign.imageUrl, campaign.title);
-      if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
-        await navigator.share({
-          title: campaign.title,
-          text: shareText,
-          files: [imageFile],
-        });
-        sharedViaFile = true;
-        setGuideMessage("Image et texte partagés avec succès ! Revenez envoyer votre preuve de vues dans 24h.");
-      }
-    } catch (err: any) {
-      if (err?.name === 'AbortError') {
-        // User closed the share sheet without picking an app
-        setIsSharing(false);
-        return;
-      }
-      console.info('Partage natif avec fichier indisponible, basculement en mode guidé:', err);
-    }
-
-    // Fallback if native file share wasn't used
-    if (!sharedViaFile) {
-      // 1. Auto-download the campaign image so user has it in gallery
-      await downloadImage(campaign.imageUrl, campaign.title);
-
-      // 2. Open destination network
-      let url = '';
-      if (platform === 'whatsapp') {
-        const shareTextWithPlatform = shareText.replace('?platform=whatsapp', '?platform=whatsapp');
-        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTextWithPlatform)}`;
-        setGuideMessage("L'image a été téléchargée dans vos photos et le texte a été copié ! Ouvrez votre statut WhatsApp, sélectionnez l'image et collez la légende.");
-      } else if (platform === 'facebook') {
-        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink + '&platform=facebook')}`;
-        setGuideMessage("L'image a été téléchargée et le texte copié ! Créez une Story Facebook avec l'image téléchargée.");
-      } else if (platform === 'instagram') {
-        url = 'https://www.instagram.com/';
-        setGuideMessage("L'image a été téléchargée et le texte copié ! Ouvrez Instagram Stories, sélectionnez l'image et collez la légende.");
+        setGuideMessage("L'image a été téléchargée et le texte a été copié. Ouvrez Instagram Stories et sélectionnez l'image.");
       } else {
-        setGuideMessage("L'image a été téléchargée dans vos photos et le texte a été copié !");
+        setGuideMessage("L'image a été téléchargée et le texte a été copié.");
       }
 
-      if (url) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      }
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      setGuideMessage('Image et texte partagés avec succès ! Revenez envoyer votre preuve de vues dans 24h.');
     }
 
-    // Record share event in database (non-blocking)
-    (async () => {
-      try {
-        await supabase.from('campaign_share_events').insert([{
-          campaign_id: campaign.id,
-          platforms: platform === 'native' ? 'whatsapp' : platform,
-          user_id: referrerId
-        }]);
-      } catch (err) {
-        console.warn('Erreur enregistrement partage:', err);
-      }
-    })();
+    try {
+      await supabase.from('campaign_share_events').insert([{
+        campaign_id: campaign.id,
+        platforms: platform === 'native' ? 'whatsapp' : platform,
+        user_id: referrerId
+      }]);
+    } catch (err) {
+      console.warn('Erreur enregistrement partage:', err);
+    }
 
-    setTimeout(() => {
-      incrementDailyCount();
-      setIsSharing(false);
-      setShareSuccess(true);
-    }, 500);
+    incrementDailyCount();
+    setIsSharing(false);
+    setShareSuccess(true);
   };
 
   if (isLoading) {
