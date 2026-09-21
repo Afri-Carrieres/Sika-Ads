@@ -90,7 +90,8 @@ function isGomboSuccess(status: unknown, message?: unknown): boolean {
 function isGomboFailure(status: unknown, message?: unknown): boolean {
   const tokens = new Set([...tokenize(status), ...tokenize(message)]);
   return ['FAILED', 'FAILURE', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC', 'REJECTED'].some(k => tokens.has(k));
-  
+}
+
 function isTransactionFailure(txnStatus: string): boolean {
   const s = txnStatus.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return ['FAILED', 'CANCELLED', 'CANCELED', 'ECHOUA', 'ECHOUER', 'ECHOUE', 'ANNULE', 'ECHEC']

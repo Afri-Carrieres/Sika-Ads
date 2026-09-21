@@ -143,20 +143,14 @@ serve(async (req: Request) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: authData, error: authError } = await supabase.auth.getUser();
+    const { data: authData } = await supabase.auth.getUser();
+    let isStaff = false;
 
-    if (authError || !authData?.user) {
-      return new Response(JSON.stringify({ error: "unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (authData?.user?.id) {
+      const { data: callerProfile } = await supabase
+        .from('users').select('role').eq('id', authData.user.id).single();
+      isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
     }
-
-    const callerId = authData.user.id;
-
-    const { data: callerProfile } = await supabase
-      .from('users').select('role').eq('id', callerId).single();
-    const isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY_SECRET");
 
@@ -183,7 +177,7 @@ serve(async (req: Request) => {
     console.log('send-email: sending', type);
 
     const toTrimmed = String(to || '').trim().toLowerCase();
-    const callerEmail = String(authData.user.email || '').trim().toLowerCase();
+    const callerEmail = String(authData?.user?.email || '').trim().toLowerCase();
 
     if (!toTrimmed || !type) {
       return new Response(JSON.stringify({ error: "Missing required fields ('to' or 'type')" }), {
@@ -192,10 +186,22 @@ serve(async (req: Request) => {
       });
     }
 
-    // Anti-relay : un utilisateur non staff ne peut envoyer un email qu'à
-    // sa propre adresse (empêche l'exploitation de cette fonction comme
-    // relais de spam/impersonation de SikaAds).
-    if (!isStaff && toTrimmed !== callerEmail) {
+    // ── CORRECTION AUTHENTIFICATION EDGE FUNCTION RESEND ──
+    // Pour les emails de vérification et de bienvenue déclenchés lors de l'inscription, 
+    // l'utilisateur n'a pas encore de jeton JWT de session active. 
+    // On autorise ces types d'emails s'ils s'adressent à une adresse email valide.
+    const isRegistrationEmail = type === "verification" || type === "welcome";
+
+    if (!authData?.user && !isRegistrationEmail) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Anti-relay : un utilisateur non staff ne peut envoyer un email qu'à sa propre adresse
+    // (sauf pour les emails de bienvenue/vérification à l'inscription).
+    if (authData?.user && !isStaff && !isRegistrationEmail && toTrimmed !== callerEmail) {
       return new Response(JSON.stringify({ error: "forbidden" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

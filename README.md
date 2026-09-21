@@ -33,3 +33,4 @@ L’intégration GomboPlus est faite côté **Firebase Functions** (les clés ne
 
 Local (emulator):
 - Copier `functions/.env.example` vers `functions/.env` et renseigner les variables.
+

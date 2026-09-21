@@ -632,7 +632,7 @@ const App: React.FC = () => {
 
         {/* ── Cartes flottantes (position: fixed → toujours en bas à droite) ── */}
         <InstallPrompt />
-        <PushNotificationBanner userId={user?.id ?? null} />
+        <PushNotificationBanner userId={user?.id ?? null} userRole={userData?.role} />
         <ScrollToTop />
 
         {/* ────── Overlay de chargement ──────

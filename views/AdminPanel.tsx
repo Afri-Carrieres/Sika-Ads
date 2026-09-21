@@ -21,12 +21,14 @@ import {
   Loader2, ChevronLeft, ChevronRight, Wallet, Shield, Mail, ShieldCheck, UserPlus, Trash2, ArrowRight,
   Pencil, Pause, Play, BarChart2, ChevronDown,
   Megaphone, PauseCircle, Zap, CreditCard, DollarSign, RefreshCcw,
-  TrendingUp, Target, ArrowUpRight, Sparkles
+  TrendingUp, Target, ArrowUpRight, Sparkles,
+  Bell
 } from 'lucide-react';
 
 import { supabase } from '../supabase';
 import { useUserData } from '../hooks/useUserData';
 import { gomboAdminApproveWithdrawal, gomboAdminRejectWithdrawal, gomboCheckTransactionStatus } from '../services/gomboPlus';
+import { sendPushNotification, sendCampaignActivatedPush } from '../services/onesignalService';
 import Pagination from '../components/Pagination';
 
 const ITEMS_PER_PAGE = 6;
@@ -82,8 +84,15 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, addNotification, activeTab }) => {
-  const [view, setView] = useState<'overview' | 'validation' | 'users' | 'payouts' | 'team' | 'campaigns' | 'withdrawals' | 'campaignPayments' | 'gomboChecker'>('overview');
+  const [view, setView] = useState<'overview' | 'validation' | 'users' | 'payouts' | 'team' | 'campaigns' | 'withdrawals' | 'campaignPayments' | 'gomboChecker' | 'pushBroadcast'>('overview');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  // State Envoi Push OneSignal
+  const [pushTitle, setPushTitle] = useState('');
+  const [pushMessage, setPushMessage] = useState('');
+  const [pushUrl, setPushUrl] = useState('/app/marketplace');
+  const [pushSegment, setPushSegment] = useState<'All' | 'Ambassadors' | 'Advertisers'>('All');
+  const [isSendingPush, setIsSendingPush] = useState(false);
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
@@ -299,6 +308,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     else if (activeTab === 'admin-withdrawals') setView('withdrawals');
     else if (activeTab === 'admin-campaign-payments' && isSuperAdmin) setView('campaignPayments');
     else if (activeTab === 'admin-gombo-status' && isSuperAdmin) setView('gomboChecker');
+    else if (activeTab === 'admin-push-broadcast' && isSuperAdmin) setView('pushBroadcast');
   }, [activeTab, isSuperAdmin]);
 
   const showFeedback = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -1080,6 +1090,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             {view === 'withdrawals' && 'Demandes de Retraits'}
             {view === 'campaignPayments' && 'Paiements des Campagnes'}
             {view === 'gomboChecker' && 'Vérificateur GomboPlus'}
+            {view === 'pushBroadcast' && 'Envoi de Notifications Push (OneSignal)'}
           </h2>
           <p className="text-gray-500 text-sm font-medium mt-1">Console de gestion SikaAds Togo</p>
         </div>
@@ -1552,6 +1563,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           })
                           .eq('id', camp.id);
                         showFeedback(`Campagne ${newStatus === 'active' ? 'activée' : 'mise en pause'} !`);
+
+                        if (newStatus === 'active') {
+                          sendCampaignActivatedPush(camp.title, camp.id)
+                            .then(() => console.log('Push alerte campagne activée envoyé'))
+                            .catch(err => console.warn('Erreur envoi push campagne activée:', err));
+                        }
                       } catch (e: any) {
                         console.error(e);
                         showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
@@ -2513,6 +2530,183 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════
+          VIEW: PUSH BROADCAST (ONE SIGNAL)
+      ══════════════════════════════════════════ */}
+      {view === 'pushBroadcast' && isSuperAdmin && (
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
+            <div className="flex flex-col items-center text-center mb-10">
+              <div className="bg-[#E7F4F4] p-6 rounded-3xl text-[#128686] mb-4">
+                <Bell size={48} />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Centre de Diffusion Push OneSignal</h3>
+              <p className="text-gray-500 max-w-lg font-medium text-sm leading-relaxed">
+                Rédigez et envoyez une notification instantanée sur les téléphones et navigateurs de vos utilisateurs pour stimuler leur engagement.
+              </p>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!pushTitle.trim() || !pushMessage.trim()) {
+                  showFeedback('Veuillez spécifier un titre et un message.', 'error');
+                  return;
+                }
+                setIsSendingPush(true);
+                try {
+                  const res = await sendPushNotification({
+                    title: pushTitle.trim(),
+                    message: pushMessage.trim(),
+                    url: pushUrl.trim(),
+                    segment: pushSegment === 'All' ? 'All' : 'Subscribed Users',
+                  });
+                  if (res.success) {
+                    showFeedback('Notification push diffusée avec succès ! 🎉', 'success');
+                    setPushTitle('');
+                    setPushMessage('');
+                  } else {
+                    showFeedback(`Échec d'envoi : ${res.error || 'Vérifiez la configuration OneSignal.'}`, 'error');
+                  }
+                } catch (err: any) {
+                  showFeedback(`Erreur : ${err?.message || 'Inconnue'}`, 'error');
+                } finally {
+                  setIsSendingPush(false);
+                }
+              }}
+              className="max-w-xl mx-auto space-y-6"
+            >
+              {/* Presets rapides */}
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
+                  Modèles rapides de message
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPushTitle('⏰ Rappel Preuve 24h');
+                      setPushMessage('N\'oubliez pas de soumettre vos preuves de partage avant l\'échéance des 24h pour valider vos FCFA !');
+                      setPushUrl('/app/tasks');
+                    }}
+                    className="px-3 py-1.5 bg-[#E7F4F4] text-[#0E6B6B] rounded-xl text-xs font-bold hover:bg-[#D9ECEC] transition-all"
+                  >
+                    ⏰ Rappel Preuve 24h
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPushTitle('🚀 Nouvelles Campagnes Disponibles !');
+                      setPushMessage('De nouvelles campagnes rémunérées viennent d\'être publiées. Venez vite les partager !');
+                      setPushUrl('/app/marketplace');
+                    }}
+                    className="px-3 py-1.5 bg-green-50 text-green-700 rounded-xl text-xs font-bold hover:bg-green-100 transition-all"
+                  >
+                    🚀 Nouvelles Campagnes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPushTitle('💰 Vos gains vous attendent');
+                      setPushMessage('Connectez-vous sur SikaAds Togo pour suivre votre solde et demander vos retraits Mobile Money.');
+                      setPushUrl('/app/wallet');
+                    }}
+                    className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all"
+                  >
+                    💰 Rappel Gains
+                  </button>
+                </div>
+              </div>
+
+              {/* Titre */}
+              <div>
+                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+                  Titre du Push <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: 📢 Important : Nouvelles opportunités !"
+                  value={pushTitle}
+                  onChange={(e) => setPushTitle(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#128686] outline-none"
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+                  Message du Push <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Rédigez le texte de votre notification..."
+                  value={pushMessage}
+                  onChange={(e) => setPushMessage(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#128686] outline-none resize-none"
+                />
+              </div>
+
+              {/* URL de redirection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+                    Lien au Clic (URL)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ex: /app/marketplace"
+                    value={pushUrl}
+                    onChange={(e) => setPushUrl(e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-[#128686] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+                    Cible / Segment
+                  </label>
+                  <select
+                    value={pushSegment}
+                    onChange={(e) => setPushSegment(e.target.value as any)}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#128686]"
+                  >
+                    <option value="All">Tous les utilisateurs abonnés</option>
+                    <option value="Ambassadors">Ambassadeurs uniquement</option>
+                    <option value="Advertisers">Annonceurs uniquement</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Aperçu en direct */}
+              <div className="bg-gray-900 text-white p-5 rounded-2xl space-y-2 border border-gray-800">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#7FD1D1]">Aperçu de la notification</p>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#128686] flex items-center justify-center shrink-0">
+                    <Bell size={18} className="text-white" />
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="font-bold text-sm leading-tight text-white">{pushTitle || 'Titre de la notification'}</p>
+                    <p className="text-xs text-gray-300 mt-1 line-clamp-2">{pushMessage || 'Contenu du message push...'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bouton d'envoi */}
+              <button
+                type="submit"
+                disabled={isSendingPush || !pushTitle.trim() || !pushMessage.trim()}
+                className="w-full py-4.5 bg-[#128686] hover:bg-[#0E6B6B] text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+              >
+                {isSendingPush ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
+                {isSendingPush ? "Diffusion en cours..." : "Envoyer la Notification Push"}
+              </button>
+            </form>
+          </div>
         </div>
       )}
 

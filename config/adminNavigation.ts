@@ -1,4 +1,4 @@
-import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, CreditCard, Crown, Users, ShieldCheck, Check, User } from 'lucide-react';
+import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, CreditCard, Crown, Users, ShieldCheck, Check, User, Bell } from 'lucide-react';
 
 export interface NavItem {
   id: string;
@@ -60,6 +60,7 @@ export const getAdminNavigation = (userRole: 'ADMIN' | 'MODERATOR' | null): NavG
     defaultOpen: true,
     items: [
       { id: 'admin-gombo-status', label: 'Vérif GomboPlus', icon: Check, route: '/app/admin-gombo-status', permission: 'ADMIN' },
+      { id: 'admin-push-broadcast', label: 'Envoi Push', icon: Bell, route: '/app/admin-push-broadcast', permission: 'ADMIN' },
     ],
   };
 

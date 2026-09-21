@@ -1,27 +1,26 @@
 // ============================================================
 // components/PushNotificationBanner.tsx
-// Carte flottante en bas à droite pour activer les notif push
+// Carte flottante en bas à droite pour activer les notif push via OneSignal
 // ============================================================
 
 import React, { useState } from 'react';
 import { Bell, X, Sparkles } from 'lucide-react';
-import { usePushNotifications } from '../hooks/usePushNotifications';
+import { useOneSignal } from '../hooks/useOneSignal';
 
 interface PushNotificationBannerProps {
   userId: string | null;
+  userRole?: string;
 }
 
-const PushNotificationBanner: React.FC<PushNotificationBannerProps> = ({ userId }) => {
+const PushNotificationBanner: React.FC<PushNotificationBannerProps> = ({ userId, userRole }) => {
   const [dismissed, setDismissed] = useState(() =>
     localStorage.getItem('sikaads_push_dismissed') === 'true'
   );
 
-  const { permission, isSubscribed, isLoading, requestPermission } = usePushNotifications({ userId });
+  const { permission, isSubscribed, isLoading, requestPermission } = useOneSignal({ userId, userRole });
 
   if (!userId) return null;
-  if (permission === 'granted' && isSubscribed) return null;
-  if (permission === 'denied') return null;
-  if (permission === 'unsupported') return null;
+  if (permission && isSubscribed) return null;
   if (dismissed) return null;
 
   const handleDismiss = () => {
@@ -55,7 +54,7 @@ const PushNotificationBanner: React.FC<PushNotificationBannerProps> = ({ userId 
         <Bell size={16} className="floating-card-popup__body-icon floating-card-popup__body-icon--green" />
         <p className="floating-card-popup__body-text">
           Recevez vos <span className="floating-card-popup__body-accent">gains validés</span>,
-          nouvelles campagnes et mises à jour — même fenêtre fermée.
+          nouvelles campagnes et rappels 24h — même fenêtre fermée.
         </p>
       </div>
 

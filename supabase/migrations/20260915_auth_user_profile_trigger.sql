@@ -15,7 +15,7 @@ alter table public.users
   add column if not exists verification_rejection_reason text;
 
 -- Create the public profile server-side when Supabase Auth creates a user.
--- This also works when email confirmation is enabled and no client session exists.
+-- Resilient implementation with exception handling to prevent auth.users rollback.
 create or replace function public.handle_new_auth_user()
 returns trigger
 language plpgsql
@@ -28,36 +28,57 @@ declare
     coalesce(metadata->>'referralCode', left(coalesce(metadata->>'full_name', 'AMB'), 3)),
     '[^A-Z0-9]', '', 'g'
   ));
-  generated_referral_code text := left(base_referral_code, 3) || floor(random() * 9000 + 1000)::text;
+  generated_referral_code text;
 begin
-  insert into public.users (
-    id,
-    name,
-    email,
-    "momoNumber",
-    role,
-    status,
-    balance,
-    "totalEarned",
-    clicks,
-    "referralCode",
-    referralCount,
-    referralEarnings
-  ) values (
-    new.id,
-    coalesce(metadata->>'full_name', split_part(new.email, '@', 1), 'Utilisateur'),
-    new.email,
-    coalesce(metadata->>'momoNumber', ''),
-    'AMBASSADOR',
-    'pending_verification',
-    0,
-    0,
-    0,
-    generated_referral_code,
-    0,
-    0
-  )
-  on conflict (id) do nothing;
+  if length(base_referral_code) < 3 then
+    base_referral_code := 'AMB';
+  end if;
+  generated_referral_code := left(base_referral_code, 3) || floor(random() * 9000 + 1000)::text;
+
+  begin
+    insert into public.users (
+      id,
+      name,
+      email,
+      "momoNumber",
+      role,
+      status,
+      balance,
+      "totalEarned",
+      clicks,
+      "referralCode",
+      "referralCount",
+      "referralEarnings"
+    ) values (
+      new.id,
+      coalesce(metadata->>'full_name', split_part(new.email, '@', 1), 'Utilisateur'),
+      new.email,
+      coalesce(metadata->>'momoNumber', metadata->>'phone', ''),
+      'AMBASSADOR',
+      'pending_verification',
+      0, 0, 0,
+      generated_referral_code,
+      0, 0
+    )
+    on conflict (id) do nothing;
+  exception when others then
+    begin
+      insert into public.users (
+        id, name, email, "momoNumber", role, status, balance, "totalEarned", clicks, "referralCode", "referralCount", "referralEarnings"
+      ) values (
+        new.id,
+        coalesce(metadata->>'full_name', split_part(new.email, '@', 1), 'Utilisateur'),
+        new.email,
+        coalesce(metadata->>'momoNumber', metadata->>'phone', ''),
+        'AMBASSADOR',
+        'active',
+        0, 0, 0, generated_referral_code, 0, 0
+      )
+      on conflict (id) do nothing;
+    exception when others then
+      null;
+    end;
+  end;
 
   return new;
 end;

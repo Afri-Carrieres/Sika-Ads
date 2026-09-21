@@ -106,43 +106,43 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
 
         const user = data.user;
 
-        // ── Cas où signUp() ne renvoie pas d'utilisateur ──
-        // Si "Confirm emails" est ACTIVÉ dans Supabase, signUp() retourne
-        // intentionnellement { user: null, session: null } : l'utilisateur est
-        // créé dans auth.users mais pas encore vérifié → VerificationPending.
-        // Avec "Confirm emails" DÉSACTIVÉ, user est renvoyé immédiatement et
-        // ce branchement n'est pas atteint.
-        if (!user) {
-          // Email de confirmation envoyé → rediriger vers VerificationPending
+        // ── CORRECTION EMAIL DE CONFIRMATION / RESEND ──
+        // Supabase Auth envoie automatiquement le mail de confirmation d'inscription 
+        // via le serveur SMTP configuré (ex: Resend via smtp.resend.com).
+        // Si "Confirm emails" est activé dans Supabase, data.session est null et 
+        // le compte passe en attente de vérification par lien email.
+        if (!user || !data.session) {
+          // Redirection vers l'écran d'attente de confirmation email
           onComplete('verification');
           return;
         }
 
-        // Le trigger PostgreSQL cree le profil public cote serveur.
-        // Cela fonctionne meme si la confirmation email laisse la session a null.
-
-        // Send verification email via Supabase Edge Function (non-blocking)
+        // Si une session existe immédiatement (confirmations email désactivées dans Supabase),
+        // on tente un envoi de courriel de bienvenue via l'Edge Function Resend (non-bloquant).
         try {
           await supabase.functions.invoke('send-email', {
             body: {
-              type: 'verification',
+              type: 'welcome',
               email,
               name
             }
           });
-          console.log("Verification email sent via Edge Function");
+          console.log("Email de bienvenue envoyé via Edge Function Resend");
         } catch (apiErr) {
-          console.warn("Verification email via Edge Function failed:", apiErr);
+          console.warn("L'envoi de l'email de bienvenue via Edge Function a échoué (non-bloquant):", apiErr);
         }
 
-        // Redirect into the app (compte déjà vérifié, confirmations désactivées)
-        onComplete('verification');
+        // Redirection finale vers l'application
+        onComplete('dashboard');
       } catch (err: any) {
-        // Translate Supabase weak password error to French
+        // ── CORRECTION GESTION DES ERREURS D'INSCRIPTION ──
+        // Traduction explicite des erreurs Supabase Auth en français pour l'utilisateur
         if (err.code === 'weak_password' || err.name === 'AuthWeakPasswordError') {
           setError('Mot de passe trop faible. Il doit contenir au moins 8 caractères avec une majuscule, une minuscule, un chiffre et un caractère spécial (ex: Monpasse1!).');
+        } else if (err.status === 429 || err.message?.includes('rate limit')) {
+          setError('Trop de tentatives d\'inscription. Veuillez patienter quelques minutes avant de réessayer.');
         } else {
-          setError('Impossible de créer le compte avec ces informations. Si vous avez déjà un compte, connectez-vous ou réinitialisez votre mot de passe.');
+          setError(err.message || 'Impossible de créer le compte avec ces informations. Si vous avez déjà un compte, connectez-vous.');
         }
         setLoading(false);
       }
@@ -291,10 +291,16 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               {/* STEP 1: Email & Password */}
               {step === 1 && (
                 <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
+                  {/* 
+                    * CORRECTION AUTH GOOGLE:
+                    * Suppression de l'attribut 'disabled' écrit en dur qui bloquait le clic sur Google.
+                    * Le bouton utilise désormais disabled={loading} pour désactiver le clic uniquement pendant la requête.
+                  */}
                   <button
+                    type="button"
                     onClick={handleGoogleSignup}
-                    disabled
-                    className="w-full py-4 bg-white border border-gray-200 text-gray-700 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 active:scale-95"
+                    disabled={loading}
+                    className="w-full py-4 bg-white border border-gray-200 text-gray-700 rounded-2xl font-bold text-sm shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? <Loader2 className="animate-spin text-gray-400" size={20} /> : (
                       <>
