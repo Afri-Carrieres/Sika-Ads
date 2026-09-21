@@ -50,7 +50,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
             appId: ONESIGNAL_APP_ID,
             allowLocalhostAsSecureOrigin: true,
             notifyButton: { enable: false },
-            serviceWorkerPath: '/OneSignalSDKWorker.js',
+            serviceWorkerPath: 'onesignal/OneSignalSDKWorker.js',
             serviceWorkerParam: { scope: '/onesignal/' },
           });
 
