@@ -50,7 +50,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
         notifyButton: {
           enable: false, // On utilise notre propre composant PushNotificationBanner UI
         },
-        serviceWorkerPath: 'OneSignalSDKWorker.js',
+        serviceWorkerPath: '/OneSignalSDKWorker.js',
         serviceWorkerParam: { scope: '/' },
       })
         .then(() => {
