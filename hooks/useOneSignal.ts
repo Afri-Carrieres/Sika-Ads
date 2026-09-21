@@ -4,7 +4,6 @@
 // ============================================================
 
 import { useEffect, useState, useCallback } from 'react';
-import OneSignal from 'react-onesignal';
 import { supabase } from '../supabase';
 
 interface UseOneSignalOptions {
@@ -35,7 +34,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 1. Initialiser le SDK OneSignal (une seule fois)
+  // 1. Initialiser le SDK OneSignal via OneSignalDeferred (recommandé v16)
   useEffect(() => {
     if (!ONESIGNAL_APP_ID) {
       console.warn('[OneSignal] VITE_ONESIGNAL_APP_ID absente dans le fichier .env.');
@@ -44,53 +43,50 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
 
     if (!window.__oneSignalInitialized) {
       window.__oneSignalInitialized = true;
-      OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        allowLocalhostAsSecureOrigin: true,
-        notifyButton: {
-          enable: false, // On utilise notre propre composant PushNotificationBanner UI
-        },
-        serviceWorkerPath: '/OneSignalSDKWorker.js',
-        serviceWorkerParam: { scope: '/' },
-      })
-        .then(() => {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async (os: any) => {
+        try {
+          await os.init({
+            appId: ONESIGNAL_APP_ID,
+            allowLocalhostAsSecureOrigin: true,
+            notifyButton: { enable: false },
+            serviceWorkerPath: '/OneSignalSDKWorker.js',
+            serviceWorkerParam: { scope: '/' },
+          });
+
           setIsInitialized(true);
           console.log('[OneSignal] SDK initialisé avec succès ✅');
 
-          // Vérifier les permissions et souscriptions actuelles
-          setPermission(OneSignal.Notifications.permission);
-          setIsSubscribed(!!OneSignal.User.PushSubscription.optedIn);
+          setPermission(os.Notifications?.permission ?? false);
+          setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
 
-          // Écouter les changements de permission
-          OneSignal.Notifications.addEventListener('change', (permissionChange) => {
+          os.Notifications?.addEventListener('change', (permissionChange: boolean) => {
             setPermission(permissionChange);
           });
 
-          // Écouter les changements de souscription
-          OneSignal.User.PushSubscription.addEventListener('change', (subscriptionChange) => {
+          os.User?.PushSubscription?.addEventListener('change', (subscriptionChange: any) => {
             setIsSubscribed(!!subscriptionChange.current.optedIn);
           });
-        })
-        .catch((err) => {
+        } catch (err: any) {
           const errMsg = String(err?.message || err);
           if (errMsg.includes('SDK already initialized')) {
             setIsInitialized(true);
             return;
           }
           if (errMsg.includes('Can only be used on')) {
-            console.warn('[OneSignal] Domaine non autorisé en local (nécessite d\'ajouter localhost dans le dashboard OneSignal) :', errMsg);
+            console.warn('[OneSignal] Domaine non autorisé en local (ajouter localhost dans le dashboard OneSignal) :', errMsg);
             return;
           }
           console.error('[OneSignal] Échec initialisation SDK:', err);
-        });
+        }
+      });
     } else {
-      // SDK déjà initialisé (ex: HMR) — récupérer l'état courant
       setIsInitialized(true);
-      try {
-        setPermission(OneSignal.Notifications.permission);
-        setIsSubscribed(!!OneSignal.User.PushSubscription.optedIn);
-      } catch (_) {
-        // Ignorer si le SDK n'est pas encore prêt
+      if (window.OneSignal) {
+        try {
+          setPermission(window.OneSignal.Notifications?.permission ?? false);
+          setIsSubscribed(!!window.OneSignal.User?.PushSubscription?.optedIn);
+        } catch (_) {}
       }
     }
   }, []);
@@ -99,20 +95,24 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (userId) {
-      // Associer le profil Supabase à OneSignal (External ID)
-      OneSignal.login(userId).then(() => {
-        console.log(`[OneSignal] Utilisateur connecté : ${userId}`);
-        if (userRole) {
-          OneSignal.User.addTag('role', userRole);
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async (os: any) => {
+      if (userId) {
+        try {
+          await os.login(userId);
+          console.log(`[OneSignal] Utilisateur connecté : ${userId}`);
+          if (userRole) {
+            os.User?.addTag('role', userRole);
+          }
+        } catch (err) {
+          console.warn('[OneSignal] Erreur lors de la connexion utilisateur:', err);
         }
-      }).catch((err) => {
-        console.warn('[OneSignal] Erreur lors de la connexion utilisateur:', err);
-      });
-    } else {
-      // Déconnexion
-      OneSignal.logout().catch(() => {});
-    }
+      } else {
+        try {
+          await os.logout();
+        } catch (_) {}
+      }
+    });
   }, [userId, userRole, isInitialized]);
 
   // 3. Demande d'autorisation de notifications push
@@ -124,27 +124,29 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
 
     setIsLoading(true);
     try {
-      await OneSignal.Notifications.requestPermission();
-      const granted = OneSignal.Notifications.permission;
-      setPermission(granted);
+      const os = window.OneSignal;
+      if (os?.Notifications) {
+        await os.Notifications.requestPermission();
+        const granted = os.Notifications.permission;
+        setPermission(granted);
 
-      if (granted) {
-        await OneSignal.User.PushSubscription.optIn();
-        setIsSubscribed(true);
-        console.log('[OneSignal] Permission accordée et abonnement activé ✅');
+        if (granted) {
+          await os.User?.PushSubscription?.optIn();
+          setIsSubscribed(true);
+          console.log('[OneSignal] Permission accordée et abonnement activé ✅');
 
-        // Facultatif: enregistrer l’ID device dans push_subscriptions
-        const pushId = OneSignal.User.PushSubscription.id;
-        if (userId && pushId) {
-          await supabase.from('push_subscriptions').upsert(
-            {
-              userId,
-              fcm_token: pushId,
-              device_info: navigator.userAgent.substring(0, 200),
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'fcm_token' }
-          );
+          const pushId = os.User?.PushSubscription?.id;
+          if (userId && pushId) {
+            await supabase.from('push_subscriptions').upsert(
+              {
+                userId,
+                fcm_token: pushId,
+                device_info: navigator.userAgent.substring(0, 200),
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: 'fcm_token' }
+            );
+          }
         }
       }
     } catch (err) {
