@@ -60,7 +60,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
           setPermission(os.Notifications?.permission ?? false);
           setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
 
-          os.Notifications?.addEventListener('change', (permissionChange: boolean) => {
+          os.Notifications?.addEventListener('permissionChange', (permissionChange: boolean) => {
             setPermission(permissionChange);
           });
 
