@@ -55,18 +55,20 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
       window.__oneSignalInitialized = true;
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       window.OneSignalDeferred.push(async (os: any) => {
-        try {
-          await os.init({
-            appId: ONESIGNAL_APP_ID,
-            allowLocalhostAsSecureOrigin: true,
-            notifyButton: { enable: false },
-            serviceWorkerPath: '/onesignal/OneSignalSDKWorker.js',
-            serviceWorkerParam: { scope: '/onesignal/' },
-          });
+        const initConfig = {
+          appId: ONESIGNAL_APP_ID,
+          allowLocalhostAsSecureOrigin: true,
+          notifyButton: { enable: false },
+          serviceWorkerPath: 'onesignal/OneSignalSDKWorker.js',
+          serviceWorkerParam: { scope: '/onesignal/' },
+        };
 
+        try {
+          await os.init(initConfig);
+          console.log('[OneSignal] Config envoyée à init():', initConfig);
           setIsInitialized(true);
           console.log('[OneSignal] SDK initialisé avec succès ✅');
-          
+
           setPermission(getPermissionState());
           setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
 

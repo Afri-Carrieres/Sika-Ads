@@ -91,7 +91,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   const [pushTitle, setPushTitle] = useState('');
   const [pushMessage, setPushMessage] = useState('');
   const [pushUrl, setPushUrl] = useState('/app/marketplace');
-  const [pushSegment, setPushSegment] = useState<'All' | 'Ambassadors' | 'Advertisers'>('All');
+  const [pushSegment, setPushSegment] = useState<'Total Subscriptions' | 'Ambassadors' | 'Advertisers'>('Total Subscriptions');
   const [isSendingPush, setIsSendingPush] = useState(false);
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -2562,7 +2562,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     title: pushTitle.trim(),
                     message: pushMessage.trim(),
                     url: pushUrl.trim(),
-                    segment: pushSegment === 'All' ? 'All' : 'Subscribed Users',
+                    segment: pushSegment === "Total Subscriptions" ? "Ambassadors" : "Ambassadors",
+                    // segment: pushSegment === 'Total Subscriptions' ? 'All' : 'Subscribed Users',
                   });
                   if (res.success) {
                     showFeedback('Notification push diffusée avec succès ! 🎉', 'success');
@@ -2589,8 +2590,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     type="button"
                     onClick={() => {
                       setPushTitle('⏰ Rappel Preuve 24h');
-                      setPushMessage('N\'oubliez pas de soumettre vos preuves de partage avant l\'échéance des 24h pour valider vos FCFA !');
-                      setPushUrl('/app/tasks');
+                      setPushMessage('N\'oubliez pas de soumettre vos preuves de partage avant l\'échéance des 24h pour valider vos gains !');
+                      setPushUrl('https://www.sika-ads.com/app/tasks');
+                      setPushSegment('Total Subscriptions');
                     }}
                     className="px-3 py-1.5 bg-[#E7F4F4] text-[#0E6B6B] rounded-xl text-xs font-bold hover:bg-[#D9ECEC] transition-all"
                   >
@@ -2601,7 +2603,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     onClick={() => {
                       setPushTitle('🚀 Nouvelles Campagnes Disponibles !');
                       setPushMessage('De nouvelles campagnes rémunérées viennent d\'être publiées. Venez vite les partager !');
-                      setPushUrl('/app/marketplace');
+                      setPushUrl('https://www.sika-ads.com/app/marketplace');
+                      setPushSegment('Ambassadors')
                     }}
                     className="px-3 py-1.5 bg-green-50 text-green-700 rounded-xl text-xs font-bold hover:bg-green-100 transition-all"
                   >
@@ -2612,7 +2615,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     onClick={() => {
                       setPushTitle('💰 Vos gains vous attendent');
                       setPushMessage('Connectez-vous sur SikaAds Togo pour suivre votre solde et demander vos retraits Mobile Money.');
-                      setPushUrl('/app/wallet');
+                      setPushUrl('https://www.sika-ads.com/app/wallet');
+                      setPushSegment("Ambassadors")
                     }}
                     className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all"
                   >
@@ -2675,9 +2679,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     onChange={(e) => setPushSegment(e.target.value as any)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#128686]"
                   >
-                    <option value="All">Tous les utilisateurs abonnés</option>
+                    <option value="Total Subscriptions">Tous les utilisateurs abonnés</option>
                     <option value="Ambassadors">Ambassadeurs uniquement</option>
-                    <option value="Advertisers">Annonceurs uniquement</option>
+                    {/* <option value="Advertisers">Annonceurs uniquement</option> */}
                   </select>
                 </div>
               </div>

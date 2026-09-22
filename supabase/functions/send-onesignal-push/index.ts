@@ -97,7 +97,7 @@ serve(async (req: Request) => {
       oneSignalPayload.target_channel = "push";
     } else {
       // Ciblage par segment (remplacer 'All' par 'Subscribed Users' pour l'API REST OneSignal v1)
-      const targetSegment = (!segment || segment === "All") ? "Subscribed Users" : segment;
+      const targetSegment = (!segment || segment === "Ambassadors") ? "Total Subscriptions" : segment;
       oneSignalPayload.included_segments = [targetSegment];
     }
 

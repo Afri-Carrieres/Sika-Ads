@@ -9,7 +9,7 @@ export interface PushNotificationPayload {
   title: string;
   message: string;
   url?: string;
-  segment?: 'All' | 'Subscribed Users' | 'Ambassadors' | 'Advertisers';
+  segment?: 'Total Subscriptions' |'Ambassadors';
   targetUserIds?: string[];
   scheduleDelayHours?: number;
 }
@@ -43,8 +43,8 @@ export async function sendCampaignActivatedPush(campaignTitle: string, campaignI
   const payload: PushNotificationPayload = {
     title: '🚀 Nouvelle Campagne Disponible !',
     message: `La campagne "${campaignTitle}" est maintenant active. Partagez-la vite pour générer des gains !`,
-    url: `/app/marketplace`,
-    segment: 'All',
+    url: `https://www.sika-ads.com/app/marketplace`,
+    segment: 'Total Subscriptions',
   };
 
   await sendPushNotification(payload);
@@ -57,7 +57,7 @@ export async function sendProofReminderPush(userId: string, campaignTitle: strin
   const payload: PushNotificationPayload = {
     title: '⏰ Rappel Preuve de Partage (Urgent)',
     message: `Il vous reste environ ${hoursRemaining}h pour soumettre votre preuve pour "${campaignTitle}" et valider vos gains !`,
-    url: `/app/task-history`,
+    url: `https://www.sika-ads.com/app/task-history`,
     targetUserIds: [userId],
   };
 
