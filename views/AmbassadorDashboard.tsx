@@ -5,7 +5,7 @@ import { Wallet, MousePointerClick, TrendingUp, ArrowUpRight, Copy, Check, BellR
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from '../supabase';
 import NotificationBell from '../components/NotificationBell';
-import { usePushNotifications } from '../hooks/usePushNotifications';
+import { useOneSignal } from '../hooks/useOneSignal';
 
 interface AmbassadorDashboardProps {
   onNavigateToWallet: () => void;
@@ -58,7 +58,7 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
   const [shareCount, setShareCount] = useState<number>(0);
 
   // Hook pour les notifications push
-  const { permission, isSubscribed, requestPermission } = usePushNotifications({
+  const { permission, isSubscribed, requestPermission } = useOneSignal({
     userId: userData?.id || null
   });
 
@@ -161,10 +161,10 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
   }, [userData?.email]);
 
   // Afficher le banner de demande de permission après 3 secondes si :
-  // - La permission n'a jamais été demandée (permission === 'default')
+  // - La permission n'a pas été accordée (!permission)
   // - L'utilisateur n'est pas déjà abonné
   useEffect(() => {
-    if (permission === 'default' && !isSubscribed) {
+    if (!permission && !isSubscribed) {
       const timer = setTimeout(() => setShowPermissionPrompt(true), 3000);
       return () => clearTimeout(timer);
     }

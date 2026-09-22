@@ -45,6 +45,12 @@ serve(async (req: Request) => {
         .eq("id", authData.user.id)
         .single();
       isStaff = callerProfile?.role === "ADMIN" || callerProfile?.role === "MODERATOR";
+      if (!isStaff) {
+        return new Response(
+          JSON.stringify({ error: "Accès refusé : réservé aux administrateurs/modérateurs." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // 2. Vérification de la clé OneSignal

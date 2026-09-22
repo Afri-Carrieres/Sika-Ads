@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
 import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useOneSignal } from '@/hooks/useOneSignal';
 import { User, UserRole } from '../types';
 
 const TILE = 'bg-white rounded-3xl border border-gray-100 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)]';
@@ -15,23 +15,7 @@ const EMERALD_BTN = 'px-6 py-3.5 bg-emerald-600 text-white rounded-xl font-bold 
 const DISABLED_FIELD = 'w-full bg-gray-100 border border-gray-200 rounded-2xl p-4 pl-12 font-semibold text-gray-500 cursor-not-allowed';
 
 const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ userId }) => {
-  const { permission, isSubscribed, isLoading, requestPermission, unsubscribe } = usePushNotifications({ userId });
-
-  if (permission === 'unsupported') {
-    return (
-      <div className={`${TILE} p-6 flex items-center justify-between`}>
-        <div className="flex items-center gap-3">
-          <div className="bg-gray-100 p-2.5 rounded-xl text-gray-400">
-            <BellOff size={20} />
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-gray-800">Notifications Push</h4>
-            <p className="text-xs text-gray-500 font-medium">Non prises en charge sur ce navigateur</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const { permission, isSubscribed, isLoading, requestPermission } = useOneSignal({ userId });
 
   return (
     <div className={`${TILE} p-6 space-y-4`}>
@@ -41,48 +25,36 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
         </div>
         <div>
           <h4 className="text-sm font-bold text-gray-900">Notifications du navigateur</h4>
-          <p className="text-xs text-gray-500 font-medium">Recevez des alerte directes sur vos revenus et validations.</p>
+          <p className="text-xs text-gray-500 font-medium">Recevez des alertes directes sur vos revenus et validations.</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between pt-2">
         <div className="text-xs font-semibold">
-          Statut : {permission === 'granted' && isSubscribed ? (
+          Statut : {permission && isSubscribed ? (
             <span className="text-emerald-600 font-bold">Actif (Abonné)</span>
-          ) : permission === 'denied' ? (
-            <span className="text-red-500 font-bold">Bloqué par le navigateur</span>
           ) : (
             <span className="text-amber-500 font-bold">Inactif</span>
           )}
         </div>
 
-        {permission === 'granted' && isSubscribed ? (
-          <button
-            onClick={unsubscribe}
-            disabled={isLoading}
-            className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-          >
-            {isLoading ? '...' : 'Désactiver'}
-          </button>
+        {permission && isSubscribed ? (
+          <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+            ✓ Activé
+          </span>
         ) : (
           <button
             onClick={() => {
               localStorage.removeItem('sikaads_push_dismissed');
               requestPermission();
             }}
-            disabled={isLoading || permission === 'denied'}
+            disabled={isLoading}
             className="px-5 py-2.5 bg-[#128686] text-white hover:bg-[#0E6B6B] rounded-xl text-xs font-bold shadow-md shadow-[#128686]/20 transition-all disabled:opacity-50"
           >
             {isLoading ? 'Activation...' : 'Activer les notifications'}
           </button>
         )}
       </div>
-
-      {permission === 'denied' && (
-        <p className="text-[11px] text-red-500 bg-red-50 p-3 rounded-xl font-medium">
-          Les notifications sont bloquées dans votre navigateur. Cliquez sur le cadenas à côté de l'URL pour réautoriser les notifications.
-        </p>
-      )}
     </div>
   );
 };

@@ -13,10 +13,11 @@ interface UseOneSignalOptions {
 
 interface UseOneSignalReturn {
   isInitialized: boolean;
-  permission: boolean; // true si accordé
+  permission: NotificationPermission | 'unsupported' | boolean;
   isSubscribed: boolean;
   isLoading: boolean;
   requestPermission: () => Promise<void>;
+  unsubscribe: () => Promise<void>;
 }
 
 const ONESIGNAL_APP_ID = (import.meta.env.VITE_ONESIGNAL_APP_ID as string) || '';
@@ -25,12 +26,21 @@ const ONESIGNAL_APP_ID = (import.meta.env.VITE_ONESIGNAL_APP_ID as string) || ''
 declare global {
   interface Window {
     __oneSignalInitialized?: boolean;
+    OneSignalDeferred?: any[];
+    OneSignal?: any;
   }
 }
 
+const getPermissionState = (): NotificationPermission | 'unsupported' | boolean => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return 'unsupported';
+  }
+  return Notification.permission;
+};
+
 export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneSignalReturn {
   const [isInitialized, setIsInitialized] = useState(!!window.__oneSignalInitialized);
-  const [permission, setPermission] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported' | boolean>(() => getPermissionState());
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,11 +67,11 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
           setIsInitialized(true);
           console.log('[OneSignal] SDK initialisé avec succès ✅');
 
-          setPermission(os.Notifications?.permission ?? false);
+          setPermission(getPermissionState());
           setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
 
-          os.Notifications?.addEventListener('permissionChange', (permissionChange: boolean) => {
-            setPermission(permissionChange);
+          os.Notifications?.addEventListener('permissionChange', () => {
+            setPermission(getPermissionState());
           });
 
           os.User?.PushSubscription?.addEventListener('change', (subscriptionChange: any) => {
@@ -84,7 +94,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
       setIsInitialized(true);
       if (window.OneSignal) {
         try {
-          setPermission(window.OneSignal.Notifications?.permission ?? false);
+          setPermission(getPermissionState());
           setIsSubscribed(!!window.OneSignal.User?.PushSubscription?.optedIn);
         } catch (_) {}
       }
@@ -126,11 +136,17 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
     try {
       const os = window.OneSignal;
       if (os?.Notifications) {
+        console.log('[OneSignal] Permission actuelle:', Notification.permission);
+        if (Notification.permission === 'denied') {
+          alert("Les notifications sont bloquées pour ce site. Réactivez-les dans les paramètres du navigateur (icône 🔒 à côté de l'URL).");
+          setIsLoading(false);
+          return;
+        }
         await os.Notifications.requestPermission();
-        const granted = os.Notifications.permission;
-        setPermission(granted);
+        const perm = getPermissionState();
+        setPermission(perm);
 
-        if (granted) {
+        if (perm === 'granted' || perm === true) {
           await os.User?.PushSubscription?.optIn();
           setIsSubscribed(true);
           console.log('[OneSignal] Permission accordée et abonnement activé ✅');
@@ -148,6 +164,9 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
             );
           }
         }
+      } else {
+        console.error('[OneSignal] SDK non disponible ou non initialisé au moment du clic', os);
+        alert("Le service de notifications n'est pas encore prêt. Réessayez dans quelques secondes.");
       }
     } catch (err) {
       console.error('[OneSignal] Erreur lors de la demande de permission:', err);
@@ -156,11 +175,29 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
     }
   }, [userId]);
 
+  // 4. Désabonnement / Opt-out des notifications push
+  const unsubscribe = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const os = window.OneSignal;
+      if (os?.User?.PushSubscription) {
+        await os.User.PushSubscription.optOut();
+        setIsSubscribed(false);
+        console.log('[OneSignal] Désabonnement effectué ✅');
+      }
+    } catch (err) {
+      console.error('[OneSignal] Erreur lors du désabonnement:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     isInitialized,
     permission,
     isSubscribed,
     isLoading,
     requestPermission,
+    unsubscribe,
   };
 }
