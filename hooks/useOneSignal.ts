@@ -175,6 +175,12 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
     }
   }, [userId]);
 
+//   console.log(import.meta.env.VITE_ONESIGNAL_APP_ID)
+
+//    console.log('OneSignal existe ?', typeof window.OneSignal);
+// console.log('OneSignalDeferred:', window.OneSignalDeferred);
+// console.log('Notification.permission:', Notification.permission);
+
   // 4. Désabonnement / Opt-out des notifications push
   const unsubscribe = useCallback(async () => {
     setIsLoading(true);
