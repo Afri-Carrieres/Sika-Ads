@@ -60,13 +60,13 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
             appId: ONESIGNAL_APP_ID,
             allowLocalhostAsSecureOrigin: true,
             notifyButton: { enable: false },
-            serviceWorkerPath: 'onesignal/OneSignalSDKWorker.js',
+            serviceWorkerPath: '/onesignal/OneSignalSDKWorker.js',
             serviceWorkerParam: { scope: '/onesignal/' },
           });
 
           setIsInitialized(true);
           console.log('[OneSignal] SDK initialisé avec succès ✅');
-
+          
           setPermission(getPermissionState());
           setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
 
