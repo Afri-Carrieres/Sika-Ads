@@ -3,6 +3,7 @@
 export interface RequestBody {
   proofId: string;
   imageUrl: string;
+  videoUrl?: string;
 }
 
 export interface RawAIResult {
@@ -15,6 +16,8 @@ export interface RawAIResult {
   imageAuthenticityConfidence: number;
   viewCountDetectionConfidence: number;
   platformUICompliance: number;
+  videoAuthenticityConfidence?: number;
+  videoConsistencyScore?: number;
   fraudEvidenceDetails: string[];
 }
 

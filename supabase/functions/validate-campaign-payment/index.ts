@@ -56,6 +56,8 @@ function tokenize(value: unknown): Set<string> {
 function isGomboSuccess(status: unknown, message?: unknown): boolean {
   const tokens = new Set([...tokenize(status), ...tokenize(message)]);
   return ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'APPROVED', 'VALIDATED'].some(k => tokens.has(k));
+}
+
 function isGomboNotFound(resObj: Record<string, unknown>): boolean {
   const msg = String(resObj.message || '').toLowerCase();
   const httpStatus = Number(resObj._httpStatus || 0);

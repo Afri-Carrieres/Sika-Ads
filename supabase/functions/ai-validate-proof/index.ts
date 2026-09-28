@@ -7,7 +7,7 @@ import { RequestBody, FunctionResponse } from './types.ts';
 import { callAI } from './ai.ts';
 import { parseAIResponse } from './parser.ts';
 import { normalizeAIResult } from './normalizer.ts';
-import { updateProof } from './supabase.ts';
+import { updateProof, getSupabaseClient } from './supabase.ts';
 
 const ALLOWED_ORIGINS = [
   'https://www.sika-ads.com',
@@ -40,14 +40,18 @@ function jsonResponse(body: FunctionResponse, status = 200): Response {
 }
 
 function validateRequest(payload: any): RequestBody {
-  const { proofId, imageUrl } = payload ?? {};
+  const { proofId, imageUrl, videoUrl } = payload ?? {};
   if (!proofId || typeof proofId !== 'string') {
     throw new Error('proofId is required and must be a string');
   }
   if (!imageUrl || typeof imageUrl !== 'string') {
     throw new Error('imageUrl is required and must be a string');
   }
-  return { proofId, imageUrl };
+  return {
+    proofId,
+    imageUrl,
+    videoUrl: typeof videoUrl === 'string' && videoUrl.trim() ? videoUrl.trim() : undefined
+  };
 }
 
 serve(async (req: Request) => {
@@ -64,11 +68,16 @@ serve(async (req: Request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+
+  // Client scoped to the user's JWT — used only for auth verification
+  const userClient = createClient(supabaseUrl, supabaseServiceKey, {
     global: { headers: { Authorization: authHeader } },
   });
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  // Pure service_role client — bypasses RLS for privileged writes
+  const adminClient = getSupabaseClient();
+
+  const { data: { user }, error: authError } = await userClient.auth.getUser();
   if (authError || !user) {
     return jsonResponse({ success: false, proofId: 'unknown', error: 'unauthorized' }, 401);
   }
@@ -81,7 +90,7 @@ serve(async (req: Request) => {
     const parsedRequest = validateRequest(body);
     proofId = parsedRequest.proofId;
 
-    const { data: proofRow, error: proofError } = await supabase
+    const { data: proofRow, error: proofError } = await adminClient
       .from('proofs')
       .select('userId, status')
       .eq('id', proofId)
@@ -95,7 +104,7 @@ serve(async (req: Request) => {
       return jsonResponse({ success: false, proofId, error: 'already_processed' }, 409);
     }
 
-    const { data: callerProfile } = await supabase
+    const { data: callerProfile } = await adminClient
       .from('users')
       .select('role')
       .eq('id', user.id)
@@ -121,15 +130,15 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`[index.ts] Validating proof ${proofId}`);
+    console.log(`[index.ts] Validating proof ${proofId} with image and videoUrl: ${parsedRequest.videoUrl ? 'present' : 'none'}`);
 
-    const rawProviderText = await callAI(parsedRequest.imageUrl, apiKey);
+    const rawProviderText = await callAI(parsedRequest.imageUrl, apiKey, parsedRequest.videoUrl);
     const rawResult = parseAIResponse(rawProviderText);
     const normalizedResult = normalizeAIResult(rawResult);
 
     console.log(`[index.ts] Normalized result for ${proofId}:`, normalizedResult);
 
-    await updateProof(supabase, proofId, normalizedResult);
+    await updateProof(adminClient, proofId, normalizedResult);
 
     console.log(`[index.ts] Proof ${proofId} updated successfully`);
 

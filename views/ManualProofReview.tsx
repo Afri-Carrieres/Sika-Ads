@@ -1,34 +1,68 @@
-import React, { useState, useMemo } from 'react';
-import { Proof, Notification } from '../types';
+import React, { useState, useMemo } from "react";
+import { Proof, Notification } from "../types";
 import {
-  Eye, X, CheckCircle2, AlertTriangle, Shield, Zap, Loader2, ChevronDown, ChevronUp
-} from 'lucide-react';
+  Eye,
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  Shield,
+  Zap,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Play,
+  Film,
+  Video,
+} from "lucide-react";
 
 interface ManualProofReviewProps {
   proofs: (Proof & { campaignTitle: string; userName: string })[];
-  setProofs: React.Dispatch<React.SetStateAction<(Proof & { campaignTitle: string; userName: string })[]>>;
-  addNotification: (notif: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
+  setProofs: React.Dispatch<
+    React.SetStateAction<
+      (Proof & { campaignTitle: string; userName: string })[]
+    >
+  >;
+  addNotification: (
+    notif: Omit<Notification, "id" | "createdAt" | "read">,
+  ) => void;
 }
 
-const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs, addNotification }) => {
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+const ManualProofReview: React.FC<ManualProofReviewProps> = ({
+  proofs,
+  setProofs,
+  addNotification,
+}) => {
+  const [previewMedia, setPreviewMedia] = useState<{
+    url: string;
+    type: "image" | "video";
+  } | null>(null);
   const [expandedProofId, setExpandedProofId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'confidence' | 'date' | 'fraudRisk'>('confidence');
-  const [confidenceFilter, setConfidenceFilter] = useState<[number, number]>([0, 100]);
+  const [sortBy, setSortBy] = useState<"confidence" | "date" | "fraudRisk">(
+    "confidence",
+  );
+  const [confidenceFilter, setConfidenceFilter] = useState<[number, number]>([
+    0, 100,
+  ]);
 
   // Filtrer les preuves en révision manuelle
   const manualReviewProofs = useMemo(() => {
     return proofs
-      .filter(p => p.aiAnalysis?.suggestedAction === 'manual_review')
-      .filter(p => 
-        p.aiAnalysis.confidence >= confidenceFilter[0] && 
-        p.aiAnalysis.confidence <= confidenceFilter[1]
+      .filter((p) => p.aiAnalysis?.suggestedAction === "manual_review")
+      .filter(
+        (p) =>
+          p.aiAnalysis.confidence >= confidenceFilter[0] &&
+          p.aiAnalysis.confidence <= confidenceFilter[1],
       )
       .sort((a, b) => {
-        if (sortBy === 'confidence') {
-          return (b.aiAnalysis?.confidence || 0) - (a.aiAnalysis?.confidence || 0);
-        } else if (sortBy === 'date') {
-          return new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+        if (sortBy === "confidence") {
+          return (
+            (b.aiAnalysis?.confidence || 0) - (a.aiAnalysis?.confidence || 0)
+          );
+        } else if (sortBy === "date") {
+          return (
+            new Date(b.submittedAt).getTime() -
+            new Date(a.submittedAt).getTime()
+          );
         } else {
           // fraudRisk: fraud alerts first
           const aRisk = a.aiAnalysis?.fraudAlert ? 1 : 0;
@@ -38,12 +72,20 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
       });
   }, [proofs, sortBy, confidenceFilter]);
 
-  const stats = useMemo(() => ({
-    total: manualReviewProofs.length,
-    withFraudAlert: manualReviewProofs.filter(p => p.aiAnalysis?.fraudAlert).length,
-    highConfidence: manualReviewProofs.filter(p => (p.aiAnalysis?.confidence || 0) >= 80).length,
-    lowConfidence: manualReviewProofs.filter(p => (p.aiAnalysis?.confidence || 0) < 50).length,
-  }), [manualReviewProofs]);
+  const stats = useMemo(
+    () => ({
+      total: manualReviewProofs.length,
+      withFraudAlert: manualReviewProofs.filter((p) => p.aiAnalysis?.fraudAlert)
+        .length,
+      highConfidence: manualReviewProofs.filter(
+        (p) => (p.aiAnalysis?.confidence || 0) >= 80,
+      ).length,
+      lowConfidence: manualReviewProofs.filter(
+        (p) => (p.aiAnalysis?.confidence || 0) < 50,
+      ).length,
+    }),
+    [manualReviewProofs],
+  );
 
   const toggleExpanded = (proofId: string) => {
     setExpandedProofId(expandedProofId === proofId ? null : proofId);
@@ -59,45 +101,67 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
           </div>
           <h1 className="text-3xl font-bold">Révision Manuelle</h1>
         </div>
-        <p className="text-blue-100 font-medium">Preuves nécessitant une intervention humaine pour la validation finale</p>
+        <p className="text-blue-100 font-medium">
+          Preuves nécessitant une intervention humaine pour la validation finale
+        </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Total à examiner</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Total à examiner
+          </p>
           <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
         </div>
         <div className="bg-red-50 rounded-2xl p-6 shadow-sm border border-red-100">
-          <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Avec alerte fraude</p>
-          <p className="text-3xl font-bold text-red-600">{stats.withFraudAlert}</p>
+          <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">
+            Avec alerte fraude
+          </p>
+          <p className="text-3xl font-bold text-red-600">
+            {stats.withFraudAlert}
+          </p>
         </div>
         <div className="bg-emerald-50 rounded-2xl p-6 shadow-sm border border-emerald-100">
-          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">Confiance haute (≥80%)</p>
-          <p className="text-3xl font-bold text-emerald-600">{stats.highConfidence}</p>
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2">
+            Confiance haute (≥80%)
+          </p>
+          <p className="text-3xl font-bold text-emerald-600">
+            {stats.highConfidence}
+          </p>
         </div>
         <div className="bg-amber-50 rounded-2xl p-6 shadow-sm border border-amber-100">
-          <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-2">Confiance basse (&lt;50%)</p>
-          <p className="text-3xl font-bold text-amber-600">{stats.lowConfidence}</p>
+          <p className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-2">
+            Confiance basse (&lt;50%)
+          </p>
+          <p className="text-3xl font-bold text-amber-600">
+            {stats.lowConfidence}
+          </p>
         </div>
       </div>
 
       {/* Filtres et tri */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
         <div>
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 block">Trier par</label>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 block">
+            Trier par
+          </label>
           <div className="flex gap-3">
-            {(['confidence', 'date', 'fraudRisk'] as const).map(option => (
+            {(["confidence", "date", "fraudRisk"] as const).map((option) => (
               <button
                 key={option}
                 onClick={() => setSortBy(option)}
                 className={`px-6 py-3 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all ${
                   sortBy === option
-                    ? 'bg-[#128686] text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? "bg-[#128686] text-white shadow-lg"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {option === 'confidence' ? 'Confiance' : option === 'date' ? 'Date récente' : 'Risque fraude'}
+                {option === "confidence"
+                  ? "Confiance"
+                  : option === "date"
+                    ? "Date récente"
+                    : "Risque fraude"}
               </button>
             ))}
           </div>
@@ -105,7 +169,8 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
 
         <div>
           <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 block">
-            Filtrer par confiance: {confidenceFilter[0]}% - {confidenceFilter[1]}%
+            Filtrer par confiance: {confidenceFilter[0]}% -{" "}
+            {confidenceFilter[1]}%
           </label>
           <div className="flex items-center gap-4">
             <input
@@ -113,7 +178,12 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
               min="0"
               max="100"
               value={confidenceFilter[0]}
-              onChange={(e) => setConfidenceFilter([parseInt(e.target.value), confidenceFilter[1]])}
+              onChange={(e) =>
+                setConfidenceFilter([
+                  parseInt(e.target.value),
+                  confidenceFilter[1],
+                ])
+              }
               className="flex-1"
             />
             <input
@@ -121,7 +191,12 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
               min="0"
               max="100"
               value={confidenceFilter[1]}
-              onChange={(e) => setConfidenceFilter([confidenceFilter[0], parseInt(e.target.value)])}
+              onChange={(e) =>
+                setConfidenceFilter([
+                  confidenceFilter[0],
+                  parseInt(e.target.value),
+                ])
+              }
               className="flex-1"
             />
           </div>
@@ -132,36 +207,64 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
       {manualReviewProofs.length === 0 ? (
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-12 text-center">
           <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Aucune preuve à examiner</h3>
-          <p className="text-gray-500 font-medium">Excellente nouvelle ! Toutes les preuves en révision manuelle ont été traitées.</p>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Aucune preuve à examiner
+          </h3>
+          <p className="text-gray-500 font-medium">
+            Excellente nouvelle ! Toutes les preuves en révision manuelle ont
+            été traitées.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {manualReviewProofs.map(proof => (
-            <div key={proof.id} className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+          {manualReviewProofs.map((proof) => (
+            <div
+              key={proof.id}
+              className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden"
+            >
               {/* Header compact */}
               <button
                 onClick={() => toggleExpanded(proof.id)}
                 className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-6 flex-1 text-left">
-                  <img
-                    src={proof.downloadURL}
-                    alt="Proof"
-                    className="w-24 h-24 object-cover rounded-xl border border-gray-200"
-                  />
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-gray-200 shrink-0">
+                    <img
+                      src={proof.downloadURL}
+                      alt="Proof"
+                      className="w-full h-full object-cover"
+                    />
+                    {proof.videoUrl && (
+                      <div className="absolute bottom-1 right-1 bg-purple-600 text-white p-1 rounded-md shadow">
+                        <Film size={12} />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-lg text-gray-900">{proof.userName}</h3>
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
+                      <h3 className="font-bold text-lg text-gray-900">
+                        {proof.userName}
+                      </h3>
+                      {proof.videoUrl && (
+                        <span className="px-2.5 py-1 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                          <Film size={10} /> Vidéo jointe
+                        </span>
+                      )}
                       {proof.aiAnalysis?.fraudAlert && (
                         <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-bold uppercase tracking-widest">
                           ⚠ Fraude
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-[#128686] font-bold uppercase tracking-widest mb-1">{proof.campaignName}</p>
+                    <p className="text-sm text-[#128686] font-bold uppercase tracking-widest mb-1">
+                      {proof.campaignName}
+                    </p>
                     <p className="text-xs text-gray-400">
-                      {new Date(proof.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      {new Date(proof.submittedAt).toLocaleDateString("fr-FR", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </p>
                   </div>
                 </div>
@@ -172,84 +275,191 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
                       <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
                           className={`h-full ${
-                            (proof.aiAnalysis?.confidence || 0) >= 70 ? 'bg-emerald-500' :
-                            (proof.aiAnalysis?.confidence || 0) >= 40 ? 'bg-amber-400' : 'bg-red-400'
+                            (proof.aiAnalysis?.confidence || 0) >= 70
+                              ? "bg-emerald-500"
+                              : (proof.aiAnalysis?.confidence || 0) >= 40
+                                ? "bg-amber-400"
+                                : "bg-red-400"
                           }`}
-                          style={{ width: `${proof.aiAnalysis?.confidence || 0}%` }}
+                          style={{
+                            width: `${proof.aiAnalysis?.confidence || 0}%`,
+                          }}
                         />
                       </div>
-                      <span className="text-sm font-bold text-gray-900 w-8">{proof.aiAnalysis?.confidence}%</span>
+                      <span className="text-sm font-bold text-gray-900 w-8">
+                        {proof.aiAnalysis?.confidence}%
+                      </span>
                     </div>
-                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Confiance</p>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                      Confiance
+                    </p>
                   </div>
-                  {expandedProofId === proof.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  {expandedProofId === proof.id ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
                 </div>
               </button>
 
               {/* Détails expandus */}
               {expandedProofId === proof.id && (
                 <div className="border-t border-gray-100 p-6 bg-gray-50 space-y-6">
-                  {/* Image en grand */}
-                  <button
-                    onClick={() => setPreviewImage(proof.downloadURL)}
-                    className="w-full group relative rounded-2xl overflow-hidden h-64 cursor-pointer"
-                  >
-                    <img src={proof.downloadURL} alt="Full preview" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                      <Eye size={32} className="text-white" />
-                    </div>
-                  </button>
+                  {/* Prévisualisation des médias (Image & Vidéo) */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      onClick={() =>
+                        setPreviewMedia({
+                          url: proof.downloadURL,
+                          type: "image",
+                        })
+                      }
+                      className="group relative rounded-2xl overflow-hidden h-56 cursor-pointer border border-gray-200"
+                    >
+                      <img
+                        src={proof.downloadURL}
+                        alt="Capture d'écran"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center backdrop-blur-sm text-white">
+                        <Eye size={28} />
+                        <span className="text-xs font-bold mt-1">
+                          Agrandir la capture
+                        </span>
+                      </div>
+                    </button>
+
+                    {proof.videoUrl ? (
+                      <button
+                        onClick={() =>
+                          setPreviewMedia({
+                            url: proof.videoUrl!,
+                            type: "video",
+                          })
+                        }
+                        className="group relative rounded-2xl overflow-hidden h-56 cursor-pointer border border-purple-200 bg-purple-950/20 flex items-center justify-center"
+                      >
+                        <div className="text-center p-4">
+                          <div className="w-14 h-14 rounded-full bg-purple-600 text-white flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-lg">
+                            <Play size={24} className="ml-1" />
+                          </div>
+                          <p className="text-sm font-bold text-purple-900">
+                            Lire l'enregistrement vidéo
+                          </p>
+                          <p className="text-[10px] text-purple-600 mt-0.5 font-medium">
+                            Cliquez pour lire en plein écran
+                          </p>
+                        </div>
+                      </button>
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-gray-200 h-56 flex flex-col items-center justify-center text-gray-400 p-6 text-center">
+                        <Video size={32} className="mb-2 text-gray-300" />
+                        <p className="text-xs font-bold text-gray-500">
+                          Aucun enregistrement vidéo
+                        </p>
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          Seule la capture d'écran a été soumise
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Scores de confiance granulaires */}
                   {proof.aiAnalysis && (
                     <div className="bg-white rounded-2xl p-6 space-y-4">
-                      <h4 className="text-sm font-bold text-gray-900 mb-4">Analyse IA détaillée</h4>
+                      <h4 className="text-sm font-bold text-gray-900 mb-4">
+                        Analyse IA détaillée
+                      </h4>
 
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-gray-50 rounded-xl p-4">
-                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">Vues détectées</p>
-                          <p className="text-2xl font-bold text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
+                          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                            Vues détectées
+                          </p>
+                          <p className="text-2xl font-bold text-gray-900">
+                            {proof.aiAnalysis.viewsCount.toLocaleString()}
+                          </p>
                         </div>
                         {proof.aiAnalysis.imageAuthenticityConfidence && (
                           <div className="bg-blue-50 rounded-xl p-4">
-                            <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-2">Authenticité image</p>
-                            <p className="text-2xl font-bold text-blue-600">{proof.aiAnalysis.imageAuthenticityConfidence}%</p>
+                            <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-2">
+                              Authenticité capture
+                            </p>
+                            <p className="text-2xl font-bold text-blue-600">
+                              {proof.aiAnalysis.imageAuthenticityConfidence}%
+                            </p>
                           </div>
                         )}
-                        {proof.aiAnalysis.viewCountDetectionConfidence && (
-                          <div className="bg-[#E7F4F4] rounded-xl p-4">
-                            <p className="text-[9px] font-bold text-[#0E6B6B] uppercase tracking-widest mb-2">Détection vues</p>
-                            <p className="text-2xl font-bold text-[#0E6B6B]">{proof.aiAnalysis.viewCountDetectionConfidence}%</p>
+                        {proof.aiAnalysis.videoAuthenticityConfidence !==
+                          undefined && (
+                          <div className="bg-purple-50 rounded-xl p-4">
+                            <p className="text-[9px] font-bold text-purple-600 uppercase tracking-widest mb-2">
+                              Authenticité vidéo
+                            </p>
+                            <p className="text-2xl font-bold text-purple-600">
+                              {proof.aiAnalysis.videoAuthenticityConfidence}%
+                            </p>
+                          </div>
+                        )}
+                        {proof.aiAnalysis.videoConsistencyScore !==
+                          undefined && (
+                          <div className="bg-indigo-50 rounded-xl p-4">
+                            <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest mb-2">
+                              Cohérence Capture/Vidéo
+                            </p>
+                            <p className="text-2xl font-bold text-indigo-600">
+                              {proof.aiAnalysis.videoConsistencyScore}%
+                            </p>
                           </div>
                         )}
                       </div>
 
                       {/* Type de fraude et éléments */}
-                      {proof.aiAnalysis.fraudType && proof.aiAnalysis.fraudType !== 'none' && (
-                        <div className="bg-red-50 rounded-xl p-4 border border-red-100">
-                          <p className="text-[9px] font-bold text-red-600 uppercase tracking-widest mb-2">Type de fraude détecté</p>
-                          <p className="text-sm font-bold text-red-600">{proof.aiAnalysis.fraudType.replace(/_/g, ' ')}</p>
-                        </div>
-                      )}
+                      {proof.aiAnalysis.fraudType &&
+                        proof.aiAnalysis.fraudType !== "none" && (
+                          <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+                            <p className="text-[9px] font-bold text-red-600 uppercase tracking-widest mb-2">
+                              Type de fraude détecté
+                            </p>
+                            <p className="text-sm font-bold text-red-600">
+                              {proof.aiAnalysis.fraudType.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                        )}
 
-                      {proof.aiAnalysis.fraudEvidenceDetails && proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
-                        <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                          <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-3">Éléments suspects détectés</p>
-                          <ul className="space-y-2">
-                            {proof.aiAnalysis.fraudEvidenceDetails.map((detail, idx) => (
-                              <li key={idx} className="text-sm text-amber-600 font-medium flex gap-2">
-                                <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                                <span>{detail}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      {proof.aiAnalysis.fraudEvidenceDetails &&
+                        proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
+                          <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                            <p className="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-3">
+                              Éléments suspects détectés
+                            </p>
+                            <ul className="space-y-2">
+                              {proof.aiAnalysis.fraudEvidenceDetails.map(
+                                (detail, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="text-sm text-amber-600 font-medium flex gap-2"
+                                  >
+                                    <AlertTriangle
+                                      size={16}
+                                      className="shrink-0 mt-0.5"
+                                    />
+                                    <span>{detail}</span>
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
 
                       {proof.aiAnalysis.reason && (
                         <div className="bg-gray-100 rounded-xl p-4">
-                          <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-2">Justification IA</p>
-                          <p className="text-sm text-gray-700 font-medium">{proof.aiAnalysis.reason}</p>
+                          <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest mb-2">
+                            Justification IA
+                          </p>
+                          <p className="text-sm text-gray-700 font-medium">
+                            {proof.aiAnalysis.reason}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -271,18 +481,37 @@ const ManualProofReview: React.FC<ManualProofReviewProps> = ({ proofs, setProofs
         </div>
       )}
 
-      {/* Modal: Preview image */}
-      {previewImage && (
+      {/* Modal: Preview Media (Image & Video) */}
+      {previewMedia && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-          onClick={() => setPreviewImage(null)}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.88)" }}
+          onClick={() => setPreviewMedia(null)}
         >
-          <button className="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all" onClick={() => setPreviewImage(null)}>
-            <X size={32} />
+          <button
+            className="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all z-10"
+            onClick={() => setPreviewMedia(null)}
+          >
+            <X size={28} />
           </button>
-          <div className="relative max-w-full max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <img src={previewImage} className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl border border-white/10" alt="Preview" />
+          <div
+            className="relative max-w-full max-h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {previewMedia.type === "video" ? (
+              <video
+                src={previewMedia.url}
+                controls
+                autoPlay
+                className="max-w-full max-h-[88vh] rounded-2xl shadow-2xl border border-white/10"
+              />
+            ) : (
+              <img
+                src={previewMedia.url}
+                className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+                alt="Preview"
+              />
+            )}
           </div>
         </div>
       )}

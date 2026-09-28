@@ -96,8 +96,8 @@ serve(async (req: Request) => {
       oneSignalPayload.include_aliases = { external_id: targetUserIds };
       oneSignalPayload.target_channel = "push";
     } else {
-      // Ciblage par segment (remplacer 'All' par 'Subscribed Users' pour l'API REST OneSignal v1)
-      const targetSegment = (!segment || segment === "Ambassadors") ? "Total Subscriptions" : segment;
+      // Ciblage par segment configuré dans OneSignal.
+      const targetSegment = segment || "Total Subscriptions";
       oneSignalPayload.included_segments = [targetSegment];
     }
 

@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Proof, Notification, Campaign, User, UserRole, Withdrawal } from '../types';
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Proof,
+  Notification,
+  Campaign,
+  User,
+  UserRole,
+  Withdrawal,
+} from "../types";
 import {
   ResponsiveContainer,
   PieChart,
@@ -13,48 +20,94 @@ import {
   YAxis,
   CartesianGrid,
   BarChart,
-  Bar
-} from 'recharts';
+  Bar,
+} from "recharts";
 import {
-  Check, X, Eye, AlertTriangle, Users, Clock, Key, Ban,
-  Activity, CheckCircle2, Banknote, Search,
-  Loader2, ChevronLeft, ChevronRight, Wallet, Shield, Mail, ShieldCheck, UserPlus, Trash2, ArrowRight,
-  Pencil, Pause, Play, BarChart2, ChevronDown,
-  Megaphone, PauseCircle, Zap, CreditCard, DollarSign, RefreshCcw,
-  TrendingUp, Target, ArrowUpRight, Sparkles,
-  Bell
-} from 'lucide-react';
+  Check,
+  X,
+  Eye,
+  AlertTriangle,
+  Users,
+  Clock,
+  Key,
+  Ban,
+  Activity,
+  CheckCircle2,
+  Banknote,
+  Search,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Wallet,
+  Shield,
+  Mail,
+  ShieldCheck,
+  UserPlus,
+  Trash2,
+  ArrowRight,
+  Pencil,
+  Pause,
+  Play,
+  BarChart2,
+  ChevronDown,
+  Megaphone,
+  PauseCircle,
+  Zap,
+  CreditCard,
+  DollarSign,
+  RefreshCcw,
+  TrendingUp,
+  Target,
+  ArrowUpRight,
+  Sparkles,
+  Bell,
+  Send,
+  Link2,
+  UsersRound,
+  LayoutTemplate,
+  Radio,
+  Film,
+} from "lucide-react";
 
-import { supabase } from '../supabase';
-import { useUserData } from '../hooks/useUserData';
-import { gomboAdminApproveWithdrawal, gomboAdminRejectWithdrawal, gomboCheckTransactionStatus } from '../services/gomboPlus';
-import { sendPushNotification, sendCampaignActivatedPush } from '../services/onesignalService';
-import Pagination from '../components/Pagination';
+import { supabase } from "../supabase";
+import { useUserData } from "../hooks/useUserData";
+import {
+  gomboAdminApproveWithdrawal,
+  gomboAdminRejectWithdrawal,
+  gomboCheckTransactionStatus,
+} from "../services/gomboPlus";
+import {
+  sendPushNotification,
+  sendCampaignActivatedPush,
+} from "../services/onesignalService";
+import Pagination from "../components/Pagination";
 
 const ITEMS_PER_PAGE = 6;
 
-const StatCard: React.FC<{ 
-  title: string; 
-  value: string; 
-  icon: any; 
+const StatCard: React.FC<{
+  title: string;
+  value: string;
+  icon: any;
   color: string;
   subtitle?: string;
   trend?: { value: number; positive: boolean };
 }> = ({ title, value, icon: Icon, color, subtitle, trend }) => {
   const colorMap: Record<string, string> = {
-    indigo: 'bg-[#E7F4F4] text-[#128686] border-[#128686]/20',
-    green: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    orange: 'bg-amber-50 text-amber-600 border-amber-100',
-    blue: 'bg-[#E7F4F4] text-[#128686] border-[#128686]/20',
-    'emerald-700': 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    'violet-700': 'bg-[#E7F4F4] text-[#0E6B6B] border-[#128686]/20',
-    'amber-700': 'bg-amber-50 text-amber-700 border-amber-100',
+    indigo: "bg-[#E7F4F4] text-[#128686] border-[#128686]/20",
+    green: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    orange: "bg-amber-50 text-amber-600 border-amber-100",
+    blue: "bg-[#E7F4F4] text-[#128686] border-[#128686]/20",
+    "emerald-700": "bg-emerald-50 text-emerald-700 border-emerald-100",
+    "violet-700": "bg-[#E7F4F4] text-[#0E6B6B] border-[#128686]/20",
+    "amber-700": "bg-amber-50 text-amber-700 border-amber-100",
   };
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-gray-500">{title}</span>
-        <div className={`${colorMap[color] || 'bg-gray-50 text-gray-600 border-gray-100'} w-10 h-10 rounded-lg flex items-center justify-center border`}>
+        <div
+          className={`${colorMap[color] || "bg-gray-50 text-gray-600 border-gray-100"} w-10 h-10 rounded-lg flex items-center justify-center border`}
+        >
           <Icon size={20} />
         </div>
       </div>
@@ -64,8 +117,14 @@ const StatCard: React.FC<{
       {(subtitle || trend) && (
         <div className="mt-2 flex items-center gap-1.5 text-sm">
           {trend && (
-            <span className={`font-medium flex items-center gap-0.5 ${trend.positive ? 'text-emerald-600' : 'text-red-600'}`}>
-              {trend.positive ? <ArrowUpRight size={14} /> : <ArrowRight size={14} className="rotate-90" />}
+            <span
+              className={`font-medium flex items-center gap-0.5 ${trend.positive ? "text-emerald-600" : "text-red-600"}`}
+            >
+              {trend.positive ? (
+                <ArrowUpRight size={14} />
+              ) : (
+                <ArrowRight size={14} className="rotate-90" />
+              )}
               {Math.abs(trend.value).toFixed(1)}%
             </span>
           )}
@@ -78,26 +137,55 @@ const StatCard: React.FC<{
 
 interface AdminPanelProps {
   proofs: (Proof & { campaignTitle: string; userName: string })[];
-  setProofs: React.Dispatch<React.SetStateAction<(Proof & { campaignTitle: string; userName: string })[]>>;
-  addNotification: (notif: Omit<Notification, 'id' | 'createdAt' | 'read'>) => void;
+  setProofs: React.Dispatch<
+    React.SetStateAction<
+      (Proof & { campaignTitle: string; userName: string })[]
+    >
+  >;
+  addNotification: (
+    notif: Omit<Notification, "id" | "createdAt" | "read">,
+  ) => void;
   activeTab?: string;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, addNotification, activeTab }) => {
-  const [view, setView] = useState<'overview' | 'validation' | 'users' | 'payouts' | 'team' | 'campaigns' | 'withdrawals' | 'campaignPayments' | 'gomboChecker' | 'pushBroadcast'>('overview');
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+const AdminPanel: React.FC<AdminPanelProps> = ({
+  proofs: propProofs,
+  setProofs,
+  addNotification,
+  activeTab,
+}) => {
+  const [view, setView] = useState<
+    | "overview"
+    | "validation"
+    | "users"
+    | "payouts"
+    | "team"
+    | "campaigns"
+    | "withdrawals"
+    | "campaignPayments"
+    | "gomboChecker"
+    | "pushBroadcast"
+  >("overview");
+  const [previewMedia, setPreviewMedia] = useState<{
+    url: string;
+    type: "image" | "video";
+  } | null>(null);
 
   // State Envoi Push OneSignal
-  const [pushTitle, setPushTitle] = useState('');
-  const [pushMessage, setPushMessage] = useState('');
-  const [pushUrl, setPushUrl] = useState('/app/marketplace');
-  const [pushSegment, setPushSegment] = useState<'Total Subscriptions' | 'Ambassadors' | 'Advertisers'>('Total Subscriptions');
+  const [pushTitle, setPushTitle] = useState("");
+  const [pushMessage, setPushMessage] = useState("");
+  const [pushUrl, setPushUrl] = useState("/app/marketplace");
+  const [pushSegment, setPushSegment] = useState<
+    "Total Subscriptions" | "Ambassadors"
+  >("Total Subscriptions");
   const [isSendingPush, setIsSendingPush] = useState(false);
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [statsCampaign, setStatsCampaign] = useState<Campaign | null>(null);
-  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(
+    null,
+  );
   const { userData: currentAdminData, isStaff } = useUserData();
 
   const isSuperAdmin = currentAdminData?.role === UserRole.ADMIN;
@@ -109,22 +197,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   const [campaignShareEvents, setCampaignShareEvents] = useState<any[]>([]);
   const [campaignClickEvents, setCampaignClickEvents] = useState<any[]>([]);
 
-  const userById = useMemo(() => new Map(allUsers.map(u => [u.id, u])), [allUsers]);
+  const userById = useMemo(
+    () => new Map(allUsers.map((u) => [u.id, u])),
+    [allUsers],
+  );
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [adminFeedback, setAdminFeedback] = useState<{ message: string, type: 'success' | 'error' | 'info' } | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [adminFeedback, setAdminFeedback] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
   const [confirmModal, setConfirmModal] = useState<null | {
     title: string;
     message: string;
-    variant?: 'success' | 'warning' | 'danger' | 'info';
+    variant?: "success" | "warning" | "danger" | "info";
     confirmLabel?: string;
     cancelLabel?: string;
   }>(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
-  const confirmActionRef = React.useRef<null | (() => Promise<void> | void)>(null);
+  const confirmActionRef = React.useRef<null | (() => Promise<void> | void)>(
+    null,
+  );
 
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberEmail, setNewMemberEmail] = useState("");
   const [isAddingMember, setIsAddingMember] = useState(false);
 
   const [userPage, setUserPage] = useState(1);
@@ -135,34 +231,49 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   const [campaignPaymentPage, setCampaignPaymentPage] = useState(1);
 
   const [validatingProof, setValidatingProof] = useState<Proof | null>(null);
-  const [viewsInput, setViewsInput] = useState<string>('');
+  const [viewsInput, setViewsInput] = useState<string>("");
   const [isValidating, setIsValidating] = useState(false);
   const [rejectingProof, setRejectingProof] = useState<Proof | null>(null);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
-  const [processingWithdrawals, setProcessingWithdrawals] = useState<Set<string>>(new Set());
+  const [processingWithdrawals, setProcessingWithdrawals] = useState<
+    Set<string>
+  >(new Set());
   const [wasBudgetLimited, setWasBudgetLimited] = useState(false);
-  const [syncingCampaigns, setSyncingCampaigns] = useState<Set<string>>(new Set());
-  const [gomboRefInput, setGomboRefInput] = useState('');
+  const [syncingCampaigns, setSyncingCampaigns] = useState<Set<string>>(
+    new Set(),
+  );
+  const [gomboRefInput, setGomboRefInput] = useState("");
   const [gomboCheckResult, setGomboCheckResult] = useState<any>(null);
   const [isCheckingGombo, setIsCheckingGombo] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
 
   // --- Financial & Operational Filters ---
-  const [withdrawalSearch, setWithdrawalSearch] = useState('');
-  const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState<'all' | 'pending' | 'completed' | 'failed'>('pending');
-  const [operatorFilter, setOperatorFilter] = useState<'all' | 'yas' | 'moov'>('all');
+  const [withdrawalSearch, setWithdrawalSearch] = useState("");
+  const [withdrawalStatusFilter, setWithdrawalStatusFilter] = useState<
+    "all" | "pending" | "completed" | "failed"
+  >("pending");
+  const [operatorFilter, setOperatorFilter] = useState<"all" | "yas" | "moov">(
+    "all",
+  );
 
   // --- Proof Validation Filters ---
-  const [proofStatusFilter, setProofStatusFilter] = useState<'all' | 'pending' | 'validated' | 'rejected'>('pending');
-  const [suggestedActionFilter, setSuggestedActionFilter] = useState<'all' | 'approve' | 'reject' | 'manual_review'>('all');
+  const [proofStatusFilter, setProofStatusFilter] = useState<
+    "all" | "pending" | "validated" | "rejected"
+  >("pending");
+  const [suggestedActionFilter, setSuggestedActionFilter] = useState<
+    "all" | "approve" | "reject" | "manual_review"
+  >("all");
 
   // --- Real-time Listeners ---
   const fetchAllUsers = async () => {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('name', { ascending: true });
+      .from("users")
+      .select("*")
+      .order("name", { ascending: true });
     if (error) {
       console.warn("Permission Users denied", error);
     } else if (data) {
@@ -172,9 +283,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const fetchAllProofs = async () => {
     const { data, error } = await supabase
-      .from('proofs')
-      .select('*')
-      .order('submittedAt', { ascending: false });
+      .from("proofs")
+      .select("*")
+      .order("submittedAt", { ascending: false });
     if (error) {
       console.warn("Permission Proofs denied", error);
     } else if (data) {
@@ -182,12 +293,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       const cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
       // Separate valid and expired
-      const valid = data.filter(p => {
+      const valid = data.filter((p) => {
         const d = toJsDate(p.submittedAt);
         return d && d >= cutoff;
       });
 
-      const expired = data.filter(p => {
+      const expired = data.filter((p) => {
         const d = toJsDate(p.submittedAt);
         return d && d < cutoff;
       });
@@ -196,9 +307,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       expired.forEach(async (proof) => {
         try {
           if (proof.storagePath) {
-            await supabase.storage.from('proofs').remove([proof.storagePath]).catch(() => { });
+            await supabase.storage
+              .from("proofs")
+              .remove([proof.storagePath])
+              .catch(() => {});
           }
-          await supabase.from('proofs').delete().eq('id', proof.id);
+          await supabase.from("proofs").delete().eq("id", proof.id);
         } catch (err) {
           console.error("Cleanup error:", err);
         }
@@ -210,9 +324,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const fetchAllCampaigns = async () => {
     const { data, error } = await supabase
-      .from('campaigns')
-      .select('*')
-      .order('createdAt', { ascending: false });
+      .from("campaigns")
+      .select("*")
+      .order("createdAt", { ascending: false });
     if (error) {
       console.warn("Permission Campaigns denied", error);
     } else if (data) {
@@ -222,9 +336,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const fetchAllPayouts = async () => {
     const { data, error } = await supabase
-      .from('withdrawals')
-      .select('*')
-      .order('createdAt', { ascending: false });
+      .from("withdrawals")
+      .select("*")
+      .order("createdAt", { ascending: false });
     if (error) {
       console.warn("Permission Payouts denied", error);
     } else if (data) {
@@ -234,18 +348,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const fetchCampaignShareEvents = async () => {
     const { data, error } = await supabase
-      .from('campaign_share_events')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("campaign_share_events")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
-      console.warn('Permission campaign_share_events denied', error);
+      console.warn("Permission campaign_share_events denied", error);
       setCampaignShareEvents([]);
     } else if (data) {
       const normalized = (data || []).map((event: any) => ({
         ...event,
-        campaignId: event.campaign_id ?? event.campaignId ?? event.campaign ?? null,
-        createdAt: event.created_at ?? event.createdAt ?? event.timestamp ?? null,
-        platform: event.platform ?? event.platforms ?? event.platformName ?? 'unknown'
+        campaignId:
+          event.campaign_id ?? event.campaignId ?? event.campaign ?? null,
+        createdAt:
+          event.created_at ?? event.createdAt ?? event.timestamp ?? null,
+        platform:
+          event.platform ?? event.platforms ?? event.platformName ?? "unknown",
       }));
       setCampaignShareEvents(normalized);
     }
@@ -253,18 +370,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const fetchCampaignClickEvents = async () => {
     const { data, error } = await supabase
-      .from('campaign_clicks')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("campaign_clicks")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
-      console.warn('Permission campaign_clicks denied', error);
+      console.warn("Permission campaign_clicks denied", error);
       setCampaignClickEvents([]);
     } else if (data) {
       const normalized = (data || []).map((event: any) => ({
         ...event,
-        campaignId: event.campaign_id ?? event.campaignId ?? event.campaign ?? null,
-        createdAt: event.created_at ?? event.createdAt ?? event.timestamp ?? null,
-        platform: event.platform ?? event.platformName ?? 'unknown'
+        campaignId:
+          event.campaign_id ?? event.campaignId ?? event.campaign ?? null,
+        createdAt:
+          event.created_at ?? event.createdAt ?? event.timestamp ?? null,
+        platform: event.platform ?? event.platformName ?? "unknown",
       }));
       setCampaignClickEvents(normalized);
     }
@@ -282,13 +401,49 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
     // Subscribe to realtime updates
     const channel = supabase
-      .channel('public:admin')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => { fetchAllUsers(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'proofs' }, () => { fetchAllProofs(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaigns' }, () => { fetchAllCampaigns(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'withdrawals' }, () => { fetchAllPayouts(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_share_events' }, () => { fetchCampaignShareEvents(); })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_clicks' }, () => { fetchCampaignClickEvents(); })
+      .channel("public:admin")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "users" },
+        () => {
+          fetchAllUsers();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "proofs" },
+        () => {
+          fetchAllProofs();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "campaigns" },
+        () => {
+          fetchAllCampaigns();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "withdrawals" },
+        () => {
+          fetchAllPayouts();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "campaign_share_events" },
+        () => {
+          fetchCampaignShareEvents();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "campaign_clicks" },
+        () => {
+          fetchCampaignClickEvents();
+        },
+      )
       .subscribe();
 
     return () => {
@@ -299,19 +454,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   // Sync with Sidebar Tabs
   useEffect(() => {
     if (!activeTab) return;
-    if (activeTab === 'admin-dashboard') setView('overview');
-    else if (activeTab === 'admin-validation') setView('validation');
-    else if (activeTab === 'admin-campaigns') setView('campaigns');
-    else if (activeTab === 'admin-users' && isSuperAdmin) setView('users');
-    else if (activeTab === 'admin-payouts' && isSuperAdmin) setView('payouts');
-    else if (activeTab === 'admin-team' && isSuperAdmin) setView('team');
-    else if (activeTab === 'admin-withdrawals') setView('withdrawals');
-    else if (activeTab === 'admin-campaign-payments' && isSuperAdmin) setView('campaignPayments');
-    else if (activeTab === 'admin-gombo-status' && isSuperAdmin) setView('gomboChecker');
-    else if (activeTab === 'admin-push-broadcast' && isSuperAdmin) setView('pushBroadcast');
+    if (activeTab === "admin-dashboard") setView("overview");
+    else if (activeTab === "admin-validation") setView("validation");
+    else if (activeTab === "admin-campaigns") setView("campaigns");
+    else if (activeTab === "admin-users" && isSuperAdmin) setView("users");
+    else if (activeTab === "admin-payouts" && isSuperAdmin) setView("payouts");
+    else if (activeTab === "admin-team" && isSuperAdmin) setView("team");
+    else if (activeTab === "admin-withdrawals") setView("withdrawals");
+    else if (activeTab === "admin-campaign-payments" && isSuperAdmin)
+      setView("campaignPayments");
+    else if (activeTab === "admin-gombo-status" && isSuperAdmin)
+      setView("gomboChecker");
+    else if (activeTab === "admin-push-broadcast" && isSuperAdmin)
+      setView("pushBroadcast");
   }, [activeTab, isSuperAdmin]);
 
-  const showFeedback = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+  const showFeedback = (
+    message: string,
+    type: "success" | "error" | "info" = "success",
+  ) => {
     setAdminFeedback({ message, type });
     setTimeout(() => setAdminFeedback(null), 3000);
   };
@@ -325,7 +486,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const openConfirmModal = (
     config: NonNullable<typeof confirmModal>,
-    action: () => Promise<void> | void
+    action: () => Promise<void> | void,
   ) => {
     confirmActionRef.current = action;
     setConfirmBusy(false);
@@ -341,7 +502,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       closeConfirmModal(true);
     } catch (e: any) {
       console.error(e);
-      showFeedback(`Erreur: ${e?.message || 'Inconnue'}`, 'error');
+      showFeedback(`Erreur: ${e?.message || "Inconnue"}`, "error");
       setConfirmBusy(false);
     }
   };
@@ -349,23 +510,55 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   useEffect(() => {
     if (!confirmModal) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeConfirmModal();
+      if (e.key === "Escape") closeConfirmModal();
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [confirmModal, confirmBusy]);
 
-  const normalizePayoutStatus = (raw: any): 'pending' | 'completed' | 'failed' => {
-    const s = String(raw ?? 'pending').trim().toLowerCase();
-    if (['completed', 'complete', 'success', 'succeeded', 'paid', 'valide', 'validé', 'validee', 'validee', 'done'].includes(s)) return 'completed';
-    if (['failed', 'fail', 'error', 'rejected', 'refused', 'annule', 'annulé', 'cancelled', 'canceled', 'ko'].includes(s)) return 'failed';
-    return 'pending';
+  const normalizePayoutStatus = (
+    raw: any,
+  ): "pending" | "completed" | "failed" => {
+    const s = String(raw ?? "pending")
+      .trim()
+      .toLowerCase();
+    if (
+      [
+        "completed",
+        "complete",
+        "success",
+        "succeeded",
+        "paid",
+        "valide",
+        "validé",
+        "validee",
+        "validee",
+        "done",
+      ].includes(s)
+    )
+      return "completed";
+    if (
+      [
+        "failed",
+        "fail",
+        "error",
+        "rejected",
+        "refused",
+        "annule",
+        "annulé",
+        "cancelled",
+        "canceled",
+        "ko",
+      ].includes(s)
+    )
+      return "failed";
+    return "pending";
   };
 
   const toJsDate = (value: any): Date | null => {
     if (!value) return null;
     try {
-      if (typeof value?.toDate === 'function') return value.toDate();
+      if (typeof value?.toDate === "function") return value.toDate();
       const d = new Date(value);
       if (Number.isNaN(d.getTime())) return null;
       return d;
@@ -375,13 +568,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   };
 
   const formatDate = (value: any) => {
-    if (!value) return '-';
+    if (!value) return "-";
     try {
       // Firestore Timestamp support (has toDate())
-      if (typeof value?.toDate === 'function') return value.toDate().toLocaleDateString();
+      if (typeof value?.toDate === "function")
+        return value.toDate().toLocaleDateString();
       return new Date(value).toLocaleDateString();
     } catch {
-      return '-';
+      return "-";
     }
   };
 
@@ -389,15 +583,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     if (!newMemberEmail.trim()) return;
     setIsAddingMember(true);
     try {
-      const userToPromote = allUsers.find(u => u.email?.toLowerCase() === newMemberEmail.toLowerCase());
+      const userToPromote = allUsers.find(
+        (u) => u.email?.toLowerCase() === newMemberEmail.toLowerCase(),
+      );
       if (!userToPromote) {
         showFeedback("Utilisateur non trouvé avec cet email.", "error");
         setIsAddingMember(false);
         return;
       }
-      await supabase.from('users').update({ role: UserRole.MODERATOR }).eq('id', userToPromote.id);
+      await supabase
+        .from("users")
+        .update({ role: UserRole.MODERATOR })
+        .eq("id", userToPromote.id);
       showFeedback(`${userToPromote.name} a été promu Modérateur !`);
-      setNewMemberEmail('');
+      setNewMemberEmail("");
       setShowAddMemberModal(false);
     } catch (e) {
       showFeedback("Erreur lors de l'ajout.", "error");
@@ -411,31 +610,36 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     const currentUserId = sessionRes.data.session?.user.id;
     if (!isSuperAdmin || userId === currentUserId) return;
 
-    const member = allUsers.find(u => u.id === userId);
+    const member = allUsers.find((u) => u.id === userId);
     openConfirmModal(
       {
-        variant: 'warning',
+        variant: "warning",
         title: "Retirer les droits d'administration ?",
-        message: `Confirmez la rétrogradation${member?.name ? ` de ${member.name}` : ''} en Ambassadeur.`,
-        confirmLabel: 'Rétrograder',
-        cancelLabel: 'Annuler'
+        message: `Confirmez la rétrogradation${member?.name ? ` de ${member.name}` : ""} en Ambassadeur.`,
+        confirmLabel: "Rétrograder",
+        cancelLabel: "Annuler",
       },
       async () => {
         try {
-          await supabase.from('users').update({ role: UserRole.AMBASSADOR }).eq('id', userId);
+          await supabase
+            .from("users")
+            .update({ role: UserRole.AMBASSADOR })
+            .eq("id", userId);
           showFeedback("Membre rétrogradé en Ambassadeur.");
         } catch (e) {
           showFeedback("Erreur lors de la rétrogradation.", "error");
         }
-      }
+      },
     );
   };
 
   const handleResetPassword = async (email: string) => {
     if (!email) return;
     try {
-      await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/?mode=resetPassword` });
-      showFeedback(`Email de réinitialisation envoyé à ${email}`, 'success');
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/?mode=resetPassword`,
+      });
+      showFeedback(`Email de réinitialisation envoyé à ${email}`, "success");
     } catch (e) {
       showFeedback("Erreur lors de l'envoi de l'email.", "error");
     }
@@ -444,46 +648,76 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     if (!isSuperAdmin) return;
     try {
-      await supabase.from('users').update({ role: newRole }).eq('id', userId);
+      await supabase.from("users").update({ role: newRole }).eq("id", userId);
       showFeedback(`Rôle de l'utilisateur mis à jour.`);
     } catch (e) {
       showFeedback("Erreur de mise à jour.", "error");
     }
   };
 
-  const handleToggleUserBlock = async (userId: string, currentStatus: string) => {
-    if (!isSuperAdmin || !['active', 'blocked'].includes(currentStatus)) return;
-    const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+  const handleToggleUserBlock = async (
+    userId: string,
+    currentStatus: string,
+  ) => {
+    if (!isSuperAdmin || !["active", "blocked"].includes(currentStatus)) return;
+    const newStatus = currentStatus === "active" ? "blocked" : "active";
     try {
-      await supabase.from('users').update({ status: newStatus }).eq('id', userId);
-      showFeedback(newStatus === 'active' ? "Utilisateur débloqué" : "Utilisateur bloqué", "info");
-    } catch (e) { showFeedback("Erreur", "error"); }
+      await supabase
+        .from("users")
+        .update({ status: newStatus })
+        .eq("id", userId);
+      showFeedback(
+        newStatus === "active" ? "Utilisateur débloqué" : "Utilisateur bloqué",
+        "info",
+      );
+    } catch (e) {
+      showFeedback("Erreur", "error");
+    }
   };
 
   const openVerificationDocument = async (path: string) => {
-    const { data, error } = await supabase.storage.from('identity-documents').createSignedUrl(path, 300);
+    const { data, error } = await supabase.storage
+      .from("identity-documents")
+      .createSignedUrl(path, 300);
     if (error || !data?.signedUrl) {
-      showFeedback('Impossible d’ouvrir le document.', 'error');
+      showFeedback("Impossible d’ouvrir le document.", "error");
       return;
     }
-    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleVerificationDecision = async (user: User, decision: 'active' | 'rejected') => {
+  const handleVerificationDecision = async (
+    user: User,
+    decision: "active" | "rejected",
+  ) => {
     if (!isSuperAdmin || !user.verification_document_path) return;
-    const reason = decision === 'rejected' ? window.prompt('Motif du refus (facultatif) :') || null : null;
-    const { error } = await supabase.from('users').update({
-      status: decision,
-      verification_reviewed_at: new Date().toISOString(),
-      verification_reviewed_by: currentAdminData?.id,
-      verification_rejection_reason: reason,
-    }).eq('id', user.id).eq('status', 'pending_verification');
+    const reason =
+      decision === "rejected"
+        ? window.prompt("Motif du refus (facultatif) :") || null
+        : null;
+    const { error } = await supabase
+      .from("users")
+      .update({
+        status: decision,
+        verification_reviewed_at: new Date().toISOString(),
+        verification_reviewed_by: currentAdminData?.id,
+        verification_rejection_reason: reason,
+      })
+      .eq("id", user.id)
+      .eq("status", "pending_verification");
     if (error) {
-      showFeedback('Erreur lors de la validation.', 'error');
+      showFeedback("Erreur lors de la validation.", "error");
       return;
     }
-    await supabase.storage.from('identity-documents').remove([user.verification_document_path]);
-    showFeedback(decision === 'active' ? 'Compte vérifié et activé.' : 'Vérification refusée.', 'success');
+    await supabase.storage
+      .from("identity-documents")
+      .remove([user.verification_document_path]);
+    showFeedback(
+      decision === "active"
+        ? "Compte vérifié et activé."
+        : "Vérification refusée.",
+      "success",
+    );
     fetchAllUsers();
   };
 
@@ -491,21 +725,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     if (!isSuperAdmin) return;
     openConfirmModal(
       {
-        variant: 'danger',
+        variant: "danger",
         title: "Supprimer définitivement l'utilisateur ?",
-        message: `Voulez-vous vraiment supprimer ${user.name || 'cet utilisateur'} (${user.email || 'Pas d\'email'}) ? Toutes ses données (solde, preuves, historique) seront perdues. Cette action est irréversible.`,
-        confirmLabel: 'Supprimer',
-        cancelLabel: 'Annuler'
+        message: `Voulez-vous vraiment supprimer ${user.name || "cet utilisateur"} (${user.email || "Pas d'email"}) ? Toutes ses données (solde, preuves, historique) seront perdues. Cette action est irréversible.`,
+        confirmLabel: "Supprimer",
+        cancelLabel: "Annuler",
       },
       async () => {
         try {
-          await supabase.from('users').delete().eq('id', user.id);
+          await supabase.from("users").delete().eq("id", user.id);
           showFeedback("Utilisateur supprimé avec succès.", "success");
         } catch (e: any) {
           console.error(e);
-          showFeedback(`Erreur lors de la suppression : ${e?.message || 'Inconnue'}`, 'error');
+          showFeedback(
+            `Erreur lors de la suppression : ${e?.message || "Inconnue"}`,
+            "error",
+          );
         }
-      }
+      },
     );
   };
 
@@ -538,7 +775,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     setIsValidating(true);
     try {
       const views = parseInt(viewsInput);
-      const campaign = allCampaigns.find(c => c.id === validatingProof.campaignId);
+      const campaign = allCampaigns.find(
+        (c) => c.id === validatingProof.campaignId,
+      );
 
       if (!campaign) {
         showFeedback("Campagne introuvable", "error");
@@ -553,28 +792,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       // Vérification du budget restant
       if (earnings > remainingBudget) {
         const maxViews = Math.floor(remainingBudget / cpv);
-        showFeedback(`Budget insuffisant. Il reste ${remainingBudget.toLocaleString()} FCFA, soit ${maxViews.toLocaleString()} vues maximum.`, "error");
+        showFeedback(
+          `Budget insuffisant. Il reste ${remainingBudget.toLocaleString()} FCFA, soit ${maxViews.toLocaleString()} vues maximum.`,
+          "error",
+        );
         setWasBudgetLimited(true);
         return;
       }
 
       // Update proof
       const { error: proofErr } = await supabase
-        .from('proofs')
+        .from("proofs")
         .update({
-          status: 'validated',
-          viewsCount: views
+          status: "validated",
+          viewsCount: views,
         })
-        .eq('id', validatingProof.id)
-        .eq('userId', validatingProof.userId);
+        .eq("id", validatingProof.id)
+        .eq("userId", validatingProof.userId);
 
-      if (proofErr) console.error("Erreur de mise à jour de la preuve:", proofErr);
+      if (proofErr)
+        console.error("Erreur de mise à jour de la preuve:", proofErr);
 
       // Get user profile to calculate increments and retrieve email
       const { data: userProfile, error: fetchErr } = await supabase
-        .from('users')
-        .select('balance, totalEarned, email')
-        .eq('id', validatingProof.userId)
+        .from("users")
+        .select("balance, totalEarned, email")
+        .eq("id", validatingProof.userId)
         .single();
 
       if (fetchErr) throw fetchErr;
@@ -584,73 +827,53 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
       // Update user balances
       await supabase
-        .from('users')
+        .from("users")
         .update({
           balance: currentBalance + earnings,
-          totalEarned: currentTotalEarned + earnings
+          totalEarned: currentTotalEarned + earnings,
         })
-        .eq('id', validatingProof.userId);
+        .eq("id", validatingProof.userId);
 
       await supabase
-        .from('campaigns')
+        .from("campaigns")
         .update({
           remainingBudget: remainingBudget - earnings,
           viewsCurrent: viewsCurrent + views,
         })
-        .eq('id', campaign.id);
+        .eq("id", campaign.id);
 
       // Notification personnalisée si le budget était limité
       const notificationMessage = wasBudgetLimited
         ? `Votre preuve a été validée, mais le budget restant de la campagne ne permettait pas de rémunérer la totalité de vos vues. +${earnings.toLocaleString()} FCFA ajoutés.`
         : `Votre preuve a été validée. +${earnings.toLocaleString()} FCFA ajoutés à votre solde.`;
 
-      await supabase
-        .from('notifications')
-        .insert({
-          userId: validatingProof.userId,
-          title: wasBudgetLimited ? 'Rémunération plafonnée' : 'Preuve validée !',
-          message: notificationMessage,
-          type: 'payout',
-          read: false,
-          createdAt: new Date().toISOString()
-        });
+      await supabase.from("notifications").insert({
+        userId: validatingProof.userId,
+        title: wasBudgetLimited ? "Rémunération plafonnée" : "Preuve validée !",
+        message: notificationMessage,
+        type: "payout",
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
 
-      // Envoi de l'email de confirmation de preuve validée à l'ambassadeur
-      // if (userProfile?.email) {
-      //   supabase.functions.invoke('send-email', {
-      //     body: {
-      //       to: userProfile.email,
-      //       type: 'validated',
-      //       data: {
-      //         userName: validatingProof.userName || 'Ambassadeur',
-      //         campaignTitle: campaign.title || validatingProof.campaignName || 'Campagne',
-      //         views,
-      //         earnings,
-      //       }
-      //     }
-      //   }).catch(err => console.error("Erreur d'envoi de l'email de validation de preuve:", err));
-      // }
+      void sendPushNotification({
+        title: wasBudgetLimited ? "Rémunération ajustée" : "Preuve validée",
+        message: notificationMessage,
+        url: "/app/wallet",
+        targetUserIds: [validatingProof.userId],
+      }).then(({ success, error }) => {
+        if (!success) {
+          console.error("Erreur d'envoi du push de validation:", error);
+        }
+      });
 
-      if (validatingProof?.userId) {
-        supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: validatingProof.userId,
-            title: 'Preuve validée ✅',
-            body: `+${earnings} FCFA pour "${campaign.title || validatingProof.campaignName || 'votre campagne'}"`,
-            data: {
-              type: 'proof_validated',
-              url: '/#/app/wallet',
-            },
-          },
-        }).catch(err => console.error("Erreur d'envoi de la notification de validation:", err));
-      }
-
-      showFeedback(`Preuve validée ! +${earnings.toLocaleString()} FCFA crédités.`);
+      showFeedback(
+        `Preuve validée ! +${earnings.toLocaleString()} FCFA crédités.`,
+      );
       setValidatingProof(null);
       // await deleteProof(validatingProof);
-      setViewsInput('');
+      setViewsInput("");
       setWasBudgetLimited(false);
-
     } catch (e) {
       showFeedback("Erreur lors de la validation", "error");
       console.error(e);
@@ -664,83 +887,72 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     setIsRejecting(true);
     try {
       const { error: proofErr } = await supabase
-        .from('proofs')
+        .from("proofs")
         .update({
-          status: 'rejected',
-          rejectionReason: rejectionReason.trim()
+          status: "rejected",
+          rejectionReason: rejectionReason.trim(),
         })
-        .eq('id', rejectingProof.id)
-        .eq('userId', rejectingProof.userId);
+        .eq("id", rejectingProof.id)
+        .eq("userId", rejectingProof.userId);
 
-      if (proofErr) console.error("Erreur de mise à jour de la preuve:", proofErr);
+      if (proofErr)
+        console.error("Erreur de mise à jour de la preuve:", proofErr);
 
-      await supabase
-        .from('notifications')
-        .insert({
-          userId: rejectingProof.userId,
-          title: 'Preuve refusée',
-          message: `Votre preuve pour la campagne ${rejectingProof.campaignName} a été refusée. Motif : ${rejectionReason.trim()}`,
-          type: 'status',
-          read: false,
-          createdAt: new Date().toISOString()
-        });
+      const rejectionNotificationMessage = `Votre preuve pour la campagne ${rejectingProof.campaignName} a été refusée. Motif : ${rejectionReason.trim()}`;
 
-      // Envoi de l'email de refus de preuve à l'ambassadeur
-      // const { data: user, error: fetchErr } = await supabase
-      //   .from('users')
-      //   .select('email')
-      //   .eq('id', rejectingProof.userId)
-      //   .single();
+      await supabase.from("notifications").insert({
+        userId: rejectingProof.userId,
+        title: "Preuve refusée",
+        message: rejectionNotificationMessage,
+        type: "status",
+        read: false,
+        createdAt: new Date().toISOString(),
+      });
 
-      // if (!fetchErr && user?.email) {
-      //   supabase.functions.invoke('send-email', {
-      //     body: {
-      //       to: user.email,
-      //       type: 'rejected',
-      //       data: {
-      //         userName: rejectingProof.userName || 'Ambassadeur',
-      //         campaignTitle: rejectingProof.campaignName || 'Campagne',
-      //         reason: rejectionReason.trim()
-      //       }
-      //     }
-      //   }).catch(err => console.error("Erreur d'envoi de l'email de refus de preuve:", err));
-      // }
-
-      if (validatingProof?.userId) {
-        supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: validatingProof.userId,
-            title: 'Preuve Refusée ❌',
-            body: `Votre preuve pour la ${rejectingProof.campaignName || 'campagne'} a été refusée. Motif : ${rejectionReason.trim()}`,
-            data: {
-              type: 'rejected',
-              url: '/#/app/wallet',
-            },
-          },
-        }).catch(err => console.error("Erreur d'envoi de la notification de validation:", err));
-      }
+      void sendPushNotification({
+        title: "Preuve refusée",
+        message: rejectionNotificationMessage,
+        url: "/app/task-history",
+        targetUserIds: [rejectingProof.userId],
+      }).then(({ success, error }) => {
+        if (!success) {
+          console.error("Erreur d'envoi du push de refus:", error);
+        }
+      });
 
       // await deleteProof(rejectingProof);
 
       showFeedback("Preuve refusée avec succès", "info");
       setRejectingProof(null);
-      setRejectionReason('');
+      setRejectionReason("");
     } catch (e) {
       showFeedback("Erreur lors du refus", "error");
       console.error(e);
+    } finally {
+      setIsRejecting(false);
     }
-    finally { setIsRejecting(false); }
   };
 
-  const stats = useMemo(() => ({
-    totalInscrits: allUsers.length,
-    pendingProofs: allProofs.filter(p => p.status === 'pending').length,
-    totalDistribute: allPayouts.reduce((acc, p) => acc + (normalizePayoutStatus(p.status) === 'completed' ? p.amount : 0), 0),
-    userDebt: allUsers.reduce((acc, u) => acc + (u.balance || 0), 0)
-  }), [allUsers, allProofs, allPayouts]);
+  const stats = useMemo(
+    () => ({
+      totalInscrits: allUsers.length,
+      pendingProofs: allProofs.filter((p) => p.status === "pending").length,
+      totalDistribute: allPayouts.reduce(
+        (acc, p) =>
+          acc +
+          (normalizePayoutStatus(p.status) === "completed" ? p.amount : 0),
+        0,
+      ),
+      userDebt: allUsers.reduce((acc, u) => acc + (u.balance || 0), 0),
+    }),
+    [allUsers, allProofs, allPayouts],
+  );
 
   const financialStats = useMemo(() => {
-    const totalRevenue = allCampaigns.reduce((acc, c) => acc + (c.totalBudget || 0), 0);
+    const totalRevenue = allCampaigns.reduce(
+      (acc, c) => acc + (c.totalBudget || 0),
+      0,
+    );
     const totalPayouts = stats.totalDistribute;
     const totalDebt = stats.userDebt;
     const netProfit = totalRevenue - totalPayouts - totalDebt;
@@ -749,15 +961,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   const campaignAnalytics = useMemo(() => {
     const campaignStats = allCampaigns.map((campaign) => {
-      const shares = campaignShareEvents.filter(event => (event.campaignId ?? event.campaign_id) === campaign.id).length;
-      const clicks = campaignClickEvents.filter(event => (event.campaignId ?? event.campaign_id) === campaign.id).length;
+      const shares = campaignShareEvents.filter(
+        (event) => (event.campaignId ?? event.campaign_id) === campaign.id,
+      ).length;
+      const clicks = campaignClickEvents.filter(
+        (event) => (event.campaignId ?? event.campaign_id) === campaign.id,
+      ).length;
       const conversionRate = shares > 0 ? (clicks / shares) * 100 : 0;
       const platforms: Record<string, number> = {};
 
       campaignShareEvents
-        .filter(event => (event.campaignId ?? event.campaign_id) === campaign.id)
+        .filter(
+          (event) => (event.campaignId ?? event.campaign_id) === campaign.id,
+        )
         .forEach((event) => {
-          const platform = String(event.platform || 'unknown').toLowerCase();
+          const platform = String(event.platform || "unknown").toLowerCase();
           platforms[platform] = (platforms[platform] || 0) + 1;
         });
 
@@ -770,22 +988,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
         clicks,
         conversionRate,
         engagementScore: shares + clicks * 2,
-        platformBreakdown: Object.entries(platforms).map(([name, value]) => ({ name, value })),
-        lastActivity: [...campaignShareEvents.filter(event => (event.campaignId ?? event.campaign_id) === campaign.id), ...campaignClickEvents.filter(event => (event.campaignId ?? event.campaign_id) === campaign.id)]
-          .map(event => toJsDate(event.createdAt ?? event.created_at))
-          .filter((value): value is Date => value !== null)
-          .sort((a, b) => b.getTime() - a.getTime())[0] || null
+        platformBreakdown: Object.entries(platforms).map(([name, value]) => ({
+          name,
+          value,
+        })),
+        lastActivity:
+          [
+            ...campaignShareEvents.filter(
+              (event) =>
+                (event.campaignId ?? event.campaign_id) === campaign.id,
+            ),
+            ...campaignClickEvents.filter(
+              (event) =>
+                (event.campaignId ?? event.campaign_id) === campaign.id,
+            ),
+          ]
+            .map((event) => toJsDate(event.createdAt ?? event.created_at))
+            .filter((value): value is Date => value !== null)
+            .sort((a, b) => b.getTime() - a.getTime())[0] || null,
       };
     });
 
-    const sorted = [...campaignStats].sort((a, b) => b.engagementScore - a.engagementScore);
+    const sorted = [...campaignStats].sort(
+      (a, b) => b.engagementScore - a.engagementScore,
+    );
     const totalShares = sorted.reduce((acc, item) => acc + item.shares, 0);
     const totalClicks = sorted.reduce((acc, item) => acc + item.clicks, 0);
-    const conversionRate = totalShares > 0 ? (totalClicks / totalShares) * 100 : 0;
+    const conversionRate =
+      totalShares > 0 ? (totalClicks / totalShares) * 100 : 0;
 
     const platformTotals: Record<string, number> = {};
     campaignShareEvents.forEach((event) => {
-      const platform = String(event.platform || 'unknown').toLowerCase();
+      const platform = String(event.platform || "unknown").toLowerCase();
       platformTotals[platform] = (platformTotals[platform] || 0) + 1;
     });
 
@@ -798,25 +1032,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       totalShares,
       totalClicks,
       conversionRate,
-      activeCampaigns: allCampaigns.filter(c => c.status === 'active').length,
+      activeCampaigns: allCampaigns.filter((c) => c.status === "active").length,
       bestCampaign: sorted[0] || null,
-      platformChart
+      platformChart,
     };
   }, [allCampaigns, campaignShareEvents, campaignClickEvents]);
 
   const topEarners = useMemo(() => {
     return [...allUsers]
-      .filter(u => (u.totalEarned || 0) > 0)
+      .filter((u) => (u.totalEarned || 0) > 0)
       .sort((a, b) => (b.totalEarned || 0) - (a.totalEarned || 0))
       .slice(0, 10);
   }, [allUsers]);
 
   const filteredWithdrawals = useMemo(() => {
-    return allPayouts.filter(p => {
-      const matchesSearch = (p.userName || '').toLowerCase().includes(withdrawalSearch.toLowerCase()) ||
-        (p.phone || '').includes(withdrawalSearch);
-      const matchesStatus = withdrawalStatusFilter === 'all' || normalizePayoutStatus(p.status) === withdrawalStatusFilter;
-      const matchesOperator = operatorFilter === 'all' || p.provider === operatorFilter;
+    return allPayouts.filter((p) => {
+      const matchesSearch =
+        (p.userName || "")
+          .toLowerCase()
+          .includes(withdrawalSearch.toLowerCase()) ||
+        (p.phone || "").includes(withdrawalSearch);
+      const matchesStatus =
+        withdrawalStatusFilter === "all" ||
+        normalizePayoutStatus(p.status) === withdrawalStatusFilter;
+      const matchesOperator =
+        operatorFilter === "all" || p.provider === operatorFilter;
       return matchesSearch && matchesStatus && matchesOperator;
     });
   }, [allPayouts, withdrawalSearch, withdrawalStatusFilter, operatorFilter]);
@@ -829,25 +1069,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     setIsCheckingGombo(true);
     setGomboCheckResult(null);
     try {
-      const result = await gomboCheckTransactionStatus({ transaction_reference: gomboRefInput.trim() });
+      const result = await gomboCheckTransactionStatus({
+        transaction_reference: gomboRefInput.trim(),
+      });
       setGomboCheckResult(result);
       showFeedback("Vérification terminée.");
     } catch (err: any) {
       console.error("Gombo Check Error:", err);
-      showFeedback("Erreur lors de la vérification : " + (err.message || "Inconnue"), "error");
+      showFeedback(
+        "Erreur lors de la vérification : " + (err.message || "Inconnue"),
+        "error",
+      );
     } finally {
       setIsCheckingGombo(false);
     }
   };
 
   const proofStatusChart = useMemo(() => {
-    const pending = allProofs.filter(p => p.status === 'pending').length;
-    const validated = allProofs.filter(p => p.status === 'validated').length;
-    const rejected = allProofs.filter(p => p.status === 'rejected').length;
+    const pending = allProofs.filter((p) => p.status === "pending").length;
+    const validated = allProofs.filter((p) => p.status === "validated").length;
+    const rejected = allProofs.filter((p) => p.status === "rejected").length;
     return [
-      { name: 'En attente', value: pending, color: '#f59e0b' },
-      { name: 'Validées', value: validated, color: '#128686' },
-      { name: 'Rejetées', value: rejected, color: '#ef4444' }
+      { name: "En attente", value: pending, color: "#f59e0b" },
+      { name: "Validées", value: validated, color: "#128686" },
+      { name: "Rejetées", value: rejected, color: "#ef4444" },
     ];
   }, [allProofs]);
 
@@ -855,36 +1100,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
     const counts = { pending: 0, completed: 0, failed: 0 };
     for (const p of allPayouts) counts[normalizePayoutStatus(p.status)]++;
     return [
-      { name: 'En attente', value: counts.pending, color: '#f59e0b' },
-      { name: 'Validés', value: counts.completed, color: '#128686' },
-      { name: 'Rejetés', value: counts.failed, color: '#ef4444' }
+      { name: "En attente", value: counts.pending, color: "#f59e0b" },
+      { name: "Validés", value: counts.completed, color: "#128686" },
+      { name: "Rejetés", value: counts.failed, color: "#ef4444" },
     ];
   }, [allPayouts]);
 
   const campaignStatusChart = useMemo(() => {
     const buckets: Record<string, number> = {};
     for (const c of allCampaigns) {
-      const k = String(c.status ?? 'pending');
+      const k = String(c.status ?? "pending");
       buckets[k] = (buckets[k] ?? 0) + 1;
     }
-    const order = ['pending', 'active', 'paused', 'completed', 'rejected'];
+    const order = ["pending", "active", "paused", "completed", "rejected"];
     const colors: Record<string, string> = {
-      pending: '#f59e0b',
-      active: '#128686',
-      paused: '#F65E06',
-      completed: '#9ca3af',
-      rejected: '#ef4444'
+      pending: "#f59e0b",
+      active: "#128686",
+      paused: "#F65E06",
+      completed: "#9ca3af",
+      rejected: "#ef4444",
     };
-    return [...order, ...Object.keys(buckets)].filter((v, i, a) => a.indexOf(v) === i && buckets[v] !== undefined).map((k) => ({
-      name: k,
-      value: buckets[k] ?? 0,
-      color: colors[k] ?? '#94a3b8'
-    }));
+    return [...order, ...Object.keys(buckets)]
+      .filter((v, i, a) => a.indexOf(v) === i && buckets[v] !== undefined)
+      .map((k) => ({
+        name: k,
+        value: buckets[k] ?? 0,
+        color: colors[k] ?? "#94a3b8",
+      }));
   }, [allCampaigns]);
 
   const payoutTrend14d = useMemo(() => {
     // Aggregate last 14 days by local date string (dd/mm/yyyy depends on locale)
-    const map = new Map<string, { date: Date; requested: number; paid: number }>();
+    const map = new Map<
+      string,
+      { date: Date; requested: number; paid: number }
+    >();
     const now = new Date();
     const cutoff = new Date(now);
     cutoff.setDate(now.getDate() - 13);
@@ -895,14 +1145,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       if (!d) continue;
       if (d < cutoff) continue;
       const key = d.toDateString();
-      const row = map.get(key) ?? { date: new Date(d.getFullYear(), d.getMonth(), d.getDate()), requested: 0, paid: 0 };
+      const row = map.get(key) ?? {
+        date: new Date(d.getFullYear(), d.getMonth(), d.getDate()),
+        requested: 0,
+        paid: 0,
+      };
       const status = normalizePayoutStatus(p.status);
-      if (status === 'completed') row.paid += (p.amount || 0);
-      else row.requested += (p.amount || 0);
+      if (status === "completed") row.paid += p.amount || 0;
+      else row.requested += p.amount || 0;
       map.set(key, row);
     }
 
-    const rows = Array.from(map.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
+    const rows = Array.from(map.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime(),
+    );
     // Fill missing days for nicer chart
     const filled: { day: string; requested: number; paid: number }[] = [];
     for (let i = 0; i < 14; i++) {
@@ -910,21 +1166,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       d.setDate(cutoff.getDate() + i);
       const key = d.toDateString();
       const row = map.get(key);
-      const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-      filled.push({ day: label, requested: row?.requested ?? 0, paid: row?.paid ?? 0 });
+      const label = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+      filled.push({
+        day: label,
+        requested: row?.requested ?? 0,
+        paid: row?.paid ?? 0,
+      });
     }
     return filled;
   }, [allPayouts]);
 
   const filteredUsers = useMemo(() => {
-    return allUsers.filter(u =>
-      (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    return allUsers.filter(
+      (u) =>
+        (u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase())),
     );
   }, [allUsers, searchTerm]);
 
   const teamMembers = useMemo(() => {
-    return allUsers.filter(u => u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR);
+    return allUsers.filter(
+      (u) => u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR,
+    );
   }, [allUsers]);
 
   const totalUserPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
@@ -955,18 +1218,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
   }, [allPayouts, payoutPage]);
 
   // Pagination for Withdrawals
-  const totalWithdrawalPages = Math.ceil(filteredWithdrawals.length / ITEMS_PER_PAGE);
+  const totalWithdrawalPages = Math.ceil(
+    filteredWithdrawals.length / ITEMS_PER_PAGE,
+  );
   const paginatedWithdrawals = useMemo(() => {
     const start = (withdrawalPage - 1) * ITEMS_PER_PAGE;
     return filteredWithdrawals.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredWithdrawals, withdrawalPage]);
 
   // Pagination for Campaign Payments
-  const campaignPaymentsList = useMemo(() =>
-    allCampaigns.filter(c => c.createdBy === 'user' || c.createdBy === undefined),
-    [allCampaigns]
+  const campaignPaymentsList = useMemo(
+    () =>
+      allCampaigns.filter(
+        (c) => c.createdBy === "user" || c.createdBy === undefined,
+      ),
+    [allCampaigns],
   );
-  const totalCampaignPaymentPages = Math.ceil(campaignPaymentsList.length / ITEMS_PER_PAGE);
+  const totalCampaignPaymentPages = Math.ceil(
+    campaignPaymentsList.length / ITEMS_PER_PAGE,
+  );
   const paginatedCampaignPayments = useMemo(() => {
     const start = (campaignPaymentPage - 1) * ITEMS_PER_PAGE;
     return campaignPaymentsList.slice(start, start + ITEMS_PER_PAGE);
@@ -974,20 +1244,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 relative">
-
       {/* ── Toast Notification ── */}
       {adminFeedback && (
         <div
-          className={`fixed top-24 right-4 z-[200] px-6 py-4 rounded-2xl shadow-xl border flex items-center gap-3 animate-in slide-in-from-right duration-300 ${adminFeedback.type === 'success'
-            ? 'bg-green-600 text-white border-green-500/20'
-            : adminFeedback.type === 'error'
-              ? 'bg-red-600 text-white border-red-500/20'
-              : 'bg-gray-900 text-white border-white/10'
-            }`}
+          className={`fixed top-24 right-4 z-[200] px-6 py-4 rounded-2xl shadow-xl border flex items-center gap-3 animate-in slide-in-from-right duration-300 ${
+            adminFeedback.type === "success"
+              ? "bg-green-600 text-white border-green-500/20"
+              : adminFeedback.type === "error"
+                ? "bg-red-600 text-white border-red-500/20"
+                : "bg-gray-900 text-white border-white/10"
+          }`}
         >
-          {adminFeedback.type === 'success' ? (
+          {adminFeedback.type === "success" ? (
             <CheckCircle2 size={24} />
-          ) : adminFeedback.type === 'error' ? (
+          ) : adminFeedback.type === "error" ? (
             <AlertTriangle size={24} />
           ) : (
             <Clock size={24} />
@@ -1015,28 +1285,33 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg p-8 md:p-10 space-y-7 animate-in zoom-in-95 duration-200 border border-gray-100">
             <div className="flex items-start gap-4">
               <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${confirmModal.variant === 'success'
-                  ? 'bg-green-100 text-green-700'
-                  : confirmModal.variant === 'danger'
-                    ? 'bg-red-100 text-red-700'
-                    : confirmModal.variant === 'info'
-                      ? 'bg-[#D9ECEC] text-[#0E6B6B]'
-                      : 'bg-amber-100 text-amber-700'
-                  }`}
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
+                  confirmModal.variant === "success"
+                    ? "bg-green-100 text-green-700"
+                    : confirmModal.variant === "danger"
+                      ? "bg-red-100 text-red-700"
+                      : confirmModal.variant === "info"
+                        ? "bg-[#D9ECEC] text-[#0E6B6B]"
+                        : "bg-amber-100 text-amber-700"
+                }`}
               >
-                {confirmModal.variant === 'success' ? (
+                {confirmModal.variant === "success" ? (
                   <CheckCircle2 size={26} />
-                ) : confirmModal.variant === 'danger' ? (
+                ) : confirmModal.variant === "danger" ? (
                   <X size={26} />
-                ) : confirmModal.variant === 'info' ? (
+                ) : confirmModal.variant === "info" ? (
                   <Clock size={26} />
                 ) : (
                   <AlertTriangle size={26} />
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 tracking-tight">{confirmModal.title}</h3>
-                <p className="text-sm text-gray-600 font-medium mt-2 leading-relaxed">{confirmModal.message}</p>
+                <h3 className="text-xl font-bold text-gray-900 tracking-tight">
+                  {confirmModal.title}
+                </h3>
+                <p className="text-sm text-gray-600 font-medium mt-2 leading-relaxed">
+                  {confirmModal.message}
+                </p>
               </div>
               <button
                 type="button"
@@ -1056,21 +1331,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 disabled={confirmBusy}
                 className="px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-[11px] bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all active:scale-95 disabled:opacity-60"
               >
-                {confirmModal.cancelLabel || 'Annuler'}
+                {confirmModal.cancelLabel || "Annuler"}
               </button>
               <button
                 type="button"
                 onClick={runConfirmAction}
                 disabled={confirmBusy}
-                className={`px-7 py-3 rounded-2xl font-bold uppercase tracking-widest text-[11px] text-white transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 ${confirmModal.variant === 'danger'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : confirmModal.variant === 'success'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-[#128686] hover:bg-[#0E6B6B]'
-                  }`}
+                className={`px-7 py-3 rounded-2xl font-bold uppercase tracking-widest text-[11px] text-white transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2 ${
+                  confirmModal.variant === "danger"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : confirmModal.variant === "success"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-[#128686] hover:bg-[#0E6B6B]"
+                }`}
               >
-                {confirmBusy ? <Loader2 size={16} className="animate-spin" /> : null}
-                {confirmBusy ? 'Traitement…' : (confirmModal.confirmLabel || 'Confirmer')}
+                {confirmBusy ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : null}
+                {confirmBusy
+                  ? "Traitement…"
+                  : confirmModal.confirmLabel || "Confirmer"}
               </button>
             </div>
           </div>
@@ -1081,22 +1361,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {view === 'overview' && `Espace ${isSuperAdmin ? 'Administrateur' : 'Modérateur'}`}
-            {view === 'users' && 'Utilisateurs & Ambassadeurs'}
-            {view === 'payouts' && 'Gestion des Finances'}
-            {view === 'validation' && 'Validation des Preuves'}
-            {view === 'team' && 'Mon Équipe Staff'}
-            {view === 'campaigns' && 'Gestion des Campagnes'}
-            {view === 'withdrawals' && 'Demandes de Retraits'}
-            {view === 'campaignPayments' && 'Paiements des Campagnes'}
-            {view === 'gomboChecker' && 'Vérificateur GomboPlus'}
-            {view === 'pushBroadcast' && 'Envoi de Notifications Push (OneSignal)'}
+            {view === "overview" &&
+              `Espace ${isSuperAdmin ? "Administrateur" : "Modérateur"}`}
+            {view === "users" && "Utilisateurs & Ambassadeurs"}
+            {view === "payouts" && "Gestion des Finances"}
+            {view === "validation" && "Validation des Preuves"}
+            {view === "team" && "Mon Équipe Staff"}
+            {view === "campaigns" && "Gestion des Campagnes"}
+            {view === "withdrawals" && "Demandes de Retraits"}
+            {view === "campaignPayments" && "Paiements des Campagnes"}
+            {view === "gomboChecker" && "Vérificateur GomboPlus"}
+            {view === "pushBroadcast" &&
+              "Envoi de Notifications Push (OneSignal)"}
           </h2>
-          <p className="text-gray-500 text-sm font-medium mt-1">Console de gestion SikaAds Togo</p>
+          <p className="text-gray-500 text-sm font-medium mt-1">
+            Console de gestion SikaAds Togo
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
-          {view === 'team' && isSuperAdmin && (
+          {view === "team" && isSuperAdmin && (
             <button
               onClick={() => setShowAddMemberModal(true)}
               className="bg-[#128686] text-white px-6 py-3 rounded-2xl font-bold uppercase text-[10px] tracking-widest shadow-lg shadow-[#128686]/20 flex items-center gap-2 active:scale-95 transition-all"
@@ -1104,14 +1388,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <UserPlus size={16} /> Ajouter Membre
             </button>
           )}
-          {view === 'users' && (
+          {view === "users" && (
             <div className="relative w-full md:w-72">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 type="text"
                 placeholder="Rechercher un membre..."
                 value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setUserPage(1); }}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setUserPage(1);
+                }}
                 className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#128686] outline-none shadow-sm"
               />
             </div>
@@ -1122,37 +1412,37 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: OVERVIEW
       ══════════════════════════════════════════ */}
-      {view === 'overview' && (
+      {view === "overview" && (
         <div className="space-y-6">
           {/* ══════════════════════════════════════════
               SECTION 1: KPI PRINCIPAUX
           ══════════════════════════════════════════ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <StatCard 
-              title="Total Inscrits" 
-              value={stats.totalInscrits.toLocaleString()} 
-              icon={Users} 
+            <StatCard
+              title="Total Inscrits"
+              value={stats.totalInscrits.toLocaleString()}
+              icon={Users}
               color="blue"
               subtitle="ambassadeurs"
             />
-            <StatCard 
-              title="Preuves en attente" 
-              value={stats.pendingProofs.toString()} 
-              icon={Clock} 
+            <StatCard
+              title="Preuves en attente"
+              value={stats.pendingProofs.toString()}
+              icon={Clock}
               color="orange"
               subtitle="à valider"
             />
-            <StatCard 
-              title="Total Distribué" 
-              value={stats.totalDistribute.toLocaleString() + ' F'} 
-              icon={CheckCircle2} 
+            <StatCard
+              title="Total Distribué"
+              value={stats.totalDistribute.toLocaleString() + " F"}
+              icon={CheckCircle2}
               color="green"
               subtitle="payé aux ambassadeurs"
             />
-            <StatCard 
-              title="Dette Ambassadeurs" 
-              value={stats.userDebt.toLocaleString() + ' F'} 
-              icon={Banknote} 
+            <StatCard
+              title="Dette Ambassadeurs"
+              value={stats.userDebt.toLocaleString() + " F"}
+              icon={Banknote}
               color="indigo"
               subtitle="solde en attente"
             />
@@ -1167,19 +1457,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em]">
                   <Sparkles size={14} /> Analytics de campagne
                 </div>
-                <h3 className="text-xl font-bold mt-3">Performance globale des campagnes</h3>
+                <h3 className="text-xl font-bold mt-3">
+                  Performance globale des campagnes
+                </h3>
                 <p className="text-sm text-[#A9DADA] mt-1 max-w-2xl">
-                  Suivi des partages, clics et conversion pour piloter les actions marketing.
+                  Suivi des partages, clics et conversion pour piloter les
+                  actions marketing.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3 min-w-[280px]">
                 <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">Partages</p>
-                  <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalShares.toLocaleString()}</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">
+                    Partages
+                  </p>
+                  <p className="text-2xl font-bold mt-1">
+                    {campaignAnalytics.totalShares.toLocaleString()}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-white/15 p-4 backdrop-blur">
-                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">Clics</p>
-                  <p className="text-2xl font-bold mt-1">{campaignAnalytics.totalClicks.toLocaleString()}</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#A9DADA]">
+                    Clics
+                  </p>
+                  <p className="text-2xl font-bold mt-1">
+                    {campaignAnalytics.totalClicks.toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>
@@ -1189,31 +1490,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               SECTION 3: MÉTRIQUES CAMPAGNE
           ══════════════════════════════════════════ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <StatCard 
-              title="Taux de conversion" 
-              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} 
-              icon={TrendingUp} 
+            <StatCard
+              title="Taux de conversion"
+              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`}
+              icon={TrendingUp}
               color="emerald-700"
               subtitle="clics/partages"
             />
-            <StatCard 
-              title="Campagnes actives" 
-              value={campaignAnalytics.activeCampaigns.toString()} 
-              icon={Target} 
+            <StatCard
+              title="Campagnes actives"
+              value={campaignAnalytics.activeCampaigns.toString()}
+              icon={Target}
               color="blue"
               subtitle="en cours"
             />
-            <StatCard 
-              title="Top campagne" 
-              value={campaignAnalytics.bestCampaign?.title || '—'} 
-              icon={ArrowUpRight} 
+            <StatCard
+              title="Top campagne"
+              value={campaignAnalytics.bestCampaign?.title || "—"}
+              icon={ArrowUpRight}
               color="violet-700"
-              subtitle={campaignAnalytics.bestCampaign ? `${campaignAnalytics.bestCampaign.shares} partages` : undefined}
+              subtitle={
+                campaignAnalytics.bestCampaign
+                  ? `${campaignAnalytics.bestCampaign.shares} partages`
+                  : undefined
+              }
             />
-            <StatCard 
-              title="Score d'engagement" 
-              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`} 
-              icon={Activity} 
+            <StatCard
+              title="Score d'engagement"
+              value={`${campaignAnalytics.conversionRate.toFixed(1)}%`}
+              icon={Activity}
               color="amber-700"
               subtitle="performance"
             />
@@ -1225,21 +1530,50 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Performance par campagne</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Clics, partages et conversion</p>
+                <h3 className="font-semibold text-gray-900">
+                  Performance par campagne
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Clics, partages et conversion
+                </p>
               </div>
               <div className="p-6 h-[320px]">
                 {campaignAnalytics.campaigns.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée disponible</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Aucune donnée disponible
+                  </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={campaignAnalytics.campaigns.slice(0, 8)}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="title" tick={{ fontSize: 11 }} angle={-10} textAnchor="end" height={70} />
+                      <XAxis
+                        dataKey="title"
+                        tick={{ fontSize: 11 }}
+                        angle={-10}
+                        textAnchor="end"
+                        height={70}
+                      />
                       <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
-                      <Bar dataKey="clicks" name="Clics" fill="#128686" radius={[6, 6, 0, 0]} />
-                      <Bar dataKey="shares" name="Partages" fill="#2BA8A8" radius={[6, 6, 0, 0]} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Bar
+                        dataKey="clicks"
+                        name="Clics"
+                        fill="#128686"
+                        radius={[6, 6, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="shares"
+                        name="Partages"
+                        fill="#2BA8A8"
+                        radius={[6, 6, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -1248,22 +1582,38 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Statuts des campagnes</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Répartition par statut</p>
+                <h3 className="font-semibold text-gray-900">
+                  Statuts des campagnes
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Répartition par statut
+                </p>
               </div>
               <div className="p-6 h-[320px]">
-                {campaignStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée disponible</div>
+                {campaignStatusChart.every((d) => d.value === 0) ? (
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Aucune donnée disponible
+                  </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={campaignStatusChart}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                       <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                       <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
                       <Bar dataKey="value">
                         {campaignStatusChart.map((entry, index) => (
-                          <Cell key={`cell-campaign-${index}`} fill={entry.color} />
+                          <Cell
+                            key={`cell-campaign-${index}`}
+                            fill={entry.color}
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -1279,21 +1629,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Répartition des preuves</h3>
-                <p className="text-xs text-gray-500 mt-0.5">En attente, validées, rejetées</p>
+                <h3 className="font-semibold text-gray-900">
+                  Répartition des preuves
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  En attente, validées, rejetées
+                </p>
               </div>
               <div className="p-6 h-[280px]">
-                {proofStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
+                {proofStatusChart.every((d) => d.value === 0) ? (
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Aucune donnée
+                  </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={proofStatusChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
+                      <Pie
+                        data={proofStatusChart}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={2}
+                      >
                         {proofStatusChart.map((entry, index) => (
-                          <Cell key={`cell-proof-${index}`} fill={entry.color} />
+                          <Cell
+                            key={`cell-proof-${index}`}
+                            fill={entry.color}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1303,21 +1676,50 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Répartition des partages</h3>
+                <h3 className="font-semibold text-gray-900">
+                  Répartition des partages
+                </h3>
                 <p className="text-xs text-gray-500 mt-0.5">Par plateforme</p>
               </div>
               <div className="p-6 h-[280px]">
                 {campaignAnalytics.platformChart.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Aucune donnée
+                  </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={campaignAnalytics.platformChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
+                      <Pie
+                        data={campaignAnalytics.platformChart}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={2}
+                      >
                         {campaignAnalytics.platformChart.map((entry, index) => (
-                          <Cell key={`platform-cell-${index}`} fill={['#128686', '#2BA8A8', '#F65E06', '#ef4444', '#0E6B6B'][index % 5]} />
+                          <Cell
+                            key={`platform-cell-${index}`}
+                            fill={
+                              [
+                                "#128686",
+                                "#2BA8A8",
+                                "#F65E06",
+                                "#ef4444",
+                                "#0E6B6B",
+                              ][index % 5]
+                            }
+                          />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1327,21 +1729,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Répartition des retraits</h3>
-                <p className="text-xs text-gray-500 mt-0.5">En attente, validés, rejetés</p>
+                <h3 className="font-semibold text-gray-900">
+                  Répartition des retraits
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  En attente, validés, rejetés
+                </p>
               </div>
               <div className="p-6 h-[280px]">
-                {payoutStatusChart.every(d => d.value === 0) ? (
-                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">Aucune donnée</div>
+                {payoutStatusChart.every((d) => d.value === 0) ? (
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Aucune donnée
+                  </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={payoutStatusChart} dataKey="value" nameKey="name" innerRadius={60} outerRadius={90} paddingAngle={2}>
+                      <Pie
+                        data={payoutStatusChart}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={2}
+                      >
                         {payoutStatusChart.map((entry, index) => (
-                          <Cell key={`cell-withdraw-${index}`} fill={entry.color} />
+                          <Cell
+                            key={`cell-withdraw-${index}`}
+                            fill={entry.color}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                      />
                       <Legend verticalAlign="bottom" height={36} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -1355,8 +1780,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           ══════════════════════════════════════════ */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">Tendance des retraits</h3>
-              <p className="text-xs text-gray-500 mt-0.5">14 derniers jours — Demandé vs Payé</p>
+              <h3 className="font-semibold text-gray-900">
+                Tendance des retraits
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                14 derniers jours — Demandé vs Payé
+              </p>
             </div>
             <div className="p-6 h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -1364,10 +1793,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis dataKey="day" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '12px' }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                    }}
+                  />
                   <Legend verticalAlign="bottom" height={36} />
-                  <Line type="monotone" dataKey="requested" name="Demandé" stroke="#f59e0b" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="paid" name="Payé" stroke="#128686" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="requested"
+                    name="Demandé"
+                    stroke="#f59e0b"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="paid"
+                    name="Payé"
+                    stroke="#128686"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1378,52 +1828,79 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           ══════════════════════════════════════════ */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">Classement des campagnes</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Les plus performantes selon l'engagement</p>
+              <h3 className="font-semibold text-gray-900">
+                Classement des campagnes
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Les plus performantes selon l'engagement
+              </p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
                   <tr>
-                    <th className="px-6 py-3 text-left font-medium">Campagne</th>
-                    <th className="px-6 py-3 text-right font-medium">Partages</th>
+                    <th className="px-6 py-3 text-left font-medium">
+                      Campagne
+                    </th>
+                    <th className="px-6 py-3 text-right font-medium">
+                      Partages
+                    </th>
                     <th className="px-6 py-3 text-right font-medium">Clics</th>
-                    <th className="px-6 py-3 text-right font-medium">Conversion</th>
+                    <th className="px-6 py-3 text-right font-medium">
+                      Conversion
+                    </th>
                     <th className="px-6 py-3 text-left font-medium">Statut</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {campaignAnalytics.campaigns.slice(0, 10).map((campaign) => (
-                    <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={campaign.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-[#D9ECEC] text-[#0E6B6B] flex items-center justify-center font-bold text-sm">
                             {campaign.title.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">{campaign.title}</p>
-                            <p className="text-xs text-gray-500">{campaign.budget.toLocaleString()} F</p>
+                            <p className="font-medium text-gray-900">
+                              {campaign.title}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {campaign.budget.toLocaleString()} F
+                            </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.shares}</td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.clicks}</td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">{campaign.conversionRate.toFixed(1)}%</td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                        {campaign.shares}
+                      </td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                        {campaign.clicks}
+                      </td>
+                      <td className="px-6 py-4 text-right font-medium text-gray-900 tabular-nums">
+                        {campaign.conversionRate.toFixed(1)}%
+                      </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          campaign.status === 'active' 
-                            ? 'bg-emerald-50 text-emerald-700' 
-                            : campaign.status === 'paused' 
-                              ? 'bg-amber-50 text-amber-700' 
-                              : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            campaign.status === 'active' 
-                              ? 'bg-emerald-500' 
-                              : campaign.status === 'paused' 
-                                ? 'bg-amber-500' 
-                                : 'bg-gray-400'
-                          }`}></span>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            campaign.status === "active"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : campaign.status === "paused"
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              campaign.status === "active"
+                                ? "bg-emerald-500"
+                                : campaign.status === "paused"
+                                  ? "bg-amber-500"
+                                  : "bg-gray-400"
+                            }`}
+                          ></span>
                           {campaign.status}
                         </span>
                       </td>
@@ -1439,7 +1916,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: CAMPAIGNS
       ══════════════════════════════════════════ */}
-      {view === 'campaigns' && (
+      {view === "campaigns" && (
         <div className="space-y-6">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
@@ -1461,43 +1938,78 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {paginatedCampaigns.map((camp) => (
-                    <tr key={camp.id} className="hover:bg-gray-50/30 transition-all">
+                    <tr
+                      key={camp.id}
+                      className="hover:bg-gray-50/30 transition-all"
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
-                          <img src={camp.imageUrl} alt="" className="w-12 h-12 rounded-xl object-cover bg-gray-100" />
+                          <img
+                            src={camp.imageUrl}
+                            alt=""
+                            className="w-12 h-12 rounded-xl object-cover bg-gray-100"
+                          />
                           <div>
-                            <p className="font-bold text-gray-900 leading-tight">{camp.title}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">{camp.category}</p>
+                            <p className="font-bold text-gray-900 leading-tight">
+                              {camp.title}
+                            </p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">
+                              {camp.category}
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-bold text-gray-900">{camp.totalBudget.toLocaleString()} F</p>
-                        <p className="text-[10px] text-gray-400 font-medium">Restant: {camp.remainingBudget.toLocaleString()} F</p>
+                        <p className="font-bold text-gray-900">
+                          {camp.totalBudget.toLocaleString()} F
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium">
+                          Restant: {camp.remainingBudget.toLocaleString()} F
+                        </p>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2">
                           <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#128686]" style={{ width: `${Math.min(100, ((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%` }} />
+                            <div
+                              className="h-full bg-[#128686]"
+                              style={{
+                                width: `${Math.min(100, ((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%`,
+                              }}
+                            />
                           </div>
                           <span className="text-xs font-bold text-gray-600">
-                            {Math.round(((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%
+                            {Math.round(
+                              ((camp.totalBudget - camp.remainingBudget) /
+                                camp.totalBudget) *
+                                100,
+                            )}
+                            %
                           </span>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 w-fit ${camp.status === 'active' ? 'bg-green-100 text-green-700' :
-                          camp.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-600'
-                          }`}>
-                          {camp.status === 'active' ? <Zap size={10} /> : <PauseCircle size={10} />}
+                        <span
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 w-fit ${
+                            camp.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : camp.status === "paused"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {camp.status === "active" ? (
+                            <Zap size={10} />
+                          ) : (
+                            <PauseCircle size={10} />
+                          )}
                           {camp.status}
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <button
                           onClick={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
+                            const rect =
+                              e.currentTarget.getBoundingClientRect();
                             if (openMenuId === camp.id) {
                               setOpenMenuId(null);
                               setMenuPosition(null);
@@ -1505,14 +2017,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                               setOpenMenuId(camp.id);
                               setMenuPosition({
                                 top: rect.bottom + window.scrollY + 8,
-                                right: window.innerWidth - rect.right
+                                right: window.innerWidth - rect.right,
                               });
                             }
                           }}
                           className="inline-flex items-center gap-1.5 text-[#128686] hover:text-[#0A4F50] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#E7F4F4] transition-all"
                         >
                           Gérer
-                          <ChevronDown size={13} className={`transition-transform duration-200 ${openMenuId === camp.id ? 'rotate-180' : ''}`} />
+                          <ChevronDown
+                            size={13}
+                            className={`transition-transform duration-200 ${openMenuId === camp.id ? "rotate-180" : ""}`}
+                          />
                         </button>
                       </td>
                     </tr>
@@ -1530,83 +2045,122 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           </div>
 
           {/* Menu déroulant global pour les actions de campagne */}
-          {openMenuId && menuPosition && (() => {
-            const camp = allCampaigns.find(c => c.id === openMenuId);
-            if (!camp) return null;
-            return (
-              <>
-                <div className="fixed inset-0 z-[100]" onClick={() => { setOpenMenuId(null); setMenuPosition(null); }} />
-                <div
-                  className="fixed w-52 bg-white rounded-2xl shadow-xl border border-gray-100 z-[101] overflow-hidden py-1"
-                  style={{ top: `${menuPosition.top}px`, right: `${menuPosition.right}px` }}
-                >
-                  <button
-                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setEditingCampaign({ ...camp }); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
-                  >
-                    <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
-                      <Pencil size={13} className="text-[#128686]" />
-                    </span>
-                    Modifier
-                  </button>
-                  <button
-                    onClick={async () => {
+          {openMenuId &&
+            menuPosition &&
+            (() => {
+              const camp = allCampaigns.find((c) => c.id === openMenuId);
+              if (!camp) return null;
+              return (
+                <>
+                  <div
+                    className="fixed inset-0 z-[100]"
+                    onClick={() => {
                       setOpenMenuId(null);
                       setMenuPosition(null);
-                      const newStatus = camp.status === 'active' ? 'paused' : 'active';
-                      try {
-                        await supabase
-                          .from('campaigns')
-                          .update({
-                            status: newStatus,
-                            updatedAt: new Date().toISOString()
-                          })
-                          .eq('id', camp.id);
-                        showFeedback(`Campagne ${newStatus === 'active' ? 'activée' : 'mise en pause'} !`);
-
-                        if (newStatus === 'active') {
-                          sendCampaignActivatedPush(camp.title, camp.id)
-                            .then(() => console.log('Push alerte campagne activée envoyé'))
-                            .catch(err => console.warn('Erreur envoi push campagne activée:', err));
-                        }
-                      } catch (e: any) {
-                        console.error(e);
-                        showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
-                      }
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all font-medium"
+                  />
+                  <div
+                    className="fixed w-52 bg-white rounded-2xl shadow-xl border border-gray-100 z-[101] overflow-hidden py-1"
+                    style={{
+                      top: `${menuPosition.top}px`,
+                      right: `${menuPosition.right}px`,
+                    }}
                   >
-                    <span className="w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                      {camp.status === 'active'
-                        ? <Pause size={13} className="text-yellow-600" />
-                        : <Play size={13} className="text-yellow-600" />
-                      }
-                    </span>
-                    {camp.status === 'active' ? 'Mettre en pause' : 'Activer'}
-                  </button>
-                  <button
-                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setStatsCampaign(camp); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
-                  >
-                    <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
-                      <BarChart2 size={13} className="text-[#128686]" />
-                    </span>
-                    Voir statistiques
-                  </button>
-                  <div className="mx-4 my-1 border-t border-gray-100" />
-                  <button
-                    onClick={() => { setOpenMenuId(null); setMenuPosition(null); setDeletingCampaign(camp); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
-                  >
-                    <span className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                      <Trash2 size={13} className="text-red-500" />
-                    </span>
-                    Supprimer
-                  </button>
-                </div>
-              </>
-            );
-          })()}
+                    <button
+                      onClick={() => {
+                        setOpenMenuId(null);
+                        setMenuPosition(null);
+                        setEditingCampaign({ ...camp });
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
+                        <Pencil size={13} className="text-[#128686]" />
+                      </span>
+                      Modifier
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setOpenMenuId(null);
+                        setMenuPosition(null);
+                        const newStatus =
+                          camp.status === "active" ? "paused" : "active";
+                        try {
+                          await supabase
+                            .from("campaigns")
+                            .update({
+                              status: newStatus,
+                              updatedAt: new Date().toISOString(),
+                            })
+                            .eq("id", camp.id);
+                          showFeedback(
+                            `Campagne ${newStatus === "active" ? "activée" : "mise en pause"} !`,
+                          );
+
+                          if (newStatus === "active") {
+                            sendCampaignActivatedPush(camp.title, camp.id)
+                              .then(() =>
+                                console.log(
+                                  "Push alerte campagne activée envoyé",
+                                ),
+                              )
+                              .catch((err) =>
+                                console.warn(
+                                  "Erreur envoi push campagne activée:",
+                                  err,
+                                ),
+                              );
+                          }
+                        } catch (e: any) {
+                          console.error(e);
+                          showFeedback(
+                            `Erreur: ${e?.message || "Impossible de mettre à jour"}`,
+                            "error",
+                          );
+                        }
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 transition-all font-medium"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                        {camp.status === "active" ? (
+                          <Pause size={13} className="text-yellow-600" />
+                        ) : (
+                          <Play size={13} className="text-yellow-600" />
+                        )}
+                      </span>
+                      {camp.status === "active" ? "Mettre en pause" : "Activer"}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setOpenMenuId(null);
+                        setMenuPosition(null);
+                        setStatsCampaign(camp);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-[#E7F4F4] hover:text-[#0E6B6B] transition-all font-medium"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-[#D9ECEC] flex items-center justify-center flex-shrink-0">
+                        <BarChart2 size={13} className="text-[#128686]" />
+                      </span>
+                      Voir statistiques
+                    </button>
+                    <div className="mx-4 my-1 border-t border-gray-100" />
+                    <button
+                      onClick={() => {
+                        setOpenMenuId(null);
+                        setMenuPosition(null);
+                        setDeletingCampaign(camp);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-all font-medium"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <Trash2 size={13} className="text-red-500" />
+                      </span>
+                      Supprimer
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
 
           {/* Modal: Modifier */}
           {editingCampaign && (
@@ -1616,32 +2170,55 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <span className="w-10 h-10 rounded-2xl bg-[#D9ECEC] flex items-center justify-center">
                     <Pencil size={18} className="text-[#128686]" />
                   </span>
-                  <h2 className="font-bold text-gray-900 text-lg">Modifier la campagne</h2>
+                  <h2 className="font-bold text-gray-900 text-lg">
+                    Modifier la campagne
+                  </h2>
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Titre</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Titre
+                    </label>
                     <input
                       className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.title}
-                      onChange={e => setEditingCampaign(p => ({ ...p!, title: e.target.value }))}
+                      onChange={(e) =>
+                        setEditingCampaign((p) => ({
+                          ...p!,
+                          title: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Budget total (F)</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Budget total (F)
+                    </label>
                     <input
                       type="number"
                       className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.totalBudget}
-                      onChange={e => setEditingCampaign(p => ({ ...p!, totalBudget: Number(e.target.value) }))}
+                      onChange={(e) =>
+                        setEditingCampaign((p) => ({
+                          ...p!,
+                          totalBudget: Number(e.target.value),
+                        }))
+                      }
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Catégorie</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Catégorie
+                    </label>
                     <input
                       className="mt-1 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#128686]"
                       value={editingCampaign.category}
-                      onChange={e => setEditingCampaign(p => ({ ...p!, category: e.target.value }))}
+                      onChange={(e) =>
+                        setEditingCampaign((p) => ({
+                          ...p!,
+                          category: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                 </div>
@@ -1656,19 +2233,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     onClick={async () => {
                       try {
                         await supabase
-                          .from('campaigns')
+                          .from("campaigns")
                           .update({
                             title: editingCampaign.title,
                             totalBudget: editingCampaign.totalBudget,
                             category: editingCampaign.category,
-                            updatedAt: new Date().toISOString()
+                            updatedAt: new Date().toISOString(),
                           })
-                          .eq('id', editingCampaign.id);
+                          .eq("id", editingCampaign.id);
                         showFeedback("Campagne mise à jour avec succès !");
                         setEditingCampaign(null);
                       } catch (e: any) {
                         console.error(e);
-                        showFeedback(`Erreur: ${e?.message || 'Impossible de mettre à jour'}`, 'error');
+                        showFeedback(
+                          `Erreur: ${e?.message || "Impossible de mettre à jour"}`,
+                          "error",
+                        );
                       }
                     }}
                     className="flex-1 py-2.5 rounded-xl bg-[#128686] text-white text-sm font-bold hover:bg-[#0E6B6B] transition-all"
@@ -1690,40 +2270,86 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                       <BarChart2 size={18} className="text-[#128686]" />
                     </span>
                     <div>
-                      <h2 className="font-bold text-gray-900 text-lg">Statistiques</h2>
-                      <p className="text-xs text-gray-400 font-medium">{statsCampaign.title}</p>
+                      <h2 className="font-bold text-gray-900 text-lg">
+                        Statistiques
+                      </h2>
+                      <p className="text-xs text-gray-400 font-medium">
+                        {statsCampaign.title}
+                      </p>
                     </div>
                   </div>
-                  <button onClick={() => setStatsCampaign(null)} className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-all">✕</button>
+                  <button
+                    onClick={() => setStatsCampaign(null)}
+                    className="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition-all"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Budget total', value: `${statsCampaign.totalBudget.toLocaleString()} F`, bg: 'bg-[#E7F4F4]', text: 'text-[#0E6B6B]' },
-                    { label: 'Budget restant', value: `${statsCampaign.remainingBudget.toLocaleString()} F`, bg: 'bg-green-50', text: 'text-green-700' },
-                    { label: 'Dépensé', value: `${(statsCampaign.totalBudget - statsCampaign.remainingBudget).toLocaleString()} F`, bg: 'bg-orange-50', text: 'text-orange-700' },
-                    { label: 'Progression', value: `${Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%`, bg: 'bg-[#E7F4F4]', text: 'text-[#0E6B6B]' },
+                    {
+                      label: "Budget total",
+                      value: `${statsCampaign.totalBudget.toLocaleString()} F`,
+                      bg: "bg-[#E7F4F4]",
+                      text: "text-[#0E6B6B]",
+                    },
+                    {
+                      label: "Budget restant",
+                      value: `${statsCampaign.remainingBudget.toLocaleString()} F`,
+                      bg: "bg-green-50",
+                      text: "text-green-700",
+                    },
+                    {
+                      label: "Dépensé",
+                      value: `${(statsCampaign.totalBudget - statsCampaign.remainingBudget).toLocaleString()} F`,
+                      bg: "bg-orange-50",
+                      text: "text-orange-700",
+                    },
+                    {
+                      label: "Progression",
+                      value: `${Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%`,
+                      bg: "bg-[#E7F4F4]",
+                      text: "text-[#0E6B6B]",
+                    },
                   ].map(({ label, value, bg, text }) => (
                     <div key={label} className={`${bg} rounded-2xl p-4`}>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{label}</p>
-                      <p className={`text-lg font-bold ${text} mt-1`}>{value}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        {label}
+                      </p>
+                      <p className={`text-lg font-bold ${text} mt-1`}>
+                        {value}
+                      </p>
                     </div>
                   ))}
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Progression du budget</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                      Progression du budget
+                    </p>
                     <span className="text-[10px] font-bold text-gray-500">
-                      {Math.round(((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%
+                      {Math.round(
+                        ((statsCampaign.totalBudget -
+                          statsCampaign.remainingBudget) /
+                          statsCampaign.totalBudget) *
+                          100,
+                      )}
+                      %
                     </span>
                   </div>
                   <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#128686] rounded-full transition-all"
-                      style={{ width: `${Math.min(100, ((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%` }}
+                      style={{
+                        width: `${Math.min(100, ((statsCampaign.totalBudget - statsCampaign.remainingBudget) / statsCampaign.totalBudget) * 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
-                <button onClick={() => setStatsCampaign(null)} className="w-full py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-bold text-gray-600 transition-all">
+                <button
+                  onClick={() => setStatsCampaign(null)}
+                  className="w-full py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-bold text-gray-600 transition-all"
+                >
                   Fermer
                 </button>
               </div>
@@ -1740,9 +2366,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <h2 className="font-bold text-gray-900 text-xl">Supprimer la campagne ?</h2>
+                  <h2 className="font-bold text-gray-900 text-xl">
+                    Supprimer la campagne ?
+                  </h2>
                   <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                    Vous êtes sur le point de supprimer <span className="font-bold text-gray-700">"{deletingCampaign.title}"</span>. Cette action est irréversible.
+                    Vous êtes sur le point de supprimer{" "}
+                    <span className="font-bold text-gray-700">
+                      "{deletingCampaign.title}"
+                    </span>
+                    . Cette action est irréversible.
                   </p>
                 </div>
                 <div className="flex gap-3 pt-1">
@@ -1756,14 +2388,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     onClick={async () => {
                       try {
                         await supabase
-                          .from('campaigns')
+                          .from("campaigns")
                           .delete()
-                          .eq('id', deletingCampaign.id);
+                          .eq("id", deletingCampaign.id);
                         showFeedback("Campagne supprimée avec succès.");
                         setDeletingCampaign(null);
                       } catch (e: any) {
                         console.error(e);
-                        showFeedback(`Erreur: ${e?.message || 'Impossible de supprimer'}`, 'error');
+                        showFeedback(
+                          `Erreur: ${e?.message || "Impossible de supprimer"}`,
+                          "error",
+                        );
                       }
                     }}
                     className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-all flex items-center justify-center gap-2"
@@ -1781,7 +2416,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: TEAM (SUPER ADMIN ONLY)
       ══════════════════════════════════════════ */}
-      {view === 'team' && isSuperAdmin && (
+      {view === "team" && isSuperAdmin && (
         <div className="space-y-8">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-8 border-b border-gray-50 bg-gray-50/20">
@@ -1802,23 +2437,43 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {paginatedTeam.map((member) => (
-                    <tr key={member.id} className="hover:bg-gray-50/30 transition-all">
+                    <tr
+                      key={member.id}
+                      className="hover:bg-gray-50/30 transition-all"
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">{member.name.charAt(0)}</div>
+                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">
+                            {member.name.charAt(0)}
+                          </div>
                           <div>
-                            <p className="font-bold text-gray-900 leading-none">{member.name}</p>
-                            {member.id === currentAdminData?.id && <span className="text-[8px] font-bold uppercase text-[#7FD1D1]">Moi</span>}
+                            <p className="font-bold text-gray-900 leading-none">
+                              {member.name}
+                            </p>
+                            {member.id === currentAdminData?.id && (
+                              <span className="text-[8px] font-bold uppercase text-[#7FD1D1]">
+                                Moi
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="text-sm text-gray-500 font-medium">{member.email}</p>
+                        <p className="text-sm text-gray-500 font-medium">
+                          {member.email}
+                        </p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest ${member.role === UserRole.ADMIN ? 'bg-[#D9ECEC] text-[#0E6B6B]' : 'bg-[#D9ECEC] text-[#0E6B6B]'
-                          }`}>
-                          {member.role === UserRole.ADMIN ? 'SUPER_ADMIN' : 'MODÉRATEUR'}
+                        <span
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                            member.role === UserRole.ADMIN
+                              ? "bg-[#D9ECEC] text-[#0E6B6B]"
+                              : "bg-[#D9ECEC] text-[#0E6B6B]"
+                          }`}
+                        >
+                          {member.role === UserRole.ADMIN
+                            ? "SUPER_ADMIN"
+                            : "MODÉRATEUR"}
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
@@ -1851,14 +2506,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: USERS (SUPER ADMIN ONLY)
       ══════════════════════════════════════════ */}
-      {view === 'users' && isSuperAdmin && (
+      {view === "users" && isSuperAdmin && (
         <div className="space-y-8">
           <div className="bg-[#128686] text-white p-8 rounded-[2rem] shadow-xl shadow-[#128686]/20 flex items-center justify-between relative overflow-hidden">
             <div className="relative z-10">
-              <p className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-widest mb-1">Croissance Communauté</p>
-              <h3 className="text-5xl font-bold tracking-tighter">Total Inscrits : {stats.totalInscrits}</h3>
+              <p className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                Croissance Communauté
+              </p>
+              <h3 className="text-5xl font-bold tracking-tighter">
+                Total Inscrits : {stats.totalInscrits}
+              </h3>
             </div>
-            <Users size={80} className="text-white/10 absolute -right-4 -bottom-4 -rotate-12" />
+            <Users
+              size={80}
+              className="text-white/10 absolute -right-4 -bottom-4 -rotate-12"
+            />
           </div>
 
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -1876,54 +2538,109 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {paginatedUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50/30 transition-colors">
+                    <tr
+                      key={user.id}
+                      className="hover:bg-gray-50/30 transition-colors"
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">{user.name?.charAt(0) || 'U'}</div>
-                          <p className="font-bold text-gray-900 leading-none">{user.name || 'Utilisateur sans nom'}</p>
+                          <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">
+                            {user.name?.charAt(0) || "U"}
+                          </div>
+                          <p className="font-bold text-gray-900 leading-none">
+                            {user.name || "Utilisateur sans nom"}
+                          </p>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="text-sm text-gray-500 font-medium">{user.email || '—'}</p>
+                        <p className="text-sm text-gray-500 font-medium">
+                          {user.email || "—"}
+                        </p>
                       </td>
                       <td className="px-8 py-6">
                         <select
                           value={user.role}
-                          onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border-none focus:ring-2 focus:ring-[#128686] outline-none cursor-pointer ${user.role === UserRole.ADMIN ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
-                            user.role === UserRole.MODERATOR ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
-                              'bg-gray-100 text-gray-600'
-                            }`}
+                          onChange={(e) =>
+                            handleRoleChange(
+                              user.id,
+                              e.target.value as UserRole,
+                            )
+                          }
+                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border-none focus:ring-2 focus:ring-[#128686] outline-none cursor-pointer ${
+                            user.role === UserRole.ADMIN
+                              ? "bg-[#D9ECEC] text-[#0E6B6B]"
+                              : user.role === UserRole.MODERATOR
+                                ? "bg-[#D9ECEC] text-[#0E6B6B]"
+                                : "bg-gray-100 text-gray-600"
+                          }`}
                         >
-                          <option value={UserRole.AMBASSADOR}>Ambassadeur</option>
+                          <option value={UserRole.AMBASSADOR}>
+                            Ambassadeur
+                          </option>
                           <option value={UserRole.MODERATOR}>Modérateur</option>
                           <option value={UserRole.ADMIN}>Admin</option>
                         </select>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-bold text-gray-900 text-sm">{user.balance?.toLocaleString() || 0} F</p>
+                        <p className="font-bold text-gray-900 text-sm">
+                          {user.balance?.toLocaleString() || 0} F
+                        </p>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${user.status === 'active' ? 'bg-green-100 text-green-700' : user.status === 'pending_verification' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
-                          }`}>
-                          {user.status === 'active' ? 'ACTIF' : user.status === 'pending_verification' ? 'À VÉRIFIER' : user.status === 'rejected' ? 'REFUSÉ' : 'BLOQUÉ'}
+                        <span
+                          className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
+                            user.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : user.status === "pending_verification"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {user.status === "active"
+                            ? "ACTIF"
+                            : user.status === "pending_verification"
+                              ? "À VÉRIFIER"
+                              : user.status === "rejected"
+                                ? "REFUSÉ"
+                                : "BLOQUÉ"}
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {user.status === 'pending_verification' && user.verification_document_path && (
-                            <>
-                              <button onClick={() => openVerificationDocument(user.verification_document_path!)} className="p-3 text-[#128686] hover:bg-[#E7F4F4] rounded-xl transition-all" title="Ouvrir la pièce d’identité">
-                                <Eye size={18} />
-                              </button>
-                              <button onClick={() => handleVerificationDecision(user, 'active')} className="p-3 text-green-600 hover:bg-green-50 rounded-xl transition-all" title="Valider la majorité">
-                                <CheckCircle2 size={18} />
-                              </button>
-                              <button onClick={() => handleVerificationDecision(user, 'rejected')} className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Refuser la vérification">
-                                <X size={18} />
-                              </button>
-                            </>
-                          )}
+                          {user.status === "pending_verification" &&
+                            user.verification_document_path && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    openVerificationDocument(
+                                      user.verification_document_path!,
+                                    )
+                                  }
+                                  className="p-3 text-[#128686] hover:bg-[#E7F4F4] rounded-xl transition-all"
+                                  title="Ouvrir la pièce d’identité"
+                                >
+                                  <Eye size={18} />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleVerificationDecision(user, "active")
+                                  }
+                                  className="p-3 text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                                  title="Valider la majorité"
+                                >
+                                  <CheckCircle2 size={18} />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleVerificationDecision(user, "rejected")
+                                  }
+                                  className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                  title="Refuser la vérification"
+                                >
+                                  <X size={18} />
+                                </button>
+                              </>
+                            )}
                           {user.email && (
                             <button
                               onClick={() => handleResetPassword(user.email!)}
@@ -1934,11 +2651,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                             </button>
                           )}
                           <button
-                            onClick={() => handleToggleUserBlock(user.id, user.status)}
-                            className={`p-3 rounded-xl transition-all ${user.status === 'active' ? 'text-red-400 hover:bg-red-50' : 'text-green-400 hover:bg-green-50'
-                              }`}
+                            onClick={() =>
+                              handleToggleUserBlock(user.id, user.status)
+                            }
+                            className={`p-3 rounded-xl transition-all ${
+                              user.status === "active"
+                                ? "text-red-400 hover:bg-red-50"
+                                : "text-green-400 hover:bg-green-50"
+                            }`}
                           >
-                            {user.status === 'active' ? <Ban size={18} /> : <CheckCircle2 size={18} />}
+                            {user.status === "active" ? (
+                              <Ban size={18} />
+                            ) : (
+                              <CheckCircle2 size={18} />
+                            )}
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user)}
@@ -1969,36 +2695,62 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: PAYOUTS / FINANCES (SUPER ADMIN ONLY)
       ══════════════════════════════════════════ */}
-      {view === 'payouts' && isSuperAdmin && (
+      {view === "payouts" && isSuperAdmin && (
         <div className="space-y-8">
           {/* Section: Rentabilité Totale */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-[#E7F4F4] text-[#128686] p-4 rounded-2xl"><CreditCard size={24} /></div>
+              <div className="bg-[#E7F4F4] text-[#128686] p-4 rounded-2xl">
+                <CreditCard size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Revenus (Campagnes)</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalRevenue.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Revenus (Campagnes)
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {financialStats.totalRevenue.toLocaleString()} F
+                </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-orange-50 text-orange-600 p-4 rounded-2xl"><Banknote size={24} /></div>
+              <div className="bg-orange-50 text-orange-600 p-4 rounded-2xl">
+                <Banknote size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reversé (Users)</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalPayouts.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Reversé (Users)
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {financialStats.totalPayouts.toLocaleString()} F
+                </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-red-50 text-red-600 p-4 rounded-2xl"><Wallet size={24} /></div>
+              <div className="bg-red-50 text-red-600 p-4 rounded-2xl">
+                <Wallet size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Dette (Soldes)</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{financialStats.totalDebt.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Dette (Soldes)
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {financialStats.totalDebt.toLocaleString()} F
+                </p>
               </div>
             </div>
-            <div className={`p-6 rounded-3xl shadow-xl flex items-center gap-4 border ${financialStats.netProfit >= 0 ? 'bg-emerald-600 border-emerald-500 shadow-emerald-100' : 'bg-red-600 border-red-500 shadow-red-100'}`}>
-              <div className="bg-white/20 text-white p-4 rounded-2xl"><Activity size={24} /></div>
+            <div
+              className={`p-6 rounded-3xl shadow-xl flex items-center gap-4 border ${financialStats.netProfit >= 0 ? "bg-emerald-600 border-emerald-500 shadow-emerald-100" : "bg-red-600 border-red-500 shadow-red-100"}`}
+            >
+              <div className="bg-white/20 text-white p-4 rounded-2xl">
+                <Activity size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Profit Net Estimé</p>
-                <p className="text-xl font-bold text-white leading-none">{financialStats.netProfit.toLocaleString()} F</p>
+                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">
+                  Profit Net Estimé
+                </p>
+                <p className="text-xl font-bold text-white leading-none">
+                  {financialStats.netProfit.toLocaleString()} F
+                </p>
               </div>
             </div>
           </div>
@@ -2008,10 +2760,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             <div className="xl:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-gray-900 tracking-tight">Top 10 des Ambassadeurs</h3>
-                  <p className="text-xs text-gray-400 font-medium mt-1">Classés par gains totaux générés</p>
+                  <h3 className="font-bold text-gray-900 tracking-tight">
+                    Top 10 des Ambassadeurs
+                  </h3>
+                  <p className="text-xs text-gray-400 font-medium mt-1">
+                    Classés par gains totaux générés
+                  </p>
                 </div>
-                <div className="bg-[#D9ECEC] text-[#0E6B6B] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Performances</div>
+                <div className="bg-[#D9ECEC] text-[#0E6B6B] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">
+                  Performances
+                </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
@@ -2025,9 +2783,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {topEarners.map((user, index) => (
-                      <tr key={user.id} className="hover:bg-gray-50/30 transition-colors">
+                      <tr
+                        key={user.id}
+                        className="hover:bg-gray-50/30 transition-colors"
+                      >
                         <td className="px-8 py-6">
-                          <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-100 text-yellow-700' : index === 1 ? 'bg-gray-100 text-gray-600' : index === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-400'}`}>
+                          <span
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${index === 0 ? "bg-yellow-100 text-yellow-700" : index === 1 ? "bg-gray-100 text-gray-600" : index === 2 ? "bg-orange-100 text-orange-700" : "bg-gray-50 text-gray-400"}`}
+                          >
                             {index + 1}
                           </span>
                         </td>
@@ -2035,8 +2798,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                           <p className="font-bold text-gray-900">{user.name}</p>
                           <p className="text-xs text-gray-400">{user.email}</p>
                         </td>
-                        <td className="px-8 py-6 font-bold text-emerald-600">{user.totalEarned?.toLocaleString() || 0} F</td>
-                        <td className="px-8 py-6 font-bold text-gray-600">{user.balance?.toLocaleString() || 0} F</td>
+                        <td className="px-8 py-6 font-bold text-emerald-600">
+                          {user.totalEarned?.toLocaleString() || 0} F
+                        </td>
+                        <td className="px-8 py-6 font-bold text-gray-600">
+                          {user.balance?.toLocaleString() || 0} F
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -2047,30 +2814,53 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
             {/* Aide-mémoire Finance */}
             <div className="bg-[#0B3A44] rounded-[2.5rem] h-96 p-8 text-white space-y-8 relative overflow-hidden shadow-2xl">
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold mb-6 leading-tight">Comprendre vos Finances</h3>
+                <h3 className="text-2xl font-bold mb-6 leading-tight">
+                  Comprendre vos Finances
+                </h3>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7FD1D1]">Formule Profit</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7FD1D1]">
+                      Formule Profit
+                    </p>
                     <p className="text-sm font-medium text-[#A9DADA] leading-relaxed">
                       Votre profit net est calculé ainsi : <br />
-                      <span className="font-bold text-white">(Budget total des campagnes)</span> <br />
-                      <span className="text-[#7FD1D1]">- (Somme des retraits validés)</span> <br />
-                      <span className="text-[#7FD1D1]">- (Soldes actuels des utilisateurs)</span>
+                      <span className="font-bold text-white">
+                        (Budget total des campagnes)
+                      </span>{" "}
+                      <br />
+                      <span className="text-[#7FD1D1]">
+                        - (Somme des retraits validés)
+                      </span>{" "}
+                      <br />
+                      <span className="text-[#7FD1D1]">
+                        - (Soldes actuels des utilisateurs)
+                      </span>
                     </p>
                   </div>
                   <div className="pt-6 border-t border-[#128686]/20 space-y-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]"><RefreshCcw size={20} /></div>
-                      <p className="text-xs font-bold">Mise à jour en temps réel à chaque transaction.</p>
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]">
+                        <RefreshCcw size={20} />
+                      </div>
+                      <p className="text-xs font-bold">
+                        Mise à jour en temps réel à chaque transaction.
+                      </p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]"><ShieldCheck size={20} /></div>
-                      <p className="text-xs font-bold">Données sécurisées et synchronisées avec Firestore.</p>
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#7FD1D1]">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <p className="text-xs font-bold">
+                        Données sécurisées et synchronisées avec Firestore.
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <Activity size={150} className="absolute -right-10 -bottom-10 text-white/5 rotate-12" />
+              <Activity
+                size={150}
+                className="absolute -right-10 -bottom-10 text-white/5 rotate-12"
+              />
             </div>
           </div>
         </div>
@@ -2079,29 +2869,59 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: WITHDRAWALS
       ══════════════════════════════════════════ */}
-      {view === 'withdrawals' && (
+      {view === "withdrawals" && (
         <div className="space-y-6">
           {/* Stat Cards — 3 frères dans le grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl"><Clock size={24} /></div>
+              <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl">
+                <Clock size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === "pending").length}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  En Attente
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {
+                    allPayouts.filter(
+                      (p) => normalizePayoutStatus(p.status) === "pending",
+                    ).length
+                  }
+                </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-green-200 text-green-600 p-4 rounded-2xl"><CheckCircle2 size={24} /></div>
+              <div className="bg-green-200 text-green-600 p-4 rounded-2xl">
+                <CheckCircle2 size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Validés</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === 'completed').length}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Validés
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {
+                    allPayouts.filter(
+                      (p) => normalizePayoutStatus(p.status) === "completed",
+                    ).length
+                  }
+                </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-red-200 text-red-600 p-4 rounded-2xl"><X size={24} /></div>
+              <div className="bg-red-200 text-red-600 p-4 rounded-2xl">
+                <X size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Rejetés</p>
-                <p className="text-xl font-bold text-gray-900 leading-none">{allPayouts.filter(p => normalizePayoutStatus(p.status) === 'failed').length}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Rejetés
+                </p>
+                <p className="text-xl font-bold text-gray-900 leading-none">
+                  {
+                    allPayouts.filter(
+                      (p) => normalizePayoutStatus(p.status) === "failed",
+                    ).length
+                  }
+                </p>
               </div>
             </div>
           </div>
@@ -2116,7 +2936,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={14}
+                  />
                   <input
                     type="text"
                     placeholder="Nom ou téléphone..."
@@ -2128,7 +2951,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
                 <select
                   value={withdrawalStatusFilter}
-                  onChange={(e) => setWithdrawalStatusFilter(e.target.value as any)}
+                  onChange={(e) =>
+                    setWithdrawalStatusFilter(e.target.value as any)
+                  }
                   className="px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-[#128686]"
                 >
                   <option value="pending">En attente</option>
@@ -2165,65 +2990,101 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   {paginatedWithdrawals.map((payout) => {
                     const payoutStatus = normalizePayoutStatus(payout.status);
                     return (
-                      <tr key={payout.id} className="hover:bg-gray-50/30 transition-colors">
+                      <tr
+                        key={payout.id}
+                        className="hover:bg-gray-50/30 transition-colors"
+                      >
                         <td className="px-8 py-6">
-                          <p className="font-bold text-gray-900 leading-none">{payout.userName}</p>
+                          <p className="font-bold text-gray-900 leading-none">
+                            {payout.userName}
+                          </p>
                         </td>
-                        <td className="px-8 py-6 font-bold text-gray-900">{payout.amount.toLocaleString()} FCFA</td>
+                        <td className="px-8 py-6 font-bold text-gray-900">
+                          {payout.amount.toLocaleString()} FCFA
+                        </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${payout.provider === 'yas' ? 'bg-[#D9ECEC] text-[#0E6B6B]' :
-                            payout.provider === 'moov' ? 'bg-orange-100 text-orange-700' :
-                              'bg-gray-100 text-gray-600'
-                            }`}>
-                            {payout.provider === 'yas' ? 'TMoney (YAS)' : (payout.provider === 'moov' ? 'Moov Money' : payout.provider)}
+                          <span
+                            className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                              payout.provider === "yas"
+                                ? "bg-[#D9ECEC] text-[#0E6B6B]"
+                                : payout.provider === "moov"
+                                  ? "bg-orange-100 text-orange-700"
+                                  : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {payout.provider === "yas"
+                              ? "TMoney (YAS)"
+                              : payout.provider === "moov"
+                                ? "Moov Money"
+                                : payout.provider}
                           </span>
                         </td>
-                        <td className="px-8 py-6 text-sm text-gray-500 font-medium">{payout.phone}</td>
+                        <td className="px-8 py-6 text-sm text-gray-500 font-medium">
+                          {payout.phone}
+                        </td>
                         <td className="px-8 py-6 text-xs text-gray-500 font-medium">
                           {formatDate(payout.createdAt || payout.date)}
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${payoutStatus === 'completed' ? 'bg-green-100 text-green-700' :
-                            payoutStatus === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-red-100 text-red-700'
-                            }`}>
+                          <span
+                            className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
+                              payoutStatus === "completed"
+                                ? "bg-green-100 text-green-700"
+                                : payoutStatus === "pending"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                            }`}
+                          >
                             {payoutStatus}
                           </span>
                         </td>
                         <td className="px-8 py-6 text-right">
-                          {payoutStatus === 'pending' && (
+                          {payoutStatus === "pending" && (
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 disabled={processingWithdrawals.has(payout.id)}
                                 onClick={() => {
                                   openConfirmModal(
                                     {
-                                      variant: 'success',
-                                      title: 'Valider le retrait ?',
-                                      message: `Confirmer le virement de ${payout.amount.toLocaleString()} FCFA vers ${payout.phone} (${payout.provider === 'yas' ? 'YAS' : payout.provider === 'moov' ? 'MOOV' : payout.provider || 'opérateur'}) ?`,
-                                      confirmLabel: 'Valider',
-                                      cancelLabel: 'Annuler'
+                                      variant: "success",
+                                      title: "Valider le retrait ?",
+                                      message: `Confirmer le virement de ${payout.amount.toLocaleString()} FCFA vers ${payout.phone} (${payout.provider === "yas" ? "YAS" : payout.provider === "moov" ? "MOOV" : payout.provider || "opérateur"}) ?`,
+                                      confirmLabel: "Valider",
+                                      cancelLabel: "Annuler",
                                     },
                                     async () => {
-                                      setProcessingWithdrawals(prev => new Set(prev).add(payout.id));
+                                      setProcessingWithdrawals((prev) =>
+                                        new Set(prev).add(payout.id),
+                                      );
                                       try {
-                                        const res = await gomboAdminApproveWithdrawal({ withdrawalId: payout.id });
+                                        const res =
+                                          await gomboAdminApproveWithdrawal({
+                                            withdrawalId: payout.id,
+                                          });
                                         if (res.success) {
-                                          showFeedback('Retrait validé et virement effectué !');
+                                          showFeedback(
+                                            "Retrait validé et virement effectué !",
+                                          );
                                         } else {
-                                          showFeedback('Erreur lors du virement Gombo Plus', 'error');
+                                          showFeedback(
+                                            "Erreur lors du virement Gombo Plus",
+                                            "error",
+                                          );
                                         }
                                       } catch (e: any) {
                                         console.error(e);
-                                        showFeedback(`Erreur: ${e?.message || 'Inconnue'}`, 'error');
+                                        showFeedback(
+                                          `Erreur: ${e?.message || "Inconnue"}`,
+                                          "error",
+                                        );
                                       } finally {
-                                        setProcessingWithdrawals(prev => {
+                                        setProcessingWithdrawals((prev) => {
                                           const next = new Set(prev);
                                           next.delete(payout.id);
                                           return next;
                                         });
                                       }
-                                    }
+                                    },
                                   );
                                 }}
                                 className="p-2 bg-green-50 text-green-600 hover:bg-green-100 rounded-xl transition-all disabled:opacity-50"
@@ -2240,32 +3101,45 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                                 onClick={() => {
                                   openConfirmModal(
                                     {
-                                      variant: 'danger',
-                                      title: 'Rejeter le retrait ?',
+                                      variant: "danger",
+                                      title: "Rejeter le retrait ?",
                                       message: `Rejeter la demande de ${payout.amount.toLocaleString()} FCFA vers ${payout.phone} ? (Remboursement automatique si le solde a été débité)`,
-                                      confirmLabel: 'Rejeter',
-                                      cancelLabel: 'Annuler'
+                                      confirmLabel: "Rejeter",
+                                      cancelLabel: "Annuler",
                                     },
                                     async () => {
-                                      setProcessingWithdrawals(prev => new Set(prev).add(payout.id));
+                                      setProcessingWithdrawals((prev) =>
+                                        new Set(prev).add(payout.id),
+                                      );
                                       try {
-                                        const res = await gomboAdminRejectWithdrawal({ withdrawalId: payout.id });
+                                        const res =
+                                          await gomboAdminRejectWithdrawal({
+                                            withdrawalId: payout.id,
+                                          });
                                         if (res.success) {
-                                          showFeedback('Retrait rejeté (remboursement effectué si débité).');
+                                          showFeedback(
+                                            "Retrait rejeté (remboursement effectué si débité).",
+                                          );
                                         } else {
-                                          showFeedback('Erreur lors du rejet', 'error');
+                                          showFeedback(
+                                            "Erreur lors du rejet",
+                                            "error",
+                                          );
                                         }
                                       } catch (e: any) {
                                         console.error(e);
-                                        showFeedback(`Erreur: ${e?.message || 'Inconnue'}`, 'error');
+                                        showFeedback(
+                                          `Erreur: ${e?.message || "Inconnue"}`,
+                                          "error",
+                                        );
                                       } finally {
-                                        setProcessingWithdrawals(prev => {
+                                        setProcessingWithdrawals((prev) => {
                                           const next = new Set(prev);
                                           next.delete(payout.id);
                                           return next;
                                         });
                                       }
-                                    }
+                                    },
                                   );
                                 }}
                                 className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all disabled:opacity-50"
@@ -2282,7 +3156,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   {allPayouts.length === 0 && (
                     <tr>
                       <td colSpan={7} className="px-8 py-12 text-center">
-                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune demande de retrait</p>
+                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">
+                          Aucune demande de retrait
+                        </p>
                       </td>
                     </tr>
                   )}
@@ -2303,44 +3179,75 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: CAMPAIGN PAYMENTS (SUPER ADMIN ONLY)
       ══════════════════════════════════════════ */}
-      {view === 'campaignPayments' && isSuperAdmin && (
+      {view === "campaignPayments" && isSuperAdmin && (
         <div className="space-y-6">
           {/* Stat Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl"><Clock size={24} /></div>
+              <div className="bg-yellow-200 text-yellow-600 p-4 rounded-2xl">
+                <Clock size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">En Attente</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  En Attente
+                </p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
-                  {allCampaigns.filter(c => c.paymentStatus === 'pending_payment' || c.paymentStatus === undefined).length}
+                  {
+                    allCampaigns.filter(
+                      (c) =>
+                        c.paymentStatus === "pending_payment" ||
+                        c.paymentStatus === undefined,
+                    ).length
+                  }
                 </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-green-200 text-green-600 p-4 rounded-2xl"><CheckCircle2 size={24} /></div>
+              <div className="bg-green-200 text-green-600 p-4 rounded-2xl">
+                <CheckCircle2 size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confirmés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Confirmés
+                </p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
-                  {allCampaigns.filter(c => c.paymentStatus === 'paid').length}
+                  {
+                    allCampaigns.filter((c) => c.paymentStatus === "paid")
+                      .length
+                  }
                 </p>
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-red-200 text-red-600 p-4 rounded-2xl"><X size={24} /></div>
+              <div className="bg-red-200 text-red-600 p-4 rounded-2xl">
+                <X size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Annulés</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Annulés
+                </p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
-                  {allCampaigns.filter(c => c.paymentStatus === 'failed').length}
+                  {
+                    allCampaigns.filter((c) => c.paymentStatus === "failed")
+                      .length
+                  }
                 </p>
               </div>
             </div>
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-              <div className="bg-[#D9ECEC] text-[#128686] p-4 rounded-2xl"><CreditCard size={24} /></div>
+              <div className="bg-[#D9ECEC] text-[#128686] p-4 rounded-2xl">
+                <CreditCard size={24} />
+              </div>
               <div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Budget</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  Total Budget
+                </p>
                 <p className="text-xl font-bold text-gray-900 leading-none">
-                  {allCampaigns.reduce((acc, c) => acc + (c.totalBudget || 0), 0).toLocaleString()} F
+                  {allCampaigns
+                    .reduce((acc, c) => acc + (c.totalBudget || 0), 0)
+                    .toLocaleString()}{" "}
+                  F
                 </p>
               </div>
             </div>
@@ -2370,50 +3277,82 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {paginatedCampaignPayments.map((campaign) => {
-                    const advertiser = campaign.advertiserId ? userById.get(campaign.advertiserId) : undefined;
-                    const advertiserName = campaign.advertiserName || advertiser?.name || 'Annonceur';
-                    const advertiserPhone = campaign.advertiserPhone || advertiser?.momoNumber || '-';
+                    const advertiser = campaign.advertiserId
+                      ? userById.get(campaign.advertiserId)
+                      : undefined;
+                    const advertiserName =
+                      campaign.advertiserName ||
+                      advertiser?.name ||
+                      "Annonceur";
+                    const advertiserPhone =
+                      campaign.advertiserPhone || advertiser?.momoNumber || "-";
 
                     return (
-                      <tr key={campaign.id} className="hover:bg-gray-50/30 transition-colors">
+                      <tr
+                        key={campaign.id}
+                        className="hover:bg-gray-50/30 transition-colors"
+                      >
                         <td className="px-8 py-6">
                           <div className="flex items-center gap-3">
-                            <img src={campaign.imageUrl || '/placeholder.png'} alt="" className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
-                            <p className="font-bold text-gray-900 leading-tight">{campaign.title}</p>
+                            <img
+                              src={campaign.imageUrl || "/placeholder.png"}
+                              alt=""
+                              className="w-10 h-10 rounded-lg object-cover bg-gray-100"
+                            />
+                            <p className="font-bold text-gray-900 leading-tight">
+                              {campaign.title}
+                            </p>
                           </div>
                         </td>
                         <td className="px-8 py-6">
-                          <p className="text-sm text-gray-500 font-medium">{advertiserName}</p>
-                          <p className="text-xs text-gray-400">{advertiserPhone}</p>
+                          <p className="text-sm text-gray-500 font-medium">
+                            {advertiserName}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {advertiserPhone}
+                          </p>
                         </td>
-                        <td className="px-8 py-6 font-bold text-gray-900">{campaign.totalBudget.toLocaleString()} F</td>
+                        <td className="px-8 py-6 font-bold text-gray-900">
+                          {campaign.totalBudget.toLocaleString()} F
+                        </td>
                         <td className="px-8 py-6">
                           <span className="px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest bg-[#D9ECEC] text-[#0E6B6B]">
-                            {campaign.budgetPack || 'Standard'}
+                            {campaign.budgetPack || "Standard"}
                           </span>
                         </td>
                         <td className="px-8 py-6 text-xs text-gray-500 font-medium">
                           {formatDate(campaign.createdAt)}
                         </td>
                         <td className="px-8 py-6">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${campaign.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
-                            campaign.paymentStatus === 'failed' ? 'bg-red-100 text-red-700' :
-                              'bg-yellow-100 text-yellow-700'
-                            }`}>
-                            {campaign.paymentStatus || 'pending'}
+                          <span
+                            className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
+                              campaign.paymentStatus === "paid"
+                                ? "bg-green-100 text-green-700"
+                                : campaign.paymentStatus === "failed"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                            }`}
+                          >
+                            {campaign.paymentStatus || "pending"}
                           </span>
                         </td>
                         <td className="px-8 py-6">
-                          <p className="text-xs font-bold text-gray-500">{campaign.paymentReference || '—'}</p>
+                          <p className="text-xs font-bold text-gray-500">
+                            {campaign.paymentReference || "—"}
+                          </p>
                         </td>
                         {/* Actions placeholder - migrated to Supabase */}
                       </tr>
                     );
                   })}
-                  {allCampaigns.filter(c => c.createdBy === 'user' || c.createdBy === undefined).length === 0 && (
+                  {allCampaigns.filter(
+                    (c) => c.createdBy === "user" || c.createdBy === undefined,
+                  ).length === 0 && (
                     <tr>
                       <td colSpan={7} className="px-8 py-12 text-center">
-                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune campagne utilisateur en attente</p>
+                        <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">
+                          Aucune campagne utilisateur en attente
+                        </p>
                       </td>
                     </tr>
                   )}
@@ -2434,22 +3373,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: GOMBO CHECKER
       ══════════════════════════════════════════ */}
-      {view === 'gomboChecker' && (
+      {view === "gomboChecker" && (
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
             <div className="flex flex-col items-center text-center mb-10">
               <div className="bg-[#E7F4F4] p-6 rounded-3xl text-[#128686] mb-6">
                 <ShieldCheck size={48} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Vérificateur de Statut GomboPlus</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Vérificateur de Statut GomboPlus
+              </h3>
               <p className="text-gray-500 max-w-md font-medium">
-                Saisissez une référence de transaction pour interroger directement l'API GomboPlus et voir les détails.
+                Saisissez une référence de transaction pour interroger
+                directement l'API GomboPlus et voir les détails.
               </p>
             </div>
 
             <div className="max-w-xl mx-auto space-y-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
                 <input
                   type="text"
                   placeholder="Ex: TXN_20241002_001 ou CMP-..."
@@ -2463,8 +3408,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 disabled={isCheckingGombo || !gomboRefInput.trim()}
                 className="w-full h-10 bg-[#128686] text-white py-4.5 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
               >
-                {isCheckingGombo ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
-                {isCheckingGombo ? "Vérification en cours..." : "Vérifier le statut"}
+                {isCheckingGombo ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  <Zap size={20} />
+                )}
+                {isCheckingGombo
+                  ? "Vérification en cours..."
+                  : "Vérifier le statut"}
               </button>
             </div>
           </div>
@@ -2476,54 +3427,90 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   <Activity className="text-[#128686]" />
                   Détails de la Transaction
                 </h3>
-                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${['completed', 'success', 'successful'].includes(String(gomboCheckResult.status || '').toLowerCase())
-                  ? 'bg-green-100 text-green-700'
-                  : ['failed', 'rejected', 'error'].includes(String(gomboCheckResult.status || '').toLowerCase())
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                  }`}>
-                  {gomboCheckResult.status || 'Inconnu'}
+                <span
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${
+                    ["completed", "success", "successful"].includes(
+                      String(gomboCheckResult.status || "").toLowerCase(),
+                    )
+                      ? "bg-green-100 text-green-700"
+                      : ["failed", "rejected", "error"].includes(
+                            String(gomboCheckResult.status || "").toLowerCase(),
+                          )
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  {gomboCheckResult.status || "Inconnu"}
                 </span>
               </div>
 
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Référence</p>
-                    <p className="text-lg font-bold text-gray-900 break-all">{gomboCheckResult.reference || gomboCheckResult.transaction_reference || gomboRefInput}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                      Référence
+                    </p>
+                    <p className="text-lg font-bold text-gray-900 break-all">
+                      {gomboCheckResult.reference ||
+                        gomboCheckResult.transaction_reference ||
+                        gomboRefInput}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Montant</p>
-                    <p className="text-2xl font-bold text-gray-900">{gomboCheckResult.amount?.toLocaleString() || '—'} F</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                      Montant
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {gomboCheckResult.amount?.toLocaleString() || "—"} F
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Opérateur</p>
-                    <p className="text-lg font-bold text-gray-900 uppercase">{gomboCheckResult.operator || '—'}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                      Opérateur
+                    </p>
+                    <p className="text-lg font-bold text-gray-900 uppercase">
+                      {gomboCheckResult.operator || "—"}
+                    </p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Message API</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                      Message API
+                    </p>
                     <p className="text-sm font-bold text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                      {gomboCheckResult.message || "Aucun message retourné par l'API."}
+                      {gomboCheckResult.message ||
+                        "Aucun message retourné par l'API."}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Date</p>
-                    <p className="text-lg font-bold text-gray-900">{gomboCheckResult.created_at ? new Date(gomboCheckResult.created_at).toLocaleString() : '—'}</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                      Date
+                    </p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {gomboCheckResult.created_at
+                        ? new Date(gomboCheckResult.created_at).toLocaleString()
+                        : "—"}
+                    </p>
                   </div>
                   {gomboCheckResult.recipient_number && (
                     <div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Numéro Client</p>
-                      <p className="text-lg font-bold text-gray-900">{gomboCheckResult.recipient_number}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        Numéro Client
+                      </p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {gomboCheckResult.recipient_number}
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="p-8 bg-gray-50/50 border-t border-gray-50">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Réponse JSON Brute</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                  Réponse JSON Brute
+                </p>
                 <pre className="bg-gray-900 text-green-400 p-6 rounded-2xl text-xs overflow-x-auto font-mono shadow-inner leading-relaxed">
                   {JSON.stringify(gomboCheckResult, null, 2)}
                 </pre>
@@ -2536,24 +3523,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: PUSH BROADCAST (ONE SIGNAL)
       ══════════════════════════════════════════ */}
-      {view === 'pushBroadcast' && isSuperAdmin && (
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12 overflow-hidden">
-            <div className="flex flex-col items-center text-center mb-10">
-              <div className="bg-[#E7F4F4] p-6 rounded-3xl text-[#128686] mb-4">
-                <Bell size={48} />
+      {view === "pushBroadcast" && isSuperAdmin && (
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 sm:p-7 overflow-hidden">
+            <div className="flex flex-col gap-4 border-b border-gray-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#128686]">
+                  <Radio size={14} /> Diffusion instantanée
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Composer une notification
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  OneSignal · Push web et mobile
+                </p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Centre de Diffusion Push OneSignal</h3>
-              <p className="text-gray-500 max-w-lg font-medium text-sm leading-relaxed">
-                Rédigez et envoyez une notification instantanée sur les téléphones et navigateurs de vos utilisateurs pour stimuler leur engagement.
-              </p>
+              <div className="inline-flex w-fit items-center gap-2 rounded-md border border-[#128686]/20 bg-[#E7F4F4] px-3 py-2 text-xs font-semibold text-[#0E6B6B]">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" /> Canal
+                push
+              </div>
             </div>
 
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
                 if (!pushTitle.trim() || !pushMessage.trim()) {
-                  showFeedback('Veuillez spécifier un titre et un message.', 'error');
+                  showFeedback(
+                    "Veuillez spécifier un titre et un message.",
+                    "error",
+                  );
                   return;
                 }
                 setIsSendingPush(true);
@@ -2562,63 +3560,90 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                     title: pushTitle.trim(),
                     message: pushMessage.trim(),
                     url: pushUrl.trim(),
-                    segment: pushSegment === "Total Subscriptions" ? "Ambassadors" : "Ambassadors",
-                    // segment: pushSegment === 'Total Subscriptions' ? 'All' : 'Subscribed Users',
+                    segment: pushSegment,
                   });
                   if (res.success) {
-                    showFeedback('Notification push diffusée avec succès ! 🎉', 'success');
-                    setPushTitle('');
-                    setPushMessage('');
+                    showFeedback(
+                      "Notification push diffusée avec succès ! 🎉",
+                      "success",
+                    );
+                    setPushTitle("");
+                    setPushMessage("");
                   } else {
-                    showFeedback(`Échec d'envoi : ${res.error || 'Vérifiez la configuration OneSignal.'}`, 'error');
+                    showFeedback(
+                      `Échec d'envoi : ${res.error || "Vérifiez la configuration OneSignal."}`,
+                      "error",
+                    );
                   }
                 } catch (err: any) {
-                  showFeedback(`Erreur : ${err?.message || 'Inconnue'}`, 'error');
+                  showFeedback(
+                    `Erreur : ${err?.message || "Inconnue"}`,
+                    "error",
+                  );
                 } finally {
                   setIsSendingPush(false);
                 }
               }}
-              className="max-w-xl mx-auto space-y-6"
+              className="mx-auto max-w-5xl space-y-6 pt-6"
             >
-              {/* Presets rapides */}
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
-                  Modèles rapides de message
-                </label>
-                <div className="flex flex-wrap gap-2">
+              <div className="border-b border-gray-100 pb-6">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                    Modèles rapides
+                  </label>
                   <button
                     type="button"
                     onClick={() => {
-                      setPushTitle('⏰ Rappel Preuve 24h');
-                      setPushMessage('N\'oubliez pas de soumettre vos preuves de partage avant l\'échéance des 24h pour valider vos gains !');
-                      setPushUrl('https://www.sika-ads.com/app/tasks');
-                      setPushSegment('Total Subscriptions');
+                      setPushTitle("");
+                      setPushMessage("");
+                      setPushUrl("/app/marketplace");
+                      setPushSegment("Total Subscriptions");
                     }}
-                    className="px-3 py-1.5 bg-[#E7F4F4] text-[#0E6B6B] rounded-xl text-xs font-bold hover:bg-[#D9ECEC] transition-all"
+                    className="text-xs font-semibold text-gray-500 transition-colors hover:text-[#128686]"
+                  >
+                    Réinitialiser
+                  </button>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPushTitle("⏰ Rappel Preuve 24h");
+                      setPushMessage(
+                        "N'oubliez pas de soumettre vos preuves de partage avant l'échéance des 24h pour valider vos gains !",
+                      );
+                      setPushUrl("https://www.sika-ads.com/app/tasks");
+                      setPushSegment("Total Subscriptions");
+                    }}
+                    className="min-h-16 rounded-md border border-[#128686]/20 bg-[#E7F4F4] px-3 text-left text-xs font-bold text-[#0E6B6B] transition-colors hover:border-[#128686]/40 hover:bg-[#D9ECEC]"
                   >
                     ⏰ Rappel Preuve 24h
                   </button>
                   <button
                     type="button"
                     onClick={() => {
-                      setPushTitle('🚀 Nouvelles Campagnes Disponibles !');
-                      setPushMessage('De nouvelles campagnes rémunérées viennent d\'être publiées. Venez vite les partager !');
-                      setPushUrl('https://www.sika-ads.com/app/marketplace');
-                      setPushSegment('Ambassadors')
+                      setPushTitle("🚀 Nouvelles Campagnes Disponibles !");
+                      setPushMessage(
+                        "De nouvelles campagnes rémunérées viennent d'être publiées. Venez vite les partager !",
+                      );
+                      setPushUrl("https://www.sika-ads.com/app/marketplace");
+                      setPushSegment("Ambassadors");
                     }}
-                    className="px-3 py-1.5 bg-green-50 text-green-700 rounded-xl text-xs font-bold hover:bg-green-100 transition-all"
+                    className="min-h-16 rounded-md border border-emerald-200 bg-emerald-50 px-3 text-left text-xs font-bold text-emerald-700 transition-colors hover:border-emerald-300 hover:bg-emerald-100"
                   >
                     🚀 Nouvelles Campagnes
                   </button>
                   <button
                     type="button"
                     onClick={() => {
-                      setPushTitle('💰 Vos gains vous attendent');
-                      setPushMessage('Connectez-vous sur SikaAds Togo pour suivre votre solde et demander vos retraits Mobile Money.');
-                      setPushUrl('https://www.sika-ads.com/app/wallet');
-                      setPushSegment("Ambassadors")
+                      setPushTitle("💰 Vos gains vous attendent");
+                      setPushMessage(
+                        "Connectez-vous sur SikaAds Togo pour suivre votre solde et demander vos retraits Mobile Money.",
+                      );
+                      setPushUrl("https://www.sika-ads.com/app/wallet");
+                      setPushSegment("Ambassadors");
                     }}
-                    className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all"
+                    className="min-h-16 rounded-md border border-amber-200 bg-amber-50 px-3 text-left text-xs font-bold text-amber-700 transition-colors hover:border-amber-300 hover:bg-amber-100"
                   >
                     💰 Rappel Gains
                   </button>
@@ -2627,75 +3652,141 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
 
               {/* Titre */}
               <div>
-                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
-                  Titre du Push <span className="text-red-500">*</span>
-                </label>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Titre du Push <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-gray-400">
+                    {pushTitle.length}/65
+                  </span>
+                </div>
                 <input
                   type="text"
                   required
-                  placeholder="Ex: 📢 Important : Nouvelles opportunités !"
+                  maxLength={65}
+                  placeholder="Ex: Nouvelle opportunité disponible"
                   value={pushTitle}
                   onChange={(e) => setPushTitle(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-[#128686] outline-none"
+                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-3 text-sm font-semibold text-gray-900 placeholder:text-gray-400 focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
                 />
               </div>
 
               {/* Message */}
               <div>
-                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
-                  Message du Push <span className="text-red-500">*</span>
-                </label>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Message du Push <span className="text-red-500">*</span>
+                  </label>
+                  <span className="text-xs font-medium text-gray-400">
+                    {pushMessage.length}/180
+                  </span>
+                </div>
                 <textarea
                   required
-                  rows={3}
+                  rows={5}
+                  maxLength={180}
                   placeholder="Rédigez le texte de votre notification..."
                   value={pushMessage}
                   onChange={(e) => setPushMessage(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#128686] outline-none resize-none"
+                  className="w-full resize-none rounded-md border border-gray-200 bg-white px-3 py-3 text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
                 />
               </div>
 
               {/* URL de redirection */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-5 border-y border-gray-100 py-6 md:grid-cols-2">
                 <div>
                   <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
                     Lien au Clic (URL)
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Ex: /app/marketplace"
-                    value={pushUrl}
-                    onChange={(e) => setPushUrl(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-[#128686] outline-none"
-                  />
+                  <div className="relative">
+                    <Link2
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={16}
+                    />
+                    <input
+                      type="text"
+                      placeholder="/app/marketplace"
+                      value={pushUrl}
+                      onChange={(e) => setPushUrl(e.target.value)}
+                      className="w-full rounded-md border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
-                    Cible / Segment
-                  </label>
-                  <select
-                    value={pushSegment}
-                    onChange={(e) => setPushSegment(e.target.value as any)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-[#128686]"
+                  <div className="mb-2 flex items-center gap-2">
+                    <UsersRound size={16} className="text-[#128686]" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Audience
+                    </p>
+                  </div>
+                  <div
+                    className="grid grid-cols-2 gap-2"
+                    role="group"
+                    aria-label="Audience de la notification"
                   >
-                    <option value="Total Subscriptions">Tous les utilisateurs abonnés</option>
-                    <option value="Ambassadors">Ambassadeurs uniquement</option>
-                    {/* <option value="Advertisers">Annonceurs uniquement</option> */}
-                  </select>
+                    {(
+                      [
+                        {
+                          value: "Total Subscriptions",
+                          label: "Tous les abonnés",
+                        },
+                        { value: "Ambassadors", label: "Ambassadeurs" },
+                      ] as const
+                    ).map((audience) => {
+                      const isSelected = pushSegment === audience.value;
+                      return (
+                        <button
+                          key={audience.value}
+                          type="button"
+                          onClick={() => setPushSegment(audience.value)}
+                          aria-pressed={isSelected}
+                          className={`min-h-12 rounded-md border px-3 text-left text-xs font-bold transition-colors ${
+                            isSelected
+                              ? "border-[#128686] bg-[#E7F4F4] text-[#0E6B6B]"
+                              : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                          }`}
+                        >
+                          {audience.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              {/* Aperçu en direct */}
-              <div className="bg-gray-900 text-white p-5 rounded-2xl space-y-2 border border-gray-800">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#7FD1D1]">Aperçu de la notification</p>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#128686] flex items-center justify-center shrink-0">
-                    <Bell size={18} className="text-white" />
+              <div className="rounded-lg bg-[#0A2E38] p-5 text-white sm:p-6">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#7FD1D1]">
+                    <LayoutTemplate size={15} /> Aperçu de la notification
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="font-bold text-sm leading-tight text-white">{pushTitle || 'Titre de la notification'}</p>
-                    <p className="text-xs text-gray-300 mt-1 line-clamp-2">{pushMessage || 'Contenu du message push...'}</p>
+                  <span className="text-xs font-medium text-white/60">
+                    {pushSegment === "Ambassadors"
+                      ? "Ambassadeurs"
+                      : "Tous les abonnés"}
+                  </span>
+                </div>
+                <div className="rounded-lg bg-white p-4 text-[#0A2E38] shadow-lg">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#128686] text-white">
+                        <Bell size={16} />
+                      </div>
+                      <span className="text-xs font-bold">SikaAds</span>
+                    </div>
+                    <span className="text-[11px] text-gray-400">
+                      maintenant
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold leading-snug text-gray-900">
+                    {pushTitle || "Titre de la notification"}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                    {pushMessage ||
+                      "Le contenu de votre message apparaîtra ici."}
+                  </p>
+                  <div className="mt-4 border-t border-gray-100 pt-3 text-xs font-semibold text-[#128686]">
+                    {pushUrl || "https://www.sika-ads.com"}
                   </div>
                 </div>
               </div>
@@ -2703,11 +3794,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               {/* Bouton d'envoi */}
               <button
                 type="submit"
-                disabled={isSendingPush || !pushTitle.trim() || !pushMessage.trim()}
-                className="w-full py-4.5 bg-[#128686] hover:bg-[#0E6B6B] text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+                disabled={
+                  isSendingPush || !pushTitle.trim() || !pushMessage.trim()
+                }
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#F65E06] px-4 text-sm font-bold text-white transition-colors hover:bg-[#D14E04] disabled:cursor-not-allowed disabled:opacity-45"
               >
-                {isSendingPush ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
-                {isSendingPush ? "Diffusion en cours..." : "Envoyer la Notification Push"}
+                {isSendingPush ? (
+                  <Loader2 className="animate-spin" size={18} />
+                ) : (
+                  <Send size={18} />
+                )}
+                {isSendingPush
+                  ? "Diffusion en cours..."
+                  : "Envoyer la notification"}
               </button>
             </form>
           </div>
@@ -2717,13 +3816,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       {/* ══════════════════════════════════════════
           VIEW: VALIDATION
       ══════════════════════════════════════════ */}
-      {view === 'validation' && (
+      {view === "validation" && (
         <div>
           {/* Filtres */}
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Statut de la preuve</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
+                  Statut de la preuve
+                </label>
                 <select
                   value={proofStatusFilter}
                   onChange={(e) => setProofStatusFilter(e.target.value as any)}
@@ -2736,10 +3837,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Action suggérée par l'IA</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
+                  Action suggérée par l'IA
+                </label>
                 <select
                   value={suggestedActionFilter}
-                  onChange={(e) => setSuggestedActionFilter(e.target.value as any)}
+                  onChange={(e) =>
+                    setSuggestedActionFilter(e.target.value as any)
+                  }
                   className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-4 py-3 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
                 >
                   <option value="all">Toutes les actions</option>
@@ -2750,7 +3855,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               </div>
               <div className="flex items-end">
                 <button
-                  onClick={() => { setProofStatusFilter('pending'); setSuggestedActionFilter('manual_review'); }}
+                  onClick={() => {
+                    setProofStatusFilter("pending");
+                    setSuggestedActionFilter("manual_review");
+                  }}
                   className="w-full bg-amber-50 hover:bg-amber-100 text-amber-600 py-3 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all"
                 >
                   Preuves à examiner
@@ -2762,57 +3870,142 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
           {/* Liste des preuves filtrées */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {allProofs
-              .filter(p => proofStatusFilter === 'all' || p.status === proofStatusFilter)
-              .filter(p => suggestedActionFilter === 'all' || p.aiAnalysis?.suggestedAction === suggestedActionFilter)
-              .map(proof => (
-                <div key={proof.id} className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[280px]">
+              .filter(
+                (p) =>
+                  proofStatusFilter === "all" || p.status === proofStatusFilter,
+              )
+              .filter(
+                (p) =>
+                  suggestedActionFilter === "all" ||
+                  p.aiAnalysis?.suggestedAction === suggestedActionFilter,
+              )
+              .map((proof) => (
+                <div
+                  key={proof.id}
+                  className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[280px]"
+                >
                   <div
                     className="w-full md:w-48 bg-gray-100 relative group shrink-0 cursor-pointer overflow-hidden"
-                    onClick={() => setPreviewImage(proof.downloadURL)}
+                    onClick={() =>
+                      setPreviewMedia({ url: proof.downloadURL, type: "image" })
+                    }
                   >
-                    <img src={proof.downloadURL} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Proof" />
+                    <img
+                      src={proof.downloadURL}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      alt="Proof"
+                    />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
                       <Eye size={24} className="text-white" />
                     </div>
                   </div>
                   <div className="flex-1 p-8 flex flex-col">
                     <div className="mb-4">
-                      <h3 className="font-bold text-lg text-gray-900 leading-none">{proof.userName}</h3>
-                      <p className="text-xs text-[#128686] font-bold uppercase tracking-widest mt-2">{proof.campaignName}</p>
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-lg text-gray-900 leading-none">
+                            {proof.userName}
+                          </h3>
+                          {(proof.videoUrl || (proof as any).video_url) && (
+                            <span className="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                              <Film size={10} /> +Vidéo
+                            </span>
+                          )}
+                        </div>
+                        {(proof.videoUrl || (proof as any).video_url) && (
+                          <button
+                            onClick={() =>
+                              setPreviewMedia({
+                                url: (proof.videoUrl ||
+                                  (proof as any).video_url)!,
+                                type: "video",
+                              })
+                            }
+                            className="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold uppercase py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-colors"
+                          >
+                            <Play size={12} /> Lire Vidéo
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#128686] font-bold uppercase tracking-widest mt-2">
+                        {proof.campaignName}
+                      </p>
                       <p className="text-[10px] text-gray-400 font-medium mt-1">
-                        {new Date(proof.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {new Date(proof.submittedAt).toLocaleDateString(
+                          "fr-FR",
+                          { day: "2-digit", month: "short", year: "numeric" },
+                        )}
                       </p>
                     </div>
 
                     {/* Analyse IA */}
                     {proof.aiAnalysis ? (
-                      <div className={`rounded-2xl p-4 mb-4 border space-y-3 ${proof.aiAnalysis.fraudAlert ? 'bg-red-50 border-red-100' :
-                        proof.aiAnalysis.isValid ? 'bg-emerald-50 border-emerald-100' :
-                          'bg-amber-50 border-amber-100'
-                        }`}>
+                      <div
+                        className={`rounded-2xl p-4 mb-4 border space-y-3 ${
+                          proof.aiAnalysis.fraudAlert
+                            ? "bg-red-50 border-red-100"
+                            : proof.aiAnalysis.isValid
+                              ? "bg-emerald-50 border-emerald-100"
+                              : "bg-amber-50 border-amber-100"
+                        }`}
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Shield size={13} className={proof.aiAnalysis.fraudAlert ? 'text-red-500' : proof.aiAnalysis.isValid ? 'text-emerald-600' : 'text-amber-500'} />
-                            <span className={`text-[10px] font-bold uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'text-red-600' : proof.aiAnalysis.isValid ? 'text-emerald-700' : 'text-amber-600'
-                              }`}>
+                            <Shield
+                              size={13}
+                              className={
+                                proof.aiAnalysis.fraudAlert
+                                  ? "text-red-500"
+                                  : proof.aiAnalysis.isValid
+                                    ? "text-emerald-600"
+                                    : "text-amber-500"
+                              }
+                            />
+                            <span
+                              className={`text-[10px] font-bold uppercase tracking-widest ${
+                                proof.aiAnalysis.fraudAlert
+                                  ? "text-red-600"
+                                  : proof.aiAnalysis.isValid
+                                    ? "text-emerald-700"
+                                    : "text-amber-600"
+                              }`}
+                            >
                               Analyse IA
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${proof.aiAnalysis.fraudAlert ? 'bg-red-100 text-red-700' :
-                              proof.aiAnalysis.isValid ? 'bg-emerald-100 text-emerald-700' :
-                                'bg-amber-100 text-amber-700'
-                              }`}>
-                              {proof.aiAnalysis.fraudAlert ? '⚠ Fraude' : proof.aiAnalysis.isValid ? '✓ Valide' : '✗ Invalide'}
+                            <span
+                              className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                                proof.aiAnalysis.fraudAlert
+                                  ? "bg-red-100 text-red-700"
+                                  : proof.aiAnalysis.isValid
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-amber-100 text-amber-700"
+                              }`}
+                            >
+                              {proof.aiAnalysis.fraudAlert
+                                ? "⚠ Fraude"
+                                : proof.aiAnalysis.isValid
+                                  ? "✓ Valide"
+                                  : "✗ Invalide"}
                             </span>
                             {proof.aiAnalysis.suggestedAction && (
-                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${proof.aiAnalysis.suggestedAction === 'approve' ? 'bg-green-100 text-green-700' :
-                                proof.aiAnalysis.suggestedAction === 'reject' ? 'bg-red-100 text-red-700' :
-                                  'bg-[#D9ECEC] text-[#0E6B6B]'
-                                }`}>
-                                {proof.aiAnalysis.suggestedAction === 'approve' ? '✓ Auto-approuver' :
-                                  proof.aiAnalysis.suggestedAction === 'reject' ? '✗ Auto-rejeter' :
-                                    '👤 Révision manuelle'}
+                              <span
+                                className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                                  proof.aiAnalysis.suggestedAction === "approve"
+                                    ? "bg-green-100 text-green-700"
+                                    : proof.aiAnalysis.suggestedAction ===
+                                        "reject"
+                                      ? "bg-red-100 text-red-700"
+                                      : "bg-[#D9ECEC] text-[#0E6B6B]"
+                                }`}
+                              >
+                                {proof.aiAnalysis.suggestedAction === "approve"
+                                  ? "✓ Auto-approuver"
+                                  : proof.aiAnalysis.suggestedAction ===
+                                      "reject"
+                                    ? "✗ Auto-rejeter"
+                                    : "👤 Révision manuelle"}
                               </span>
                             )}
                           </div>
@@ -2821,93 +4014,158 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                         {/* Scores de confiance */}
                         <div className="grid grid-cols-2 gap-2">
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Confiance globale</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                              Confiance globale
+                            </p>
                             <div className="flex items-center gap-1.5">
                               <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                 <div
-                                  className={`h-full rounded-full ${proof.aiAnalysis.confidence >= 70 ? 'bg-emerald-500' :
-                                    proof.aiAnalysis.confidence >= 40 ? 'bg-amber-400' : 'bg-red-400'
-                                    }`}
-                                  style={{ width: `${proof.aiAnalysis.confidence}%` }}
+                                  className={`h-full rounded-full ${
+                                    proof.aiAnalysis.confidence >= 70
+                                      ? "bg-emerald-500"
+                                      : proof.aiAnalysis.confidence >= 40
+                                        ? "bg-amber-400"
+                                        : "bg-red-400"
+                                  }`}
+                                  style={{
+                                    width: `${proof.aiAnalysis.confidence}%`,
+                                  }}
                                 />
                               </div>
-                              <span className="text-xs font-bold text-gray-700">{proof.aiAnalysis.confidence}%</span>
+                              <span className="text-xs font-bold text-gray-700">
+                                {proof.aiAnalysis.confidence}%
+                              </span>
                             </div>
                           </div>
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Vues détectées</p>
-                            <p className="text-sm font-bold text-gray-900">{proof.aiAnalysis.viewsCount.toLocaleString()}</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                              Vues détectées
+                            </p>
+                            <p className="text-sm font-bold text-gray-900">
+                              {proof.aiAnalysis.viewsCount.toLocaleString()}
+                            </p>
                           </div>
                         </div>
 
                         {/* Scores de confiance granulaires */}
-                        {(proof.aiAnalysis.imageAuthenticityConfidence || proof.aiAnalysis.viewCountDetectionConfidence || proof.aiAnalysis.platformUICompliance) && (
+                        {(proof.aiAnalysis.imageAuthenticityConfidence ||
+                          proof.aiAnalysis.viewCountDetectionConfidence ||
+                          proof.aiAnalysis.platformUICompliance) && (
                           <div className="bg-white/70 rounded-xl p-2.5 space-y-2">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Scores spécifiques</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                              Scores spécifiques
+                            </p>
                             {proof.aiAnalysis.imageAuthenticityConfidence && (
                               <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">Authenticité image</span>
-                                <span className="font-bold text-gray-900">{proof.aiAnalysis.imageAuthenticityConfidence}%</span>
+                                <span className="text-gray-600 font-medium">
+                                  Authenticité image
+                                </span>
+                                <span className="font-bold text-gray-900">
+                                  {proof.aiAnalysis.imageAuthenticityConfidence}
+                                  %
+                                </span>
                               </div>
                             )}
                             {proof.aiAnalysis.viewCountDetectionConfidence && (
                               <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">Détection vues</span>
-                                <span className="font-bold text-gray-900">{proof.aiAnalysis.viewCountDetectionConfidence}%</span>
+                                <span className="text-gray-600 font-medium">
+                                  Détection vues
+                                </span>
+                                <span className="font-bold text-gray-900">
+                                  {
+                                    proof.aiAnalysis
+                                      .viewCountDetectionConfidence
+                                  }
+                                  %
+                                </span>
                               </div>
                             )}
                             {proof.aiAnalysis.platformUICompliance && (
                               <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">Conformité interface</span>
-                                <span className="font-bold text-gray-900">{proof.aiAnalysis.platformUICompliance}%</span>
+                                <span className="text-gray-600 font-medium">
+                                  Conformité interface
+                                </span>
+                                <span className="font-bold text-gray-900">
+                                  {proof.aiAnalysis.platformUICompliance}%
+                                </span>
                               </div>
                             )}
                           </div>
                         )}
 
                         {/* Type de fraude */}
-                        {proof.aiAnalysis.fraudType && proof.aiAnalysis.fraudType !== 'none' && (
-                          <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Type de fraude</p>
-                            <p className="text-[11px] font-bold text-red-600">{proof.aiAnalysis.fraudType.replace(/_/g, ' ')}</p>
-                          </div>
-                        )}
+                        {proof.aiAnalysis.fraudType &&
+                          proof.aiAnalysis.fraudType !== "none" && (
+                            <div className="bg-white/70 rounded-xl p-2.5">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                Type de fraude
+                              </p>
+                              <p className="text-[11px] font-bold text-red-600">
+                                {proof.aiAnalysis.fraudType.replace(/_/g, " ")}
+                              </p>
+                            </div>
+                          )}
 
                         {/* Détails des éléments de fraude */}
-                        {proof.aiAnalysis.fraudEvidenceDetails && proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
-                          <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Éléments suspects</p>
-                            <ul className="space-y-1">
-                              {proof.aiAnalysis.fraudEvidenceDetails.map((detail, idx) => (
-                                <li key={idx} className="text-[10px] text-red-600 font-medium flex gap-2">
-                                  <span className="shrink-0">•</span>
-                                  <span>{detail}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                        {proof.aiAnalysis.fraudEvidenceDetails &&
+                          proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
+                            <div className="bg-white/70 rounded-xl p-2.5">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                Éléments suspects
+                              </p>
+                              <ul className="space-y-1">
+                                {proof.aiAnalysis.fraudEvidenceDetails.map(
+                                  (detail, idx) => (
+                                    <li
+                                      key={idx}
+                                      className="text-[10px] text-red-600 font-medium flex gap-2"
+                                    >
+                                      <span className="shrink-0">•</span>
+                                      <span>{detail}</span>
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            </div>
+                          )}
 
                         {proof.aiAnalysis.reason && (
                           <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Motif IA</p>
-                            <p className="text-[11px] text-gray-600 font-medium leading-snug">{proof.aiAnalysis.reason}</p>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                              Motif IA
+                            </p>
+                            <p className="text-[11px] text-gray-600 font-medium leading-snug">
+                              {proof.aiAnalysis.reason}
+                            </p>
                           </div>
                         )}
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 mb-4 border border-gray-100">
-                        <AlertTriangle size={13} className="text-gray-400 shrink-0" />
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Aucune analyse IA disponible</p>
+                        <AlertTriangle
+                          size={13}
+                          className="text-gray-400 shrink-0"
+                        />
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          Aucune analyse IA disponible
+                        </p>
                       </div>
                     )}
 
                     <div className="flex gap-3 mt-auto">
-                      <button onClick={() => setRejectingProof(proof)} className="flex-1 bg-gray-50 hover:bg-red-50 text-red-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all">
+                      <button
+                        onClick={() => setRejectingProof(proof)}
+                        className="flex-1 bg-gray-50 hover:bg-red-50 text-red-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all"
+                      >
                         Refuser
                       </button>
                       <button
-                        onClick={() => { setValidatingProof(proof); setViewsInput(proof.aiAnalysis?.viewsCount?.toString() || '0'); }}
+                        onClick={() => {
+                          setValidatingProof(proof);
+                          setViewsInput(
+                            proof.aiAnalysis?.viewsCount?.toString() || "0",
+                          );
+                        }}
                         className="flex-1 bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-lg transition-all"
                       >
                         Valider
@@ -2916,9 +4174,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                   </div>
                 </div>
               ))}
-            {allProofs.filter(p => p.status === 'pending').length === 0 && (
+            {allProofs.filter((p) => p.status === "pending").length === 0 && (
               <div className="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-100">
-                <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Aucune preuve en attente</p>
+                <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">
+                  Aucune preuve en attente
+                </p>
               </div>
             )}
           </div>
@@ -2937,15 +4197,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               <div className="bg-[#D9ECEC] w-12 h-12 rounded-2xl flex items-center justify-center text-[#128686]">
                 <UserPlus size={24} />
               </div>
-              <button onClick={() => setShowAddMemberModal(false)} className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600">
+              <button
+                onClick={() => setShowAddMemberModal(false)}
+                className="p-2 bg-gray-50 rounded-full text-gray-400 hover:text-gray-600"
+              >
                 <X size={24} />
               </button>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Ajouter un Modérateur</h3>
-            <p className="text-gray-500 text-sm font-medium mb-6">Saisissez l'adresse email d'un utilisateur existant pour l'élever au rang de Staff.</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Ajouter un Modérateur
+            </h3>
+            <p className="text-gray-500 text-sm font-medium mb-6">
+              Saisissez l'adresse email d'un utilisateur existant pour l'élever
+              au rang de Staff.
+            </p>
             <div className="space-y-4">
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Mail
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
                 <input
                   type="email"
                   value={newMemberEmail}
@@ -2959,7 +4230,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 disabled={isAddingMember || !newMemberEmail}
                 className="w-full bg-[#128686] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-xl shadow-[#128686]/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
               >
-                {isAddingMember ? <Loader2 className="animate-spin" size={20} /> : "Confirmer la promotion"}
+                {isAddingMember ? (
+                  <Loader2 className="animate-spin" size={20} />
+                ) : (
+                  "Confirmer la promotion"
+                )}
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -2968,17 +4243,36 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       )}
 
       {/* Modal: Preview image */}
-      {previewImage && (
+      {previewMedia && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-200"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-          onClick={() => setPreviewImage(null)}
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          onClick={() => setPreviewMedia(null)}
         >
-          <button className="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all" onClick={() => setPreviewImage(null)}>
+          <button
+            className="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all"
+            onClick={() => setPreviewMedia(null)}
+          >
             <X size={32} />
           </button>
-          <div className="relative max-w-full max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-            <img src={previewImage} className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl border border-white/10" alt="Preview" />
+          <div
+            className="relative max-w-full max-h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {previewMedia.type === "video" ? (
+              <video
+                src={previewMedia.url}
+                controls
+                autoPlay
+                className="max-w-full max-h-[88vh] rounded-2xl shadow-2xl border border-white/10"
+              />
+            ) : (
+              <img
+                src={previewMedia.url}
+                className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl border border-white/10"
+                alt="Preview"
+              />
+            )}
           </div>
         </div>
       )}
@@ -2992,8 +4286,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
                 <X size={22} className="text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">Refuser la preuve</h3>
-                <p className="text-xs text-gray-400 font-medium">{rejectingProof.userName} · {rejectingProof.campaignName}</p>
+                <h3 className="text-lg font-bold text-gray-900">
+                  Refuser la preuve
+                </h3>
+                <p className="text-xs text-gray-400 font-medium">
+                  {rejectingProof.userName} · {rejectingProof.campaignName}
+                </p>
               </div>
             </div>
             <div>
@@ -3014,10 +4312,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
               disabled={isRejecting || !rejectionReason.trim()}
               className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
             >
-              {isRejecting ? <Loader2 className="animate-spin" size={18} /> : <X size={16} />}
-              {isRejecting ? 'Traitement...' : 'Confirmer le refus'}
+              {isRejecting ? (
+                <Loader2 className="animate-spin" size={18} />
+              ) : (
+                <X size={16} />
+              )}
+              {isRejecting ? "Traitement..." : "Confirmer le refus"}
             </button>
-            <button onClick={() => { setRejectingProof(null); setRejectionReason(''); }} className="w-full text-gray-400 text-xs font-bold py-2">
+            <button
+              onClick={() => {
+                setRejectingProof(null);
+                setRejectionReason("");
+              }}
+              className="w-full text-gray-400 text-xs font-bold py-2"
+            >
               Annuler
             </button>
           </div>
@@ -3025,67 +4333,103 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ proofs: propProofs, setProofs, 
       )}
 
       {/* Modal: Validation de preuve */}
-      {validatingProof && (() => {
-        const campaign = allCampaigns.find(c => c.id === validatingProof.campaignId);
-        const cpv = campaign?.cpv ?? 20;
-        const computedEarnings = Math.round((parseInt(viewsInput) || 0) * cpv);
-        return (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl space-y-5">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#D9ECEC] flex items-center justify-center shrink-0">
-                  <Check size={22} className="text-[#128686]" />
+      {validatingProof &&
+        (() => {
+          const campaign = allCampaigns.find(
+            (c) => c.id === validatingProof.campaignId,
+          );
+          const cpv = campaign?.cpv ?? 20;
+          const computedEarnings = Math.round(
+            (parseInt(viewsInput) || 0) * cpv,
+          );
+          return (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-white rounded-[2.5rem] w-full max-w-sm p-8 shadow-2xl space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#D9ECEC] flex items-center justify-center shrink-0">
+                    <Check size={22} className="text-[#128686]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">
+                      Valider la preuve
+                    </h3>
+                    <p className="text-xs text-gray-400 font-medium">
+                      {validatingProof.userName} ·{" "}
+                      {validatingProof.campaignName}
+                    </p>
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Valider la preuve</h3>
-                  <p className="text-xs text-gray-400 font-medium">{validatingProof.userName} · {validatingProof.campaignName}</p>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
+                    Nombre de vues confirmées
+                  </label>
+                  <input
+                    type="number"
+                    value={viewsInput}
+                    onChange={(e) => setViewsInput(e.target.value)}
+                    className="w-full bg-gray-50 border-2 border-[#128686]/20 rounded-2xl p-4 text-center text-3xl font-bold focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
+                    autoFocus
+                  />
                 </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">Nombre de vues confirmées</label>
-                <input
-                  type="number"
-                  value={viewsInput}
-                  onChange={(e) => setViewsInput(e.target.value)}
-                  className="w-full bg-gray-50 border-2 border-[#128686]/20 rounded-2xl p-4 text-center text-3xl font-bold focus:outline-none focus:ring-2 focus:ring-[#128686]/40"
-                  autoFocus
-                />
-              </div>
-              <div className="bg-[#E7F4F4] rounded-2xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Rémunération calculée</p>
-                  <p className="text-2xl font-bold text-[#0E6B6B] mt-0.5">{computedEarnings.toLocaleString()} <span className="text-sm">FCFA</span></p>
+                <div className="bg-[#E7F4F4] rounded-2xl p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">
+                      Rémunération calculée
+                    </p>
+                    <p className="text-2xl font-bold text-[#0E6B6B] mt-0.5">
+                      {computedEarnings.toLocaleString()}{" "}
+                      <span className="text-sm">FCFA</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">
+                      Taux / vue
+                    </p>
+                    <p className="text-sm font-bold text-[#128686]">
+                      {cpv} FCFA
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold text-[#7FD1D1] uppercase tracking-widest">Taux / vue</p>
-                  <p className="text-sm font-bold text-[#128686]">{cpv} FCFA</p>
-                </div>
-              </div>
 
-              {wasBudgetLimited && (
-                <div className="flex items-start gap-2 p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 animate-pulse">
-                  <AlertTriangle size={16} className="shrink-0 mt-0.5" />
-                  <p className="text-[10px] font-bold leading-tight uppercase tracking-wider">
-                    Budget limité : Le nombre de vues a dû être ajusté au budget restant de la campagne ({campaign?.remainingBudget?.toLocaleString()} FCFA).
-                  </p>
-                </div>
-              )}
-              <button
-                onClick={handleConfirmValidation}
-                disabled={isValidating || !viewsInput || parseInt(viewsInput) <= 0}
-                className="w-full bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
-              >
-                {isValidating ? <Loader2 className="animate-spin" size={18} /> : <Check size={16} />}
-                {isValidating ? 'Traitement...' : `Valider · +${computedEarnings.toLocaleString()} FCFA`}
-              </button>
-              <button onClick={() => { setValidatingProof(null); setWasBudgetLimited(false); }} className="w-full text-gray-400 text-xs font-bold py-2">
-                Annuler
-              </button>
+                {wasBudgetLimited && (
+                  <div className="flex items-start gap-2 p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 animate-pulse">
+                    <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                    <p className="text-[10px] font-bold leading-tight uppercase tracking-wider">
+                      Budget limité : Le nombre de vues a dû être ajusté au
+                      budget restant de la campagne (
+                      {campaign?.remainingBudget?.toLocaleString()} FCFA).
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={handleConfirmValidation}
+                  disabled={
+                    isValidating || !viewsInput || parseInt(viewsInput) <= 0
+                  }
+                  className="w-full bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+                >
+                  {isValidating ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : (
+                    <Check size={16} />
+                  )}
+                  {isValidating
+                    ? "Traitement..."
+                    : `Valider · +${computedEarnings.toLocaleString()} FCFA`}
+                </button>
+                <button
+                  onClick={() => {
+                    setValidatingProof(null);
+                    setWasBudgetLimited(false);
+                  }}
+                  className="w-full text-gray-400 text-xs font-bold py-2"
+                >
+                  Annuler
+                </button>
+              </div>
             </div>
-          </div>
-        );
-      })()}
-
+          );
+        })()}
     </div>
   );
 };

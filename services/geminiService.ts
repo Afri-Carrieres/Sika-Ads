@@ -15,10 +15,15 @@ export interface ProofValidationResult {
   | "early_deletion_pattern"
   | "metadata_mismatch"
   | "ui_inconsistency"
+  | "video_editing_manipulation"
+  | "video_mismatch"
   | "other_fraud";
   imageAuthenticityConfidence: number;
   viewCountDetectionConfidence: number;
   platformUICompliance: number;
+  videoAuthenticityConfidence?: number;
+  videoConsistencyScore?: number;
+  suggestedAction?: 'approve' | 'reject' | 'manual_review';
   fraudEvidenceDetails: string[];
 }
 
@@ -93,6 +98,8 @@ const normalizeAIResult = (parsed: unknown): ProofValidationResult => {
       'early_deletion_pattern',
       'metadata_mismatch',
       'ui_inconsistency',
+      'video_editing_manipulation',
+      'video_mismatch',
       'other_fraud'
     ];
     if (typeof value === 'string' && allowed.includes(value as ProofValidationResult['fraudType'])) {
@@ -111,6 +118,9 @@ const normalizeAIResult = (parsed: unknown): ProofValidationResult => {
     imageAuthenticityConfidence: toNumber(p.imageAuthenticityConfidence, 0),
     viewCountDetectionConfidence: toNumber(p.viewCountDetectionConfidence, 0),
     platformUICompliance: toNumber(p.platformUICompliance, 0),
+    videoAuthenticityConfidence: p.videoAuthenticityConfidence !== undefined ? toNumber(p.videoAuthenticityConfidence, 0) : undefined,
+    videoConsistencyScore: p.videoConsistencyScore !== undefined ? toNumber(p.videoConsistencyScore, 0) : undefined,
+    suggestedAction: p.suggestedAction,
     fraudEvidenceDetails: toStringArray(p.fraudEvidenceDetails)
   };
 };
@@ -153,11 +163,12 @@ const resizeImage = (dataUrl: string, maxWidth = 1024): Promise<string> => {
 };
 
 // 5. Fonction principale avec Retry
-//    proofId est désormais obligatoire : l'Edge Function en a besoin pour
+//    proofId est obligatoire : l'Edge Function en a besoin pour
 //    mettre à jour la ligne correspondante dans la table `proofs`.
 export const validateProofWithAI = async (
   imageUrl: string,
   proofId: string,
+  videoUrl?: string,
   retries = 3
 ): Promise<ProofValidationResult> => {
 
@@ -181,7 +192,8 @@ export const validateProofWithAI = async (
         {
           body: {
             proofId,
-            imageUrl: `data:${mimeType};base64,${base64Clean}`
+            imageUrl: `data:${mimeType};base64,${base64Clean}`,
+            videoUrl: videoUrl || undefined
           }
         }
       );

@@ -99,6 +99,8 @@ export interface AIAnalysis {
   imageAuthenticityConfidence?: number; // Confiance que l'image n'a pas été altérée (0-100)
   viewCountDetectionConfidence?: number; // Confiance dans la précision du nombre de vues détecté (0-100)
   platformUICompliance?: number; // Score de conformité de l'interface utilisateur avec la plateforme (0-100)
+  videoAuthenticityConfidence?: number; // Confiance dans l'authenticité de la vidéo (0-100)
+  videoConsistencyScore?: number; // Score de cohérence entre la capture et la vidéo (0-100)
   
   // Détails des éléments de fraude détectés
   fraudEvidenceDetails?: string[]; // Ex: ["EXIF data missing", "Font mismatch in view count area", "Inconsistent timestamp"]
@@ -121,6 +123,12 @@ export interface Proof {
   downloadURL: string;
   size: number;
   type: string;
+  // Champs vidéo optionnels
+  videoUrl?: string;
+  videoStoragePath?: string;
+  videoFileName?: string;
+  videoSize?: number;
+  videoType?: string;
   status: 'pending' | 'validated' | 'rejected';
   aiValidation: boolean;
   submittedAt: string;

@@ -24,6 +24,8 @@ export function normalizeAIResult(raw: RawAIResult): NormalizedAIResult {
     imageAuthenticityConfidence: toPercent(raw.imageAuthenticityConfidence),
     viewCountDetectionConfidence: toPercent(raw.viewCountDetectionConfidence),
     platformUICompliance: toPercent(raw.platformUICompliance),
+    videoAuthenticityConfidence: raw.videoAuthenticityConfidence !== undefined ? toPercent(raw.videoAuthenticityConfidence) : undefined,
+    videoConsistencyScore: raw.videoConsistencyScore !== undefined ? toPercent(raw.videoConsistencyScore) : undefined,
     fraudEvidenceDetails: Array.isArray(raw.fraudEvidenceDetails) ? raw.fraudEvidenceDetails : []
   };
 }
