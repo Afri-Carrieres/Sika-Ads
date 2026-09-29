@@ -135,6 +135,213 @@ const StatCard: React.FC<{
   );
 };
 
+const ProofReviewWorkspace: React.FC<{
+  proofs: Proof[];
+  selectedProof: Proof | null;
+  onSelect: (proofId: string) => void;
+  onPreview: (media: { url: string; type: "image" | "video" }) => void;
+  onApprove: (proof: Proof) => void;
+  onReject: (proof: Proof) => void;
+}> = ({ proofs, selectedProof, onSelect, onPreview, onApprove, onReject }) => {
+  const metrics = selectedProof
+    ? [
+        {
+          label: "Vues détectées",
+          value: (selectedProof.aiAnalysis?.viewsCount ?? selectedProof.viewsCount ?? 0).toLocaleString("fr-FR"),
+          score: selectedProof.aiAnalysis?.viewCountDetectionConfidence,
+          color: "#12999a",
+          icon: Eye,
+        },
+        {
+          label: "Authenticité image",
+          value: selectedProof.aiAnalysis?.imageAuthenticityConfidence == null ? "—" : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
+          score: selectedProof.aiAnalysis?.imageAuthenticityConfidence,
+          color: "#7650ce",
+          icon: ShieldCheck,
+        },
+        {
+          label: "Authenticité vidéo",
+          value: selectedProof.aiAnalysis?.videoAuthenticityConfidence == null ? "—" : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
+          score: selectedProof.aiAnalysis?.videoAuthenticityConfidence,
+          color: "#43218f",
+          icon: Film,
+        },
+        {
+          label: "Cohérence",
+          value: selectedProof.aiAnalysis?.videoConsistencyScore == null ? "—" : `${selectedProof.aiAnalysis.videoConsistencyScore}%`,
+          score: selectedProof.aiAnalysis?.videoConsistencyScore,
+          color: "#1d725d",
+          icon: Activity,
+        },
+      ]
+    : [];
+
+  return (
+    <section className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(320px,0.78fr)_minmax(0,2fr)]">
+      <aside className="flex h-[min(860px,calc(100vh-250px))] min-h-[720px] min-w-0 flex-col overflow-hidden rounded-xl border border-[#202633] bg-[#062127] text-white shadow-sm">
+        <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-4">
+          <div>
+            <h3 className="font-semibold">Preuves à réviser</h3>
+            <p className="mt-1 text-xs text-gray-400">
+              {proofs.length} preuve{proofs.length === 1 ? "" : "s"} soumise{proofs.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          {/* <Shield size={18} className="text-teal-300" /> */}
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {proofs.map((proof) => {
+            const isSelected = proof.id === selectedProof?.id;
+            const hasVideo = Boolean(proof.videoUrl || (proof as any).video_url);
+            return (
+              <button
+                key={proof.id}
+                type="button"
+                onClick={() => onSelect(proof.id)}
+                aria-pressed={isSelected}
+                className={`flex w-full items-center gap-3 border-b border-white/10 p-3 text-left transition-colors hover:bg-white/10 ${isSelected ? "bg-[#006868] ring-1 ring-inset ring-violet-400" : ""}`}
+              >
+                <img
+                  src={proof.downloadURL}
+                  alt=""
+                  className="h-16 w-20 shrink-0 rounded-md bg-gray-800 object-cover"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-white">
+                    {proof.userName || "Ambassadeur"}
+                  </span>
+                  <span className="mt-1 block truncate text-xs text-gray-400">
+                    {proof.campaignName}
+                  </span>
+                  <span className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className={`rounded-[5px] px-2 py-0.5 text-[10px] font-semibold ${proof.aiAnalysis?.fraudAlert ? "bg-red-500 text-red-200" : proof.aiAnalysis?.isValid ? "bg-emerald-500 text-emerald-900" : "bg-amber-500 text-amber-100"}`}>
+                      {proof.aiAnalysis?.fraudAlert ? "Risque fraude" : proof.aiAnalysis?.isValid ? "IA favorable" : "À examiner"}
+                    </span>
+                    {hasVideo && <Film size={13} className="text-gray-400" aria-label="Vidéo jointe" />}
+                  </span>
+                </span>
+                <span className="shrink-0 text-[10px] text-gray-400">
+                  {new Date(proof.submittedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                </span>
+              </button>
+            );
+          })}
+          {proofs.length === 0 && (
+            <p className="px-4 py-10 text-center text-sm text-gray-400">
+              Aucune preuve à réviser.
+            </p>
+          )}
+        </div>
+      </aside>
+
+      {selectedProof ? (
+        <article className="flex min-w-0 flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+          <header className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="truncate text-xl font-bold text-gray-950 sm:text-2xl">
+                Révision manuelle
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                {selectedProof.userName || "Ambassadeur"} · {selectedProof.campaignName}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className={`rounded-md px-2.5 py-1.5 font-semibold ${selectedProof.status === "pending" ? "bg-amber-50 text-amber-700" : selectedProof.status === "validated" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                {selectedProof.status === "pending" ? "En attente" : selectedProof.status === "validated" ? "Validée" : "Rejetée"}
+              </span>
+              <span className="rounded-md bg-gray-100 px-2.5 py-1.5 text-gray-600">
+                {new Date(selectedProof.submittedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => onPreview({ url: selectedProof.downloadURL, type: "image" })}
+              className="group relative aspect-video overflow-hidden rounded-lg border border-gray-200 bg-gray-100"
+              aria-label="Agrandir la preuve image"
+            >
+              <img src={selectedProof.downloadURL} alt="Preuve soumise" className="h-full w-full object-contain transition-transform group-hover:scale-[1.02]" />
+              <span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-xs font-medium text-white">Capture de preuve</span>
+              <span className="absolute right-2 top-2 rounded bg-white/90 p-2 text-gray-700"><Eye size={16} /></span>
+            </button>
+            {(selectedProof.videoUrl || (selectedProof as any).video_url) ? (
+              <button
+                type="button"
+                onClick={() => onPreview({ url: (selectedProof.videoUrl || (selectedProof as any).video_url)!, type: "video" })}
+                className="group relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
+                aria-label="Lire la vidéo soumise"
+              >
+                <Film size={30} className="absolute left-4 top-4 text-white/50" />
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover:scale-110"><Play size={25} fill="currentColor" /></span>
+                <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">Vidéo soumise · Lire</span>
+              </button>
+            ) : (
+              <div className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400">
+                Aucune vidéo jointe
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+            {metrics.map(({ label, value, score, color, icon: Icon }) => {
+              const progress = Math.min(100, Math.max(0, Number(score) || 0));
+              return (
+                <div key={label} className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-gray-200 p-3 sm:p-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-medium text-gray-500">{label}</p>
+                    <p className="mt-1 truncate text-lg font-bold tabular-nums text-gray-950 sm:text-xl">{value}</p>
+                    <p className="text-xs text-gray-500">{label === "Vues détectées" ? "Vues" : "Authenticité / score"}</p>
+                  </div>
+                  <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full" style={{ background: `conic-gradient(${color} ${progress}%, #e8e9ef ${progress}%)` }}>
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-[11px] font-semibold tabular-nums text-gray-700">{score == null ? <Icon size={16} style={{ color }} /> : `${progress}%`}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <section className={`min-h-24 rounded-lg border p-4 ${selectedProof.aiAnalysis?.fraudAlert ? "border-red-200 bg-red-50/60" : "border-gray-200 bg-white"}`}>
+            <div className="mb-2 flex items-center gap-2">
+              <Shield size={16} className={selectedProof.aiAnalysis?.fraudAlert ? "text-red-600" : "text-[#128686]"} />
+              <h3 className="text-sm font-bold text-gray-900">Analyse et justification IA</h3>
+              {selectedProof.aiAnalysis?.fraudAlert && <span className="rounded bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase text-red-700">Risque de fraude</span>}
+            </div>
+            <p className="text-sm leading-relaxed text-gray-700">
+              {selectedProof.aiAnalysis?.reason || "Aucune justification IA n’est disponible pour cette preuve. Vérifiez les médias et les informations avant de prendre une décision."}
+            </p>
+            {selectedProof.aiAnalysis?.fraudEvidenceDetails?.length ? (
+              <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-red-700">
+                {selectedProof.aiAnalysis.fraudEvidenceDetails.map((detail, index) => <li key={`${detail}-${index}`}>{detail}</li>)}
+              </ul>
+            ) : null}
+          </section>
+
+          {selectedProof.status === "pending" ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => onApprove(selectedProof)} className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700">
+                <Check size={18} /> Approuver manuellement
+              </button>
+              <button type="button" onClick={() => onReject(selectedProof)} className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700">
+                <X size={18} /> Rejeter la preuve
+              </button>
+            </div>
+          ) : (
+            <p className="rounded-lg bg-gray-50 px-4 py-3 text-center text-sm font-medium text-gray-500">
+              Cette preuve a déjà été traitée.
+              {selectedProof.status === "rejected" && selectedProof.rejectionReason ? ` Motif : ${selectedProof.rejectionReason}` : ""}
+            </p>
+          )}
+        </article>
+      ) : (
+        <div className="grid min-h-[520px] place-items-center rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+          Sélectionnez une preuve dans la liste pour examiner ses médias et son analyse.
+        </div>
+      )}
+    </section>
+  );
+};
+
 interface AdminPanelProps {
   proofs: (Proof & { campaignTitle: string; userName: string })[];
   setProofs: React.Dispatch<
@@ -231,6 +438,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [campaignPaymentPage, setCampaignPaymentPage] = useState(1);
 
   const [validatingProof, setValidatingProof] = useState<Proof | null>(null);
+  const [selectedProofId, setSelectedProofId] = useState<string | null>(null);
   const [viewsInput, setViewsInput] = useState<string>("");
   const [isValidating, setIsValidating] = useState(false);
   const [rejectingProof, setRejectingProof] = useState<Proof | null>(null);
@@ -1184,6 +1392,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     );
   }, [allUsers, searchTerm]);
 
+  const filteredProofs = useMemo(
+    () =>
+      allProofs
+        .filter(
+          (proof) =>
+            proofStatusFilter === "all" || proof.status === proofStatusFilter,
+        )
+        .filter(
+          (proof) =>
+            suggestedActionFilter === "all" ||
+            proof.aiAnalysis?.suggestedAction === suggestedActionFilter,
+        ),
+    [allProofs, proofStatusFilter, suggestedActionFilter],
+  );
+  const selectedProof =
+    filteredProofs.find((proof) => proof.id === selectedProofId) ??
+    filteredProofs[0] ??
+    null;
+
   const teamMembers = useMemo(() => {
     return allUsers.filter(
       (u) => u.role === UserRole.ADMIN || u.role === UserRole.MODERATOR,
@@ -1358,7 +1585,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       )}
 
       {/* ── HEADER ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
             {view === "overview" &&
@@ -3817,9 +4044,90 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           VIEW: VALIDATION
       ══════════════════════════════════════════ */}
       {view === "validation" && (
-        <div>
+        <ProofReviewWorkspace
+          proofs={allProofs}
+          selectedProof={
+            allProofs.find((proof) => proof.id === selectedProofId) ??
+            allProofs[0] ??
+            null
+          }
+          onSelect={setSelectedProofId}
+          onPreview={setPreviewMedia}
+          onApprove={(proof) => {
+            setValidatingProof(proof);
+            setViewsInput(proof.aiAnalysis?.viewsCount?.toString() || "0");
+          }}
+          onReject={(proof) => {
+            setRejectingProof(proof);
+            setRejectionReason("");
+          }}
+        />
+      )}
+      {false && view === "validation" && (
+        <div className="space-y-6">
+          {selectedProof && (
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+              {[
+                {
+                  label: "Vues détectées",
+                  value: (
+                    selectedProof.aiAnalysis?.viewsCount ??
+                    selectedProof.viewsCount ??
+                    0
+                  ).toLocaleString(),
+                  icon: Eye,
+                  color: "text-teal-700 bg-teal-50",
+                },
+                {
+                  label: "Authenticité image",
+                  value:
+                    selectedProof.aiAnalysis?.imageAuthenticityConfidence == null
+                      ? "—"
+                      : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
+                  icon: ShieldCheck,
+                  color: "text-violet-700 bg-violet-50",
+                },
+                {
+                  label: "Authenticité vidéo",
+                  value:
+                    selectedProof.aiAnalysis?.videoAuthenticityConfidence == null
+                      ? "—"
+                      : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
+                  icon: Film,
+                  color: "text-blue-700 bg-blue-50",
+                },
+                {
+                  label: "Cohérence",
+                  value:
+                    selectedProof.aiAnalysis?.videoConsistencyScore == null
+                      ? "—"
+                      : `${selectedProof.aiAnalysis.videoConsistencyScore}%`,
+                  icon: Activity,
+                  color: "text-emerald-700 bg-emerald-50",
+                },
+              ].map(({ label, value, icon: Icon, color }) => (
+                <div
+                  key={label}
+                  className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-medium text-gray-500">
+                      {label}
+                    </p>
+                    <p className="mt-1 text-xl font-bold tabular-nums text-gray-900">
+                      {value}
+                    </p>
+                  </div>
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
+                    <Icon size={19} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Filtres */}
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block">
@@ -3868,38 +4176,95 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           </div>
 
           {/* Liste des preuves filtrées */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {allProofs
-              .filter(
-                (p) =>
-                  proofStatusFilter === "all" || p.status === proofStatusFilter,
-              )
-              .filter(
-                (p) =>
-                  suggestedActionFilter === "all" ||
-                  p.aiAnalysis?.suggestedAction === suggestedActionFilter,
-              )
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(300px,0.8fr)_minmax(0,2fr)]">
+            <aside className="overflow-hidden rounded-xl border border-gray-200 bg-[#10141d] text-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+                <div>
+                  <h3 className="font-semibold">Preuves à réviser</h3>
+                  <p className="mt-1 text-xs text-gray-400">
+                    {filteredProofs.length} résultat{filteredProofs.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+                <Shield size={18} className="text-teal-300" />
+              </div>
+              <div className="max-h-[760px] overflow-y-auto">
+                {filteredProofs.map((proof) => {
+                  const isSelected = proof.id === selectedProof?.id;
+                  const videoUrl = proof.videoUrl || (proof as any).video_url;
+                  return (
+                    <button
+                      key={proof.id}
+                      type="button"
+                      onClick={() => setSelectedProofId(proof.id)}
+                      aria-pressed={isSelected}
+                      className={`flex w-full items-center gap-3 border-b border-white/10 p-3 text-left transition-colors hover:bg-white/10 ${isSelected ? "bg-teal-900/40 ring-1 ring-inset ring-teal-300" : ""}`}
+                    >
+                      <img
+                        src={proof.downloadURL}
+                        alt=""
+                        className="h-16 w-20 shrink-0 rounded-md bg-gray-800 object-cover"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-white">
+                          {proof.userName || "Ambassadeur"}
+                        </span>
+                        <span className="mt-1 block truncate text-xs text-gray-400">
+                          {proof.campaignName}
+                        </span>
+                        <span className="mt-2 flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${proof.aiAnalysis?.fraudAlert ? "bg-red-500/20 text-red-200" : proof.aiAnalysis?.isValid ? "bg-emerald-500/20 text-emerald-200" : "bg-amber-500/20 text-amber-200"}`}
+                          >
+                            {proof.aiAnalysis?.fraudAlert
+                              ? "Risque fraude"
+                              : proof.aiAnalysis?.isValid
+                                ? "IA favorable"
+                                : "À examiner"}
+                          </span>
+                          {videoUrl && <Film size={13} className="text-gray-400" aria-label="Vidéo jointe" />}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-[10px] text-gray-400">
+                        {new Date(proof.submittedAt).toLocaleDateString("fr-FR", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </span>
+                    </button>
+                  );
+                })}
+                {filteredProofs.length === 0 && (
+                  <p className="px-4 py-10 text-center text-sm text-gray-400">
+                    Aucune preuve ne correspond aux filtres.
+                  </p>
+                )}
+              </div>
+            </aside>
+
+            <div className="min-w-0">
+            {filteredProofs
+              .filter((proof) => proof.id === selectedProof?.id)
               .map((proof) => (
                 <div
                   key={proof.id}
-                  className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[280px]"
+                  className="min-h-[520px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col md:flex-row"
                 >
                   <div
-                    className="w-full md:w-48 bg-gray-100 relative group shrink-0 cursor-pointer overflow-hidden"
+                    className="group relative min-h-[260px] w-full shrink-0 cursor-pointer overflow-hidden bg-gray-100 md:min-h-full md:w-2/5"
                     onClick={() =>
                       setPreviewMedia({ url: proof.downloadURL, type: "image" })
                     }
                   >
                     <img
                       src={proof.downloadURL}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       alt="Proof"
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
                       <Eye size={24} className="text-white" />
                     </div>
                   </div>
-                  <div className="flex-1 p-8 flex flex-col">
+                  <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-7">
                     <div className="mb-4">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <div className="flex items-center gap-2">
@@ -3937,6 +4302,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         )}
                       </p>
                     </div>
+
+                    {(proof.videoUrl || (proof as any).video_url) && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPreviewMedia({
+                            url: (proof.videoUrl || (proof as any).video_url)!,
+                            type: "video",
+                          })
+                        }
+                        className="group/video relative mb-4 flex min-h-36 items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
+                        aria-label="Lire la vidéo de preuve"
+                      >
+                        <Film size={32} className="absolute left-4 top-4 text-white/50" />
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover/video:scale-110">
+                          <Play size={23} fill="currentColor" />
+                        </span>
+                        <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">
+                          Lire la vidéo soumise
+                        </span>
+                      </button>
+                    )}
 
                     {/* Analyse IA */}
                     {proof.aiAnalysis ? (
@@ -4153,34 +4540,35 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     )}
 
                     <div className="flex gap-3 mt-auto">
-                      <button
+                        <button
                         onClick={() => setRejectingProof(proof)}
-                        className="flex-1 bg-gray-50 hover:bg-red-50 text-red-600 py-4 rounded-2xl font-bold uppercase text-xs tracking-widest transition-all"
+                        disabled={proof.status !== "pending"}
+                        className="flex-1 rounded-lg bg-red-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
                       >
-                        Refuser
+                        Refuser la preuve
                       </button>
                       <button
+                        disabled={proof.status !== "pending"}
                         onClick={() => {
                           setValidatingProof(proof);
                           setViewsInput(
                             proof.aiAnalysis?.viewsCount?.toString() || "0",
                           );
                         }}
-                        className="flex-1 bg-[#128686] hover:bg-[#0E6B6B] text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest shadow-lg transition-all"
+                        className="flex-1 rounded-lg bg-emerald-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
                       >
-                        Valider
+                        Approuver manuellement
                       </button>
                     </div>
                   </div>
                 </div>
               ))}
-            {allProofs.filter((p) => p.status === "pending").length === 0 && (
-              <div className="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-100">
-                <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">
-                  Aucune preuve en attente
-                </p>
-              </div>
+            {filteredProofs.length > 0 && selectedProof?.status !== "pending" && (
+              <p className="mt-3 text-center text-xs text-gray-500">
+                Cette preuve a déjà été traitée. Les actions sont désactivées.
+              </p>
             )}
+            </div>
           </div>
         </div>
       )}
