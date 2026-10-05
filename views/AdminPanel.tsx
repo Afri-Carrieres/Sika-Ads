@@ -177,8 +177,8 @@ const ProofReviewWorkspace: React.FC<{
     : [];
 
   return (
-    <section className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(320px,0.78fr)_minmax(0,2fr)]">
-      <aside className="flex h-[min(860px,calc(100vh-250px))] min-h-[720px] min-w-0 flex-col overflow-hidden rounded-xl border border-[#202633] bg-[#062127] text-white shadow-sm">
+    <section className="grid min-w-0 grid-cols-1 gap-3 sm:gap-5 xl:grid-cols-[minmax(280px,0.78fr)_minmax(0,2fr)]">
+      <aside className="flex h-[min(44vh,380px)] min-h-[260px] min-w-0 flex-col overflow-hidden rounded-xl border border-[#202633] bg-[#062127] text-white shadow-sm sm:h-[min(44vh,440px)] sm:min-h-[300px] xl:h-[min(760px,calc(100vh-220px))] xl:min-h-[360px]">
         <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-4">
           <div>
             <h3 className="font-semibold">Preuves à réviser</h3>
@@ -234,7 +234,7 @@ const ProofReviewWorkspace: React.FC<{
       </aside>
 
       {selectedProof ? (
-        <article className="flex min-w-0 flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+        <article className="flex min-w-0 flex-col gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:gap-4 sm:p-5">
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="truncate text-xl font-bold text-gray-950 sm:text-2xl">
@@ -283,7 +283,7 @@ const ProofReviewWorkspace: React.FC<{
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 2xl:grid-cols-4">
             {metrics.map(({ label, value, score, color, icon: Icon }) => {
               const progress = Math.min(100, Math.max(0, Number(score) || 0));
               return (
@@ -338,6 +338,556 @@ const ProofReviewWorkspace: React.FC<{
           Sélectionnez une preuve dans la liste pour examiner ses médias et son analyse.
         </div>
       )}
+    </section>
+  );
+};
+
+type ProofStatusFilter = "all" | "pending" | "validated" | "rejected";
+type ProofSuggestionFilter = "all" | "approve" | "reject" | "manual_review";
+
+const EnhancedProofReviewWorkspace: React.FC<{
+  proofs: Proof[];
+  summaryProofs: Proof[];
+  selectedProof: Proof | null;
+  onSelect: (proofId: string) => void;
+  onPreview: (media: { url: string; type: "image" | "video" }) => void;
+  onApprove: (proof: Proof) => void;
+  onReject: (proof: Proof) => void;
+  statusFilter: ProofStatusFilter;
+  suggestedActionFilter: ProofSuggestionFilter;
+  onStatusFilterChange: (status: ProofStatusFilter) => void;
+  onSuggestedActionFilterChange: (action: ProofSuggestionFilter) => void;
+}> = ({
+  proofs,
+  summaryProofs,
+  selectedProof,
+  onSelect,
+  onPreview,
+  onApprove,
+  onReject,
+  statusFilter,
+  suggestedActionFilter,
+  onStatusFilterChange,
+  onSuggestedActionFilterChange,
+}) => {
+  const queueStats = useMemo(
+    () => ({
+      pending: summaryProofs.filter((proof) => proof.status === "pending").length,
+      approve: summaryProofs.filter(
+        (proof) => proof.aiAnalysis?.suggestedAction === "approve",
+      ).length,
+      reject: summaryProofs.filter(
+        (proof) => proof.aiAnalysis?.suggestedAction === "reject",
+      ).length,
+      manual: summaryProofs.filter(
+        (proof) => proof.aiAnalysis?.suggestedAction === "manual_review",
+      ).length,
+    }),
+    [summaryProofs],
+  );
+
+  const selectedVideoUrl =
+    selectedProof?.videoUrl || (selectedProof as any)?.video_url || "";
+
+  const aiRecommendation = selectedProof?.aiAnalysis?.fraudAlert
+    ? {
+        label: "Risque fraude",
+        className: "border-red-200 bg-red-50 text-red-700",
+        dot: "bg-red-500",
+      }
+    : selectedProof?.aiAnalysis?.suggestedAction === "approve" ||
+        selectedProof?.aiAnalysis?.isValid
+      ? {
+          label: "IA favorable",
+          className: "border-emerald-200 bg-emerald-50 text-emerald-700",
+          dot: "bg-emerald-500",
+        }
+      : selectedProof?.aiAnalysis?.suggestedAction === "reject"
+        ? {
+            label: "Rejet suggere",
+            className: "border-red-200 bg-red-50 text-red-700",
+            dot: "bg-red-500",
+          }
+        : {
+            label: "Revue manuelle",
+            className: "border-amber-200 bg-amber-50 text-amber-700",
+            dot: "bg-amber-500",
+          };
+
+  const metrics = selectedProof
+    ? [
+        {
+          label: "Vues detectees",
+          value: (
+            selectedProof.aiAnalysis?.viewsCount ??
+            selectedProof.viewsCount ??
+            0
+          ).toLocaleString("fr-FR"),
+          score: selectedProof.aiAnalysis?.viewCountDetectionConfidence,
+          color: "#12999a",
+          icon: Eye,
+          helper: "Confiance lecture",
+        },
+        {
+          label: "Authenticite image",
+          value:
+            selectedProof.aiAnalysis?.imageAuthenticityConfidence == null
+              ? "-"
+              : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
+          score: selectedProof.aiAnalysis?.imageAuthenticityConfidence,
+          color: "#0f766e",
+          icon: ShieldCheck,
+          helper: "Capture",
+        },
+        {
+          label: "Authenticite video",
+          value:
+            selectedProof.aiAnalysis?.videoAuthenticityConfidence == null
+              ? "-"
+              : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
+          score: selectedProof.aiAnalysis?.videoAuthenticityConfidence,
+          color: "#2563eb",
+          icon: Film,
+          helper: selectedVideoUrl ? "Video jointe" : "Non fournie",
+        },
+        {
+          label: "Coherence",
+          value:
+            selectedProof.aiAnalysis?.videoConsistencyScore == null
+              ? "-"
+              : `${selectedProof.aiAnalysis.videoConsistencyScore}%`,
+          score: selectedProof.aiAnalysis?.videoConsistencyScore,
+          color: "#7c3aed",
+          icon: Activity,
+          helper: "Image / video",
+        },
+      ]
+    : [];
+
+  return (
+    <section className="min-w-0 space-y-4">
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-[#E7F4F4] text-[#128686]">
+              <ShieldCheck size={20} />
+            </span>
+            <div>
+              <h2 className="text-xl font-bold text-gray-950">
+                Validation des preuves
+              </h2>
+              <p className="text-sm text-gray-500">
+                File de controle, analyse IA et decision finale.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4 xl:min-w-[520px]">
+            {[
+              ["En attente", queueStats.pending, "text-amber-700 bg-amber-50"],
+              ["A approuver", queueStats.approve, "text-emerald-700 bg-emerald-50"],
+              ["A rejeter", queueStats.reject, "text-red-700 bg-red-50"],
+              ["Manuelles", queueStats.manual, "text-blue-700 bg-blue-50"],
+            ].map(([label, value, className]) => (
+              <div
+                key={label}
+                className={`rounded-lg px-3 py-2 ${className as string}`}
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wide">
+                  {label}
+                </p>
+                <p className="mt-1 text-xl font-bold tabular-nums">{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:max-w-3xl">
+          <label className="text-sm font-semibold text-gray-700">
+            Statut
+            <select
+              value={statusFilter}
+              onChange={(event) =>
+                onStatusFilterChange(event.target.value as ProofStatusFilter)
+              }
+              className="mt-1 h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none transition focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/20"
+            >
+              <option value="pending">En attente</option>
+              <option value="all">Toutes</option>
+              <option value="validated">Validees</option>
+              <option value="rejected">Rejetees</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-gray-700">
+            Suggestion IA
+            <select
+              value={suggestedActionFilter}
+              onChange={(event) =>
+                onSuggestedActionFilterChange(
+                  event.target.value as ProofSuggestionFilter,
+                )
+              }
+              className="mt-1 h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-800 outline-none transition focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/20"
+            >
+              <option value="all">Toutes</option>
+              <option value="approve">Approuver</option>
+              <option value="reject">Rejeter</option>
+              <option value="manual_review">Revue manuelle</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-[minmax(300px,0.86fr)_minmax(0,2fr)]">
+        <aside className="flex h-[min(48vh,440px)] min-h-[300px] min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm xl:h-[min(780px,calc(100vh-245px))] xl:min-h-[520px]">
+          <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-4">
+            <div>
+              <h3 className="font-semibold text-gray-950">File de preuves</h3>
+              <p className="mt-1 text-xs text-gray-500">
+                {proofs.length} preuve{proofs.length === 1 ? "" : "s"} affichee
+                {proofs.length === 1 ? "" : "s"}
+              </p>
+            </div>
+            <span className="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">
+              Tri recent
+            </span>
+          </header>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            {proofs.map((proof) => {
+              const isSelected = proof.id === selectedProof?.id;
+              const hasVideo = Boolean(proof.videoUrl || (proof as any).video_url);
+              const isRisky = Boolean(proof.aiAnalysis?.fraudAlert);
+              const isAiOk = Boolean(proof.aiAnalysis?.isValid);
+              const confidence = proof.aiAnalysis?.confidence;
+              return (
+                <button
+                  key={proof.id}
+                  type="button"
+                  onClick={() => onSelect(proof.id)}
+                  aria-pressed={isSelected}
+                  className={`flex w-full gap-3 border-b border-gray-100 p-3 text-left transition hover:bg-gray-50 ${isSelected ? "bg-[#E7F4F4] ring-1 ring-inset ring-[#128686]" : ""}`}
+                >
+                  <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                    <img
+                      src={proof.downloadURL}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                    {hasVideo && (
+                      <span className="absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-md bg-black/70 text-white">
+                        <Film size={13} />
+                      </span>
+                    )}
+                  </div>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-start justify-between gap-2">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold text-gray-950">
+                          {proof.userName || "Ambassadeur"}
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-gray-500">
+                          {proof.campaignName}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-[11px] font-medium text-gray-400">
+                        {new Date(proof.submittedAt).toLocaleDateString("fr-FR", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </span>
+                    </span>
+                    <span className="mt-3 flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded-md px-2 py-1 text-[11px] font-bold ${isRisky ? "bg-red-100 text-red-700" : isAiOk ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
+                      >
+                        {isRisky
+                          ? "Risque fraude"
+                          : isAiOk
+                            ? "IA favorable"
+                            : "A examiner"}
+                      </span>
+                      {confidence != null && (
+                        <span className="rounded-md bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-600">
+                          {confidence}% confiance
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+            {proofs.length === 0 && (
+              <div className="grid h-full min-h-[260px] place-items-center px-6 text-center">
+                <div>
+                  <ShieldCheck className="mx-auto text-gray-300" size={34} />
+                  <p className="mt-3 text-sm font-semibold text-gray-700">
+                    Aucune preuve dans ce filtre
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Changez le statut ou la suggestion IA pour elargir la file.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {selectedProof ? (
+          <article className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <header className="border-b border-gray-200 p-4 sm:p-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="truncate text-xl font-bold text-gray-950 sm:text-2xl">
+                      {selectedProof.userName || "Ambassadeur"}
+                    </h3>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${aiRecommendation.className}`}
+                    >
+                      <span
+                        className={`h-2 w-2 rounded-full ${aiRecommendation.dot}`}
+                      />
+                      {aiRecommendation.label}
+                    </span>
+                  </div>
+                  <p className="mt-1 truncate text-sm text-gray-500">
+                    {selectedProof.campaignName}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <span
+                    className={`rounded-md px-2.5 py-1.5 font-semibold ${
+                      selectedProof.status === "pending"
+                        ? "bg-amber-50 text-amber-700"
+                        : selectedProof.status === "validated"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-red-50 text-red-700"
+                    }`}
+                  >
+                    {selectedProof.status === "pending"
+                      ? "En attente"
+                      : selectedProof.status === "validated"
+                        ? "Validee"
+                        : "Rejetee"}
+                  </span>
+                  <span className="rounded-md bg-gray-100 px-2.5 py-1.5 text-gray-600">
+                    {new Date(selectedProof.submittedAt).toLocaleDateString(
+                      "fr-FR",
+                      { day: "2-digit", month: "short", year: "numeric" },
+                    )}
+                  </span>
+                </div>
+              </div>
+            </header>
+
+            <div className="grid gap-4 p-4 sm:p-5 2xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.8fr)]">
+              <div className="min-w-0 space-y-4">
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onPreview({ url: selectedProof.downloadURL, type: "image" })
+                    }
+                    className="group relative aspect-video overflow-hidden rounded-lg border border-gray-200 bg-gray-950"
+                    aria-label="Agrandir la preuve image"
+                  >
+                    <img
+                      src={selectedProof.downloadURL}
+                      alt="Preuve soumise"
+                      className="h-full w-full object-contain transition-transform group-hover:scale-[1.02]"
+                    />
+                    <span className="absolute bottom-3 left-3 rounded-md bg-black/70 px-2.5 py-1.5 text-xs font-semibold text-white">
+                      Capture
+                    </span>
+                    <span className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-lg bg-white/90 text-gray-700">
+                      <Eye size={16} />
+                    </span>
+                  </button>
+
+                  {selectedVideoUrl ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onPreview({ url: selectedVideoUrl, type: "video" })
+                      }
+                      className="group relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
+                      aria-label="Lire la video soumise"
+                    >
+                      <video
+                        src={selectedVideoUrl}
+                        className="absolute inset-0 h-full w-full object-cover opacity-50"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                      <span className="relative grid h-16 w-16 place-items-center rounded-full bg-white text-[#128686] shadow-lg transition-transform group-hover:scale-105">
+                        <Play size={25} fill="currentColor" />
+                      </span>
+                      <span className="absolute bottom-3 left-3 rounded-md bg-black/70 px-2.5 py-1.5 text-xs font-semibold text-white">
+                        Video jointe
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400">
+                      Aucune video jointe
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2">
+                  {metrics.map(
+                    ({ label, value, score, color, icon: Icon, helper }) => {
+                      const progress = Math.min(
+                        100,
+                        Math.max(0, Number(score) || 0),
+                      );
+                      return (
+                        <div
+                          key={label}
+                          className="min-w-0 rounded-lg border border-gray-200 p-4"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                {label}
+                              </p>
+                              <p className="mt-2 truncate text-2xl font-bold tabular-nums text-gray-950">
+                                {value}
+                              </p>
+                              <p className="mt-1 truncate text-xs text-gray-500">
+                                {helper}
+                              </p>
+                            </div>
+                            <div
+                              className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full"
+                              style={{
+                                background: `conic-gradient(${color} ${progress}%, #edf0f4 ${progress}%)`,
+                              }}
+                            >
+                              <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-[11px] font-semibold tabular-nums text-gray-700">
+                                {score == null ? (
+                                  <Icon size={16} style={{ color }} />
+                                ) : (
+                                  `${progress}%`
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
+
+              <div className="min-w-0 space-y-4">
+                <section
+                  className={`rounded-lg border p-4 ${
+                    selectedProof.aiAnalysis?.fraudAlert
+                      ? "border-red-200 bg-red-50"
+                      : "border-gray-200 bg-gray-50"
+                  }`}
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <Shield
+                      size={17}
+                      className={
+                        selectedProof.aiAnalysis?.fraudAlert
+                          ? "text-red-600"
+                          : "text-[#128686]"
+                      }
+                    />
+                    <h3 className="text-sm font-bold text-gray-950">
+                      Analyse IA
+                    </h3>
+                  </div>
+                  <p className="text-sm leading-relaxed text-gray-700">
+                    {selectedProof.aiAnalysis?.reason ||
+                      "Aucune justification IA n'est disponible pour cette preuve. Verifiez les medias et les informations avant de prendre une decision."}
+                  </p>
+                  {selectedProof.aiAnalysis?.fraudEvidenceDetails?.length ? (
+                    <ul className="mt-3 space-y-2 text-xs text-red-700">
+                      {selectedProof.aiAnalysis.fraudEvidenceDetails.map(
+                        (detail, index) => (
+                          <li
+                            key={`${detail}-${index}`}
+                            className="flex gap-2 rounded-md bg-white/70 p-2"
+                          >
+                            <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                            <span>{detail}</span>
+                          </li>
+                        ),
+                      )}
+                    </ul>
+                  ) : null}
+                </section>
+
+                <section className="rounded-lg border border-gray-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-950">
+                    Informations de controle
+                  </h3>
+                  <dl className="mt-3 grid grid-cols-1 gap-3 text-sm">
+                    <div className="flex items-center justify-between gap-3">
+                      <dt className="text-gray-500">Fichier</dt>
+                      <dd className="max-w-[60%] truncate font-medium text-gray-900">
+                        {selectedProof.fileName || "Capture soumise"}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <dt className="text-gray-500">Taille</dt>
+                      <dd className="font-medium text-gray-900">
+                        {selectedProof.size
+                          ? `${(selectedProof.size / 1024 / 1024).toFixed(2)} Mo`
+                          : "Non renseignee"}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <dt className="text-gray-500">ID preuve</dt>
+                      <dd className="max-w-[60%] truncate font-mono text-xs text-gray-700">
+                        {selectedProof.id}
+                      </dd>
+                    </div>
+                  </dl>
+                </section>
+              </div>
+            </div>
+
+            <footer className="sticky bottom-0 z-10 border-t border-gray-200 bg-white/95 p-4 backdrop-blur sm:p-5">
+              {selectedProof.status === "pending" ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => onApprove(selectedProof)}
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700"
+                  >
+                    <Check size={18} /> Approuver la preuve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onReject(selectedProof)}
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+                  >
+                    <X size={18} /> Rejeter la preuve
+                  </button>
+                </div>
+              ) : (
+                <p className="rounded-lg bg-gray-50 px-4 py-3 text-center text-sm font-medium text-gray-500">
+                  Cette preuve a deja ete traitee.
+                  {selectedProof.status === "rejected" &&
+                  selectedProof.rejectionReason
+                    ? ` Motif : ${selectedProof.rejectionReason}`
+                    : ""}
+                </p>
+              )}
+            </footer>
+          </article>
+        ) : (
+          <div className="grid min-h-[520px] place-items-center rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+            Selectionnez une preuve dans la file pour examiner ses medias et son
+            analyse.
+          </div>
+        )}
+      </div>
     </section>
   );
 };
@@ -4044,13 +4594,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           VIEW: VALIDATION
       ══════════════════════════════════════════ */}
       {view === "validation" && (
-        <ProofReviewWorkspace
-          proofs={allProofs}
-          selectedProof={
-            allProofs.find((proof) => proof.id === selectedProofId) ??
-            allProofs[0] ??
-            null
-          }
+        <EnhancedProofReviewWorkspace
+          proofs={filteredProofs}
+          summaryProofs={allProofs}
+          selectedProof={selectedProof}
           onSelect={setSelectedProofId}
           onPreview={setPreviewMedia}
           onApprove={(proof) => {
@@ -4061,6 +4608,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             setRejectingProof(proof);
             setRejectionReason("");
           }}
+          statusFilter={proofStatusFilter}
+          suggestedActionFilter={suggestedActionFilter}
+          onStatusFilterChange={setProofStatusFilter}
+          onSuggestedActionFilterChange={setSuggestedActionFilter}
         />
       )}
       {false && view === "validation" && (

@@ -44,6 +44,7 @@ import { deleteAllCampaigns } from './services/resetCampaigns';
 import { initializeDatabase } from './services/initDb';
 import { cleanupNonAdminUsers } from './services/cleanupUsers';
 import { validateCampaignPayment } from './services/gomboPlus';
+import { sendAdminCampaignCreatedPush } from './services/onesignalService';
 import { Clock, Loader2 } from 'lucide-react';
 
 type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'admin-login' | 'register' | 'verification-pending' | 'reset-password';
@@ -443,6 +444,10 @@ const App: React.FC = () => {
         if (!data) throw new Error("Erreur lors de la création de la campagne sur Supabase.");
 
         // console.log("✅ Campaign created with ID:", data.id);
+        void sendAdminCampaignCreatedPush(
+          campaignDraft.title,
+          campaignData.advertiserName,
+        );
 
         setPendingCampaignId(data.id);
         setPendingAmount(amount);

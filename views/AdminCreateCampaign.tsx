@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Check, Search, AlertTriangle, Loader2, Image as ImageIcon, Crown, User, DollarSign, Globe, FileText, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../supabase';
+import { sendAdminCampaignCreatedPush } from '../services/onesignalService';
 import { User as UserType } from '../types';
 
 interface AdminCreateCampaignProps {
@@ -139,6 +140,11 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
         .insert(campaignData);
 
       if (insertError) throw insertError;
+
+            void sendAdminCampaignCreatedPush(
+                title,
+                campaignData.advertiserName || 'un administrateur',
+            );
       
       onSuccess();
     } catch (error) {

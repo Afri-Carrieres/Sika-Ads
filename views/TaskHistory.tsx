@@ -3,6 +3,7 @@ import { Proof, Notification, AIAnalysis, Campaign } from '../types';
 import { Upload, CheckCircle2, XCircle, Clock, Trash2, Eye, X, Image as ImageIcon, FileText, AlertCircle, Loader2, BrainCircuit, ShieldCheck, ShieldAlert, ChevronDown, Info, Search, Sparkles, Video, Play, Film } from 'lucide-react';
 import { supabase } from '../supabase';
 import { validateProofWithAI } from '../services/geminiService';
+import { sendAdminProofSubmittedPush } from '../services/onesignalService';
 import Pagination from '../components/Pagination';
 import { useUserData } from '../hooks/useUserData';
 
@@ -376,6 +377,10 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
 
       // 4. Lancement de l'analyse IA croisée en arrière-plan
       if (proofId) {
+        void sendAdminProofSubmittedPush(
+          campaignName,
+          session.user.user_metadata?.full_name || session.user.email || 'Un utilisateur',
+        );
         performBackgroundAIAnalysis(selectedFile, proofId, userId, videoData?.videoUrl);
       }
 

@@ -9,7 +9,7 @@ export interface PushNotificationPayload {
   title: string;
   message: string;
   url?: string;
-  segment?: 'Total Subscriptions' |'Ambassadors';
+  segment?: 'Total Subscriptions' | 'Ambassadors' | 'Administrator';
   targetUserIds?: string[];
   scheduleDelayHours?: number;
 }
@@ -48,6 +48,24 @@ export async function sendCampaignActivatedPush(campaignTitle: string, campaignI
   };
 
   await sendPushNotification(payload);
+}
+
+export async function sendAdminProofSubmittedPush(campaignTitle: string, submitterName: string): Promise<void> {
+  await sendPushNotification({
+    title: 'Nouvelle preuve soumise',
+    message: `${submitterName} a soumis une preuve pour la campagne "${campaignTitle}".`,
+    url: 'https://www.sika-ads.com/app/admin',
+    segment: 'Administrator',
+  });
+}
+
+export async function sendAdminCampaignCreatedPush(campaignTitle: string, advertiserName: string): Promise<void> {
+  await sendPushNotification({
+    title: 'Nouvelle campagne créée',
+    message: `La campagne "${campaignTitle}" a été créée par ${advertiserName}.`,
+    url: 'https://www.sika-ads.com/app/admin',
+    segment: 'Administrator',
+  });
 }
 
 /**
