@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff } from 'lucide-react';
+import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff, ExternalLink } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
 import { useOneSignal } from '@/hooks/useOneSignal';
 import { User, UserRole } from '../types';
+import { SIKA_WHATSAPP_CHANNEL_URL } from '../constants';
 
 const TILE = 'bg-white rounded-3xl border border-gray-100 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)]';
 const TILE_HOVER = 'transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_16px_40px_rgba(15,23,42,0.08)]';
@@ -54,6 +55,43 @@ const PushNotificationSettingsCard: React.FC<{ userId: string | null }> = ({ use
             {isLoading ? 'Activation...' : 'Activer les notifications'}
           </button>
         )}
+      </div>
+    </div>
+  );
+};
+
+const WhatsAppChannelCard: React.FC = () => {
+  return (
+    <div className={`${TILE} ${TILE_HOVER} p-6 space-y-4 border border-emerald-100 bg-gradient-to-br from-white via-white to-emerald-50/40 relative overflow-hidden`}>
+      <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[#25D366]/10 blur-2xl pointer-events-none" />
+      <div className="flex items-start gap-3.5 relative">
+        <div className="bg-[#25D366]/10 p-2.5 rounded-2xl text-[#25D366] border border-[#25D366]/20 shrink-0">
+          <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-6 h-6 object-contain" />
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-bold text-gray-900">Chaîne WhatsApp</h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+              Officielle
+            </span>
+          </div>
+          <p className="text-xs text-gray-500 font-medium leading-relaxed">
+            Rejoignez la chaîne officielle Sika Ads pour ne rater aucune nouvelle campagne, actualité et astuce.
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-1">
+        <a
+          href={SIKA_WHATSAPP_CHANNEL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-3.5 px-4 bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 group"
+        >
+          <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-4 h-4 object-contain brightness-0 invert" />
+          <span>Rejoindre la chaîne WhatsApp</span>
+          <ExternalLink size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </a>
       </div>
     </div>
   );
@@ -533,6 +571,7 @@ const ProfilePage: React.FC = () => {
             </form>
 
             <PushNotificationSettingsCard userId={user?.id ?? null} />
+            <WhatsAppChannelCard />
           </div>
         </div>
 

@@ -7,12 +7,14 @@ import {
   Clock,
   AlertCircle,
   History,
-  Info
+  Info,
+  ExternalLink
 } from 'lucide-react';
 
 import { useUserData } from '../hooks/useUserData';
 import { requestWithdrawal } from '../services/withdrawals';
 import { supabase } from '../supabase';
+import { SIKA_WHATSAPP_CHANNEL_URL } from '../constants';
 
 interface WalletViewProps {
   onWithdrawalRequested?: (amount: number, provider: string) => void;
@@ -147,6 +149,16 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
             <Clock className="text-[#128686] shrink-0" size={24} />
             <p className="text-sm text-[#0B2B33] font-medium">Validation prévue sous <strong>24 heures</strong> après vérification de votre activité par notre service financier.</p>
           </div>
+          <a
+            href={SIKA_WHATSAPP_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3.5 px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-4 h-4 object-contain" />
+            <span>Suivre l'actualité sur notre chaîne WhatsApp</span>
+            <ExternalLink size={14} />
+          </a>
           <button
             onClick={() => setShowSuccess(false)}
             className="w-full py-5 bg-[#128686] text-white rounded-2xl font-bold uppercase tracking-widest hover:bg-[#0E6B6B] transition-all shadow-xl active:scale-95"
@@ -226,6 +238,33 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
                 );
               })}
             </div>
+          </div>
+
+          {/* Chaîne WhatsApp Sika Ads */}
+          <div className="bg-gradient-to-br from-emerald-500/10 via-white to-emerald-500/5 rounded-[2rem] p-6 border border-emerald-200/60 shadow-sm space-y-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-[#25D366] flex items-center justify-center shrink-0 shadow-md shadow-[#25D366]/20">
+                <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-6 h-6 object-contain" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-bold text-gray-900">Chaîne WhatsApp Sika Ads</p>
+                </div>
+                <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
+                  Suivez les alertes de paiements, actualités et opportunités de gains en direct.
+                </p>
+              </div>
+            </div>
+            <a
+              href={SIKA_WHATSAPP_CHANNEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 hover:shadow-emerald-600/30 transition-all group"
+            >
+              <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-4 h-4 object-contain brightness-0 invert" />
+              <span>Rejoindre la chaîne WhatsApp</span>
+              <ExternalLink size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
           </div>
         </div>
 
