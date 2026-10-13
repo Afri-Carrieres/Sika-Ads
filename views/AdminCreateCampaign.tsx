@@ -51,9 +51,16 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
     }
   };
 
+  const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 Mo
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_IMAGE_SIZE) {
+        alert(`L'image sélectionnée est trop lourde (${(file.size / (1024 * 1024)).toFixed(1)} Mo). La taille maximale autorisée est de 5 Mo.`);
+        e.target.value = '';
+        return;
+      }
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
@@ -376,6 +383,7 @@ const AdminCreateCampaign: React.FC<AdminCreateCampaignProps> = ({ onSuccess, on
                                 <ImageIcon size={32} className="text-[#128686]" />
                                 </div>
                                 <p className="text-sm font-bold text-gray-600">Ajouter l'image</p>
+                                <p className="text-[10px] text-gray-400 font-medium mt-1">Format recommandé : 1080x1920 · Max 5 Mo</p>
                             </>
                             )}
                             <input 

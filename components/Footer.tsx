@@ -1,5 +1,6 @@
 import React from 'react';
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
+import { SIKA_WHATSAPP_CHANNEL_URL } from '../constants';
 
 interface FooterProps {
   onNavigate: (view: 'landing' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy') => void;
@@ -41,9 +42,16 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <button type="button" aria-label="Instagram" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128686] hover:text-white transition-all duration-300 border border-slate-800">
                 <Instagram size={18} />
               </button>
-              <button type="button" aria-label="LinkedIn" className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#128686] hover:text-white transition-all duration-300 border border-slate-800">
-                <Linkedin size={18} />
-              </button>
+              <a
+                href={SIKA_WHATSAPP_CHANNEL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chaîne WhatsApp Sika Ads"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-[#25D366] hover:text-white transition-all duration-300 border border-slate-800 group"
+              >
+              
+                <img src="/icons-whatsapp.png" alt="WhatsApp" className="w-4 h-4 sm:w-5 sm:h-5 object-contain group-hover:scale-110 transition-transform" />
+              </a>
             </div>
           </div>
 

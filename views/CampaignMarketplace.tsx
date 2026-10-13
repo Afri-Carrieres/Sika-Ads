@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { CATEGORIES } from '../constants';
 import { supabase } from '../supabase';
 import { Campaign } from '../types';
-import { Share2, Download, X, Instagram, Facebook, MessageCircle, Copy, Check, Loader2, Smartphone, TrendingUp, Sparkles, CheckCircle2, PartyPopper, Archive, Ban, Lock, Info, Zap, PauseCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Share2, Download, X, Instagram, Facebook, MessageCircle, Copy, Check, Loader2, Smartphone, TrendingUp, Sparkles, CheckCircle2, PartyPopper, Ban, Lock, Info, Zap, PauseCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CampaignMarketplaceProps {
   onShareCampaign: (campaignId: string) => void;
@@ -104,10 +104,7 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
   }, []);
 
   const filteredCampaigns = useMemo(() => {
-    if (selectedCategory === 'Terminé') {
-      return campaigns.filter(c => c.status === 'completed' || localBudgets[c.id] <= 0);
-    }
-    let base = campaigns.filter(c => c.status === 'active' && localBudgets[c.id] > 0);
+    let base = campaigns.filter(c => c.status === 'active' && (localBudgets[c.id] ?? 0) > 0);
     if (selectedCategory !== 'All') {
       base = base.filter(c => c.category === selectedCategory);
     }
@@ -254,23 +251,15 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
                 {cat}
               </button>
             ))}
-            <div className="w-px h-6 bg-gray-200 mx-2 shrink-0"></div>
-            <button
-              onClick={() => setSelectedCategory('Terminé')}
-              className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2 ${selectedCategory === 'Terminé' ? 'bg-gray-800 text-white shadow-lg' : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-300'}`}
-            >
-              <Archive size={14} />
-              Archives
-            </button>
           </div>
         </div>
 
         {filteredCampaigns.length === 0 ? (
           <div className="bg-white rounded-[3rem] py-20 border border-dashed border-gray-100 text-center space-y-4">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-200">
-              <Archive size={40} />
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
+              <Sparkles size={36} />
             </div>
-            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Aucune campagne {selectedCategory === 'Terminé' ? 'archivée' : 'dans cette catégorie'}</p>
+            <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">Aucune campagne active dans cette catégorie</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

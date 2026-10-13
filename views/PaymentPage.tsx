@@ -10,6 +10,7 @@ import {
 interface PaymentPageProps {
   amount: number;
   campaignId: string;
+  campaignTitle?: string;
   onPaymentSuccess: (payment: {
     reference: string;
     operator: string;
@@ -21,9 +22,28 @@ interface PaymentPageProps {
 const PaymentPage: React.FC<PaymentPageProps> = ({
   amount,
   campaignId,
+  campaignTitle,
   onPaymentSuccess,
   onCancel,
 }) => {
+  const [displayTitle, setDisplayTitle] = useState(campaignTitle || "");
+
+  useEffect(() => {
+    if (campaignTitle) {
+      setDisplayTitle(campaignTitle);
+    } else if (campaignId) {
+      supabase
+        .from("campaigns")
+        .select("title")
+        .eq("id", campaignId)
+        .single()
+        .then(({ data }) => {
+          if (data?.title) setDisplayTitle(data.title);
+        })
+        .catch(() => {});
+    }
+  }, [campaignId, campaignTitle]);
+
   const [recipientNumber, setRecipientNumber] = useState("");
   const [operator, setOperator] = useState<"yas" | "moov">("yas");
   const [status, setStatus] = useState<
@@ -346,8 +366,8 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
                 <CreditCard size={12} />
                 Paiement Sécurisé
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 leading-tight">Checkout</h1>
-              <p className="text-gray-500 text-sm font-medium mt-1">Finalisez votre campagne SikaAds</p>
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">Paiement </h1>
+              <p className="text-gray-500 text-sm font-medium mt-1">Finalisez votre campagnesur SikaAds en validant votre paiement </p>
             </div>
 
             {/* Campaign Summary & Amount */}
@@ -356,8 +376,8 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Campagne ID</p>
-                    <p className="font-mono text-xs opacity-80">{campaignId}</p>
+                    <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest leading-none mb-1">Campagne</p>
+                    <p className="font-semibold text-sm text-white line-clamp-2">{displayTitle || campaignTitle || "Votre campagne"}</p>
                   </div>
                   <Coins className="text-[#7FD1D1]" size={20} />
                 </div>

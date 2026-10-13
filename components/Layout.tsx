@@ -235,7 +235,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
   };
 
   const renderAmbassadorWhatsAppLink = (onNavigate?: () => void) => (
-    <div className="pt-4 mt-2 border-t border-[#128686]/20">
+    <div className="p-4  border-t border-[#128686]/20">
       <div className="px-2 mb-2">
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#7FD1D1]/70">
           Communauté
@@ -389,12 +389,12 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
                 </button>
               </div>
 
-              <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-280px)]">
+              <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-350px)]">
                 {renderAmbassadorNav(() => setIsMobileMenuOpen(false))}
-                {renderAmbassadorWhatsAppLink(() => setIsMobileMenuOpen(false))}
+            
               </nav>
-
-              {renderSidebarFooter()}
+                {renderAmbassadorWhatsAppLink(() => setIsMobileMenuOpen(false))}
+                {renderSidebarFooter()}
             </aside>
           </div>
         </>

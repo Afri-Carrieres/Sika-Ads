@@ -89,6 +89,7 @@ const App: React.FC = () => {
   const [proofs, setProofs] = useState<(Proof & { campaignTitle: string; userName: string })[]>([]);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
+  const [pendingCampaignTitle, setPendingCampaignTitle] = useState<string>('');
   const [pendingAmount, setPendingAmount] = useState<number>(0);
   const [showPayment, setShowPayment] = useState(false);
   const [successData, setSuccessData] = useState({ campaignId: '', amount: 0 });
@@ -337,7 +338,7 @@ const App: React.FC = () => {
         case 'notes': return <StrategyNotes />;
         case 'wallet': return <WalletView onWithdrawalRequested={(a, p) => console.log('Withdrawal requested', a, p)} />;
         case 'create-campaign': return <CreateCampaign onSuccess={handleCampaignFormSuccess} onCancel={() => setTab('dashboard')} />;
-        case 'my-campaigns': return <MyCampaigns onRetryPayment={(id, amount) => { setPendingCampaignId(id); setPendingAmount(amount); setShowPayment(true); }} onNavigateToCreate={() => setTab('create-campaign')} />;
+        case 'my-campaigns': return <MyCampaigns onRetryPayment={(id, amount, title) => { setPendingCampaignId(id); setPendingAmount(amount); setPendingCampaignTitle(title || ''); setShowPayment(true); }} onNavigateToCreate={() => setTab('create-campaign')} />;
         case 'profile': return <ProfilePage />;
         default: return <AmbassadorDashboard userData={userData} onNavigateToWallet={() => setTab('wallet')} />;
       }
@@ -451,6 +452,7 @@ const App: React.FC = () => {
 
         setPendingCampaignId(data.id);
         setPendingAmount(amount);
+        setPendingCampaignTitle(campaignDraft.title || '');
 
         // Send email notification for campaign creation
         try {
@@ -526,6 +528,7 @@ const App: React.FC = () => {
       }
       setShowPayment(false);
       setPendingCampaignId(null);
+      setPendingCampaignTitle('');
       setPendingAmount(0);
       if (user) {
         setView('app');
@@ -556,6 +559,7 @@ const App: React.FC = () => {
       }
       setShowPayment(false);
       setPendingCampaignId(null);
+      setPendingCampaignTitle('');
       setPendingAmount(0);
       if (user) {
         setView('app');
@@ -570,6 +574,7 @@ const App: React.FC = () => {
         <PaymentPage
           amount={pendingAmount}
           campaignId={pendingCampaignId}
+          campaignTitle={pendingCampaignTitle || 'Votre campagne'}
           onPaymentSuccess={handlePaymentSuccess}
           onCancel={handlePaymentCancel}
         />
