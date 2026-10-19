@@ -15,6 +15,7 @@ import AmbassadorDashboard from './views/AmbassadorDashboard';
 import CampaignMarketplace from './views/CampaignMarketplace';
 import CampaignShareOption from './views/CampaignShareOption';
 import TaskHistory from './views/TaskHistory';
+import ReferralNetwork from './views/ReferralNetwork';
 import StrategyNotes from './views/StrategyNotes';
 import AdminPanel from './views/AdminPanel';
 import AdminCreateCampaign from './views/AdminCreateCampaign';
@@ -335,6 +336,7 @@ const App: React.FC = () => {
         case 'dashboard': return <AmbassadorDashboard userData={userData} onNavigateToWallet={() => setTab('wallet')} />;
         case 'marketplace': return <CampaignMarketplace onShareCampaign={(campaignId) => setTab(`campaign-share/${campaignId}`)} />;
         case 'tasks': return <TaskHistory proofs={proofs} setProofs={setProofs} addNotification={addNotification} />;
+        // case 'referrals': return <ReferralNetwork />;
         case 'notes': return <StrategyNotes />;
         case 'wallet': return <WalletView onWithdrawalRequested={(a, p) => console.log('Withdrawal requested', a, p)} />;
         case 'create-campaign': return <CreateCampaign onSuccess={handleCampaignFormSuccess} onCancel={() => setTab('dashboard')} />;

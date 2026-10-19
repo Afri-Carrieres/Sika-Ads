@@ -14,10 +14,17 @@ const ReferralNetwork: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isPromoCodeActive, setIsPromoCodeActive] = useState(false);
+  const [promoBaseline, setPromoBaseline] = useState({ referralCount: 0, referralEarnings: 0 });
+  const [promoRewards, setPromoRewards] = useState<any[]>([]);
+  const [conversionRequests, setConversionRequests] = useState<any[]>([]);
+  const [isRequestingConversion, setIsRequestingConversion] = useState(false);
 
   const referralCode = userData?.referralCode || 'SIKAADS';
   const referralCount = userData?.referralCount || 0;
   const referralEarnings = userData?.referralEarnings || 0;
+  const promoReferralCount = Math.max(0, referralCount - promoBaseline.referralCount);
+  const promoPoints = Math.max(0, referralEarnings - promoBaseline.referralEarnings);
 
   useEffect(() => {
     let active = true;
@@ -25,6 +32,21 @@ const ReferralNetwork: React.FC = () => {
     const fetchReferrals = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return;
+
+      const [{ data: promoAssignment }, { data: conversionData }, { data: rewardData }] = await Promise.all([
+        supabase.from('promo_ambassadors').select('user_id, starting_referral_count, starting_referral_earnings').eq('user_id', session.user.id).maybeSingle(),
+        supabase.from('promo_conversion_requests').select('id, points, amount_fcfa, status, created_at').eq('user_id', session.user.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('promo_referral_rewards').select('referred_user_id, referred_name, points, created_at').eq('promoter_user_id', session.user.id).order('created_at', { ascending: false }),
+      ]);
+      if (active) {
+        setIsPromoCodeActive(Boolean(promoAssignment));
+        setPromoBaseline({
+          referralCount: Number(promoAssignment?.starting_referral_count || 0),
+          referralEarnings: Number(promoAssignment?.starting_referral_earnings || 0),
+        });
+        setConversionRequests(conversionData || []);
+        setPromoRewards(rewardData || []);
+      }
 
       const { data, error } = await supabase
         .from('referrals')
@@ -39,13 +61,13 @@ const ReferralNetwork: React.FC = () => {
       }
 
       if (data && active) {
-        setReferrals(data.map(r => ({
-          id: r.id,
-          name: r.name,
-          phone: r.phone || '',
-          status: r.status || 'inactive',
-          earningsGenerated: r.earningsGenerated ?? 0,
-          createdAt: r.createdAt || new Date().toISOString()
+        setReferrals(data.map((referralRow: Record<string, any>) => ({
+          id: referralRow.id,
+          name: referralRow.name,
+          phone: referralRow.phone || '',
+          status: referralRow.status || 'inactive',
+          earningsGenerated: referralRow.earningsGenerated ?? 0,
+          createdAt: referralRow.createdAt || new Date().toISOString()
         } as Referral)));
         setLoading(false);
       }
@@ -58,6 +80,27 @@ const ReferralNetwork: React.FC = () => {
     };
   }, [userData]);
 
+  const handleRequestConversion = async () => {
+    setIsRequestingConversion(true);
+    const { data, error } = await supabase.rpc('request_promotional_conversion');
+    setIsRequestingConversion(false);
+    if (error) {
+      alert(error.message.includes('minimum_conversion_is_10_points')
+        ? 'Il faut au moins 10 points pour demander une conversion.'
+        : 'Impossible d’enregistrer la demande de conversion.');
+      return;
+    }
+    const request = Array.isArray(data) ? data[0] : data;
+    alert(`Demande envoyée : ${request.amount_fcfa} FCFA seront crédités après validation.`);
+    const { data: updatedRequests } = await supabase
+      .from('promo_conversion_requests')
+      .select('id, points, amount_fcfa, status, created_at')
+      .eq('user_id', userData?.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
+    setConversionRequests(updatedRequests || []);
+  };
+
   const handleCopyCode = () => {
     navigator.clipboard.writeText(referralCode);
     setCopied(true);
@@ -68,7 +111,7 @@ const ReferralNetwork: React.FC = () => {
     const shareData = {
       title: 'Rejoins SikaAds Togo',
       text: `Utilise mon code ${referralCode} pour gagner de l'argent avec tes statuts WhatsApp !`,
-      url: `https://www.sika-ads.com/ref/${referralCode}`
+      url: `https://www.sika-ads.com/register?ref=${encodeURIComponent(referralCode)}`
     };
 
     if (navigator.share) {
@@ -108,7 +151,7 @@ const ReferralNetwork: React.FC = () => {
       <div className="bg-gradient-to-r from-[#062127] to-[#0B3A44] rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-2 text-center md:text-left">
-            <p className="text-[#7FD1D1] text-xs font-bold uppercase tracking-[0.2em]">Votre Code Parrain</p>
+            <p className="text-[#7FD1D1] text-xs font-bold uppercase tracking-[0.2em]">{isPromoCodeActive ? 'Votre Code Promo' : 'Votre Code Parrain'}</p>
             <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">
               <span className="text-3xl font-mono font-bold tracking-wider">{referralCode}</span>
               <button onClick={handleCopyCode} className="text-[#A9DADA] hover:text-white transition-colors">
@@ -119,17 +162,66 @@ const ReferralNetwork: React.FC = () => {
           <div className="flex gap-6 text-center">
             <div>
               <p className="text-[#7FD1D1] text-[10px] font-bold uppercase tracking-widest mb-1">Total Filleuls</p>
-              <p className="text-3xl font-bold">{referralCount}</p>
+              <p className="text-3xl font-bold">{isPromoCodeActive ? promoReferralCount : referralCount}</p>
             </div>
             <div className="w-px bg-white/10"></div>
             <div>
-              <p className="text-green-300 text-[10px] font-bold uppercase tracking-widest mb-1">Commissions</p>
-              <p className="text-3xl font-bold">{referralEarnings.toLocaleString()} F</p>
+              <p className="text-green-300 text-[10px] font-bold uppercase tracking-widest mb-1">{isPromoCodeActive ? 'Points disponibles' : 'Commissions'}</p>
+              <p className="text-3xl font-bold">{(isPromoCodeActive ? promoPoints : referralEarnings).toLocaleString()} {isPromoCodeActive ? 'pts' : 'F'}</p>
             </div>
           </div>
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
       </div>
+
+      {isPromoCodeActive && (
+        <section className="border-y border-gray-200 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h3 className="font-bold text-gray-900">Conversion des points</h3>
+            <p className="text-sm text-gray-500">10 points = 1 FCFA. Solde convertible : {Math.floor(promoPoints / 10).toLocaleString()} FCFA. Les points sont réservés jusqu’à la décision de l’équipe.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleRequestConversion}
+            disabled={isRequestingConversion || promoPoints < 10}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#128686] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0E6B6B] disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {isRequestingConversion ? 'Envoi...' : 'Demander la conversion'}
+          </button>
+        </section>
+      )}
+
+      {isPromoCodeActive && conversionRequests.length > 0 && (
+        <section className="border-b border-gray-200 pb-6">
+          <h3 className="mb-3 font-bold text-gray-900">Demandes de conversion</h3>
+          <ul className="divide-y divide-gray-100">
+            {conversionRequests.map((request) => (
+              <li key={request.id} className="flex items-center justify-between gap-4 py-3 text-sm">
+                <span>{request.points} points · {request.amount_fcfa} FCFA</span>
+                <span className="font-semibold text-gray-600">{request.status === 'pending' ? 'En attente' : request.status === 'approved' ? 'Validée' : 'Refusée'}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {isPromoCodeActive && (
+        <section className="border-b border-gray-200 pb-6">
+          <h3 className="mb-3 font-bold text-gray-900">Inscriptions confirmées avec votre code</h3>
+          {promoRewards.length === 0 ? (
+            <p className="text-sm text-gray-500">Aucune inscription confirmée pour le moment.</p>
+          ) : (
+            <ul className="divide-y divide-gray-100">
+              {promoRewards.map((reward) => (
+                <li key={reward.referred_user_id} className="flex items-center justify-between gap-4 py-3 text-sm">
+                  <span>{reward.referred_name}</span>
+                  <span className="text-right text-gray-500">+{reward.points} pts · {new Date(reward.created_at).toLocaleDateString('fr-FR')}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {/* Referrals List */}
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 overflow-hidden">
@@ -229,12 +321,12 @@ const ReferralNetwork: React.FC = () => {
                 <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
                   <input
                     readOnly
-                    value={`https://www.sika-ads.com/ref/${referralCode}`}
+                    value={`https://www.sika-ads.com/register?ref=${encodeURIComponent(referralCode)}`}
                     className="bg-transparent border-none outline-none text-xs font-medium text-gray-600 flex-1 w-full"
                   />
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://www.sika-ads.com/ref/${referralCode}`);
+                      navigator.clipboard.writeText(`https://www.sika-ads.com/register?ref=${encodeURIComponent(referralCode)}`);
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}

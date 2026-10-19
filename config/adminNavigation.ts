@@ -1,4 +1,4 @@
-import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, CreditCard, Crown, Users, ShieldCheck, Check, User, Bell } from 'lucide-react';
+import { LayoutDashboard, Megaphone, CheckCircle2, Wallet, CreditCard, Crown, Users, ShieldCheck, Check, User, Bell, Tag } from 'lucide-react';
 
 export interface NavItem {
   id: string;
@@ -49,6 +49,7 @@ export const getAdminNavigation = (userRole: 'ADMIN' | 'MODERATOR' | null): NavG
     defaultOpen: true,
     items: [
       { id: 'admin-users', label: 'Utilisateurs', icon: Users, route: '/app/admin-users', permission: 'ADMIN' },
+      { id: 'admin-promotions', label: 'Codes promo', icon: Tag, route: '/app/admin-promotions', permission: 'ADMIN' },
       { id: 'admin-team', label: 'Mon Équipe', icon: ShieldCheck, route: '/app/admin-team', permission: 'ADMIN' },
     ],
   };

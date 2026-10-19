@@ -49,6 +49,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
   // Step 3 Data (Payment)
   const [paymentMethod, setPaymentMethod] = useState<'Mixx' | 'Moov' | ''>('');
   const [momoNumber, setMomoNumber] = useState('');
+  const [promoCode, setPromoCode] = useState(() =>
+    new URLSearchParams(window.location.search).get('ref')?.trim().toUpperCase() || ''
+  );
   const [identityDocument, setIdentityDocument] = useState<File | null>(null);
 
   const cities = ['Lomé', 'Kara', 'Sokodé', 'Kpalimé', 'Atakpamé', 'Dapaong', 'Autre'];
@@ -78,6 +81,19 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
       // Final step: Create user in Supabase
       setLoading(true);
       try {
+        if (promoCode.trim()) {
+          const { data: isValidPromoCode, error: promoCodeError } = await supabase.rpc(
+            'validate_promotional_code',
+            { promo_code: promoCode.trim() },
+          );
+          if (promoCodeError) throw promoCodeError;
+          if (!isValidPromoCode) {
+            setError('Ce code promotionnel est invalide ou désactivé.');
+            setLoading(false);
+            return;
+          }
+        }
+
         // Upload de la pièce d'identité temporairement désactivé pendant les tests.
         // La vérification pourra être réactivée lorsque le bucket et les policies seront prêts.
         // Generate referral code BEFORE signUp so it can be stored in user_metadata
@@ -98,6 +114,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
               paymentMethod,
               momoNumber,
               referralCode,
+              promoCode: promoCode.trim().toUpperCase() || null,
             },
             emailRedirectTo: `${window.location.origin}/app?tab=dashboard`
           }
@@ -466,6 +483,19 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({onComplete, onCancel
                       </select>
                     </div>
                   </label>
+
+                  {/* <label className="block">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Code promotionnel (facultatif)</span>
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                      className="w-full bg-white border border-gray-200 rounded-2xl p-4 focus:ring-2 focus:ring-[#f55d05] focus:border-[#f55d05] outline-none font-bold text-gray-900 transition-all"
+                      placeholder="Ex. SIKA2026"
+                      maxLength={20}
+                      autoComplete="off"
+                    />
+                  </label> */}
                 </div>
               )}
 

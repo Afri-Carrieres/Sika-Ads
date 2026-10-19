@@ -24,6 +24,7 @@ const AMBASSADOR_NAV_ITEMS = [
   { id: 'create-campaign', label: 'Créer une campagne', icon: PlusCircle },
   { id: 'my-campaigns', label: 'Mes Campagnes', icon: BarChart2 },
   { id: 'tasks', label: 'Mes Preuves', icon: CheckCircle2 },
+  // { id: 'referrals', label: 'Parrainage & points', icon: Users },
   { id: 'wallet', label: 'Portefeuille', icon: Wallet },
   { id: 'profile', label: 'Mon Profil', icon: User },
 ];
@@ -389,11 +390,11 @@ const Layout: React.FC<LayoutProps> = ({ children, role, currentTab, setTab, onR
                 </button>
               </div>
 
-              <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-350px)]">
+              <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2 scrollbar-hide h-[calc(100vh-220px)]">
                 {renderAmbassadorNav(() => setIsMobileMenuOpen(false))}
+                {renderAmbassadorWhatsAppLink(() => setIsMobileMenuOpen(false))}
             
               </nav>
-                {renderAmbassadorWhatsAppLink(() => setIsMobileMenuOpen(false))}
                 {renderSidebarFooter()}
             </aside>
           </div>

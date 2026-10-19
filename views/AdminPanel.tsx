@@ -67,6 +67,7 @@ import {
   LayoutTemplate,
   Radio,
   Film,
+  Tag,
 } from "lucide-react";
 
 import { supabase } from "../supabase";
@@ -922,6 +923,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     | "campaignPayments"
     | "gomboChecker"
     | "pushBroadcast"
+    | "promotions"
   >("overview");
   const [previewMedia, setPreviewMedia] = useState<{
     url: string;
@@ -950,6 +952,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [allProofs, setAllProofs] = useState<Proof[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [allPayouts, setAllPayouts] = useState<Withdrawal[]>([]);
+  const [promoAmbassadors, setPromoAmbassadors] = useState<any[]>([]);
+  const [promoConversionRequests, setPromoConversionRequests] = useState<any[]>([]);
+  const [selectedPromoUserId, setSelectedPromoUserId] = useState("");
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [isSavingPromoCode, setIsSavingPromoCode] = useState(false);
   const [allCampaigns, setAllCampaigns] = useState<Campaign[]>([]);
   const [campaignShareEvents, setCampaignShareEvents] = useState<any[]>([]);
   const [campaignClickEvents, setCampaignClickEvents] = useState<any[]>([]);
@@ -1209,6 +1216,24 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     };
   }, [isStaff]);
 
+  useEffect(() => {
+    if (view !== "promotions" || !isSuperAdmin) return;
+    let active = true;
+    const loadPromotionalData = async () => {
+      const [ambassadors, requests] = await Promise.all([
+        supabase.from("promo_ambassadors").select("*").order("created_at", { ascending: false }),
+        supabase.from("promo_conversion_requests").select("*").order("created_at", { ascending: false }),
+      ]);
+      if (!active) return;
+      if (ambassadors.error) console.error("Chargement des codes promo impossible:", ambassadors.error);
+      if (requests.error) console.error("Chargement des conversions impossible:", requests.error);
+      setPromoAmbassadors(ambassadors.data || []);
+      setPromoConversionRequests(requests.data || []);
+    };
+    void loadPromotionalData();
+    return () => { active = false; };
+  }, [view, isSuperAdmin]);
+
   // Sync with Sidebar Tabs
   useEffect(() => {
     if (!activeTab) return;
@@ -1225,6 +1250,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       setView("gomboChecker");
     else if (activeTab === "admin-push-broadcast" && isSuperAdmin)
       setView("pushBroadcast");
+    else if (activeTab === "admin-promotions" && isSuperAdmin)
+      setView("promotions");
   }, [activeTab, isSuperAdmin]);
 
   const showFeedback = (
@@ -1411,6 +1438,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     } catch (e) {
       showFeedback("Erreur de mise à jour.", "error");
     }
+  };
+
+  const handleAssignPromoCode = async () => {
+    if (!isSuperAdmin || !selectedPromoUserId || !promoCodeInput.trim()) return;
+    setIsSavingPromoCode(true);
+    const { error } = await supabase.rpc("assign_promotional_code", {
+      p_user_id: selectedPromoUserId,
+      promo_code: promoCodeInput.trim().toUpperCase(),
+    });
+    setIsSavingPromoCode(false);
+    if (error) {
+      showFeedback(error.message.includes("duplicate key") ? "Ce code est déjà utilisé." : "Impossible d’attribuer ce code promo.", "error");
+      return;
+    }
+    showFeedback("Code promo attribué.");
+    setPromoCodeInput("");
+    fetchAllUsers();
+    const { data } = await supabase.from("promo_ambassadors").select("*").order("created_at", { ascending: false });
+    setPromoAmbassadors(data || []);
+  };
+
+  const handleReviewPromoConversion = async (requestId: string, decision: "approved" | "rejected") => {
+    if (!isSuperAdmin) return;
+    const { error } = await supabase.rpc("review_promotional_conversion", {
+      p_request_id: requestId,
+      p_decision: decision,
+    });
+    if (error) {
+      showFeedback("Impossible de traiter cette demande.", "error");
+      return;
+    }
+    showFeedback(decision === "approved" ? "Conversion validée et créditée." : "Conversion refusée; les points ont été restitués.");
+    const { data } = await supabase.from("promo_conversion_requests").select("*").order("created_at", { ascending: false });
+    setPromoConversionRequests(data || []);
+    fetchAllUsers();
   };
 
   const handleToggleUserBlock = async (
@@ -3283,6 +3345,110 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* ══════════════════════════════════════════
           VIEW: USERS (SUPER ADMIN ONLY)
       ══════════════════════════════════════════ */}
+      {/* {view === "promotions" && isSuperAdmin && (
+        <div className="space-y-8">
+          <section className="border-b border-gray-200 pb-6">
+            <h2 className="text-xl font-bold text-gray-900">Codes promotionnels</h2>
+            <p className="mt-1 text-sm text-gray-500">Attribuez un code à un ambassadeur. Chaque nouveau compte vérifié rapporte 2 points; 10 points valent 1 FCFA.</p>
+          </section>
+
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end">
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold text-gray-600">Ambassadeur</span>
+              <select
+                value={selectedPromoUserId}
+                onChange={(event) => {
+                  const selectedUser = allUsers.find((user) => user.id === event.target.value);
+                  const currentPromo = promoAmbassadors.find((promo) => promo.user_id === event.target.value);
+                  setSelectedPromoUserId(event.target.value);
+                  setPromoCodeInput(currentPromo?.code || selectedUser?.referralCode || "");
+                }}
+                className="min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm"
+              >
+                <option value="">Choisir un utilisateur</option>
+                {allUsers.filter((user) => user.role === UserRole.AMBASSADOR).map((user) => (
+                  <option key={user.id} value={user.id}>{user.name} · {user.email || user.id}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold text-gray-600">Code unique (3 à 20 caractères)</span>
+              <input
+                value={promoCodeInput}
+                onChange={(event) => setPromoCodeInput(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 20))}
+                placeholder="SIKA2026"
+                className="min-h-11 w-full rounded-lg border border-gray-300 px-3 text-sm font-mono uppercase"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={handleAssignPromoCode}
+              disabled={isSavingPromoCode || !selectedPromoUserId || promoCodeInput.length < 3}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#128686] px-5 text-sm font-semibold text-white hover:bg-[#0E6B6B] disabled:cursor-not-allowed disabled:bg-gray-300"
+            >
+              <Tag size={16} /> {isSavingPromoCode ? "Enregistrement..." : "Attribuer le code"}
+            </button>
+          </section>
+
+          <section className="border-t border-gray-200 pt-6">
+            <h3 className="mb-4 font-bold text-gray-900">Codes actifs</h3>
+            {promoAmbassadors.length === 0 ? (
+              <p className="text-sm text-gray-500">Aucun code promotionnel attribué.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-gray-200 text-xs text-gray-500">
+                    <tr><th className="py-3 pr-4">Utilisateur</th><th className="py-3 pr-4">Code</th><th className="py-3">Date d’attribution</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {promoAmbassadors.map((promo) => (
+                      <tr key={promo.user_id}>
+                        <td className="py-3 pr-4">{userById.get(promo.user_id)?.name || promo.user_id}</td>
+                        <td className="py-3 pr-4 font-mono font-bold">{promo.code}</td>
+                        <td className="py-3 text-gray-500">{new Date(promo.created_at).toLocaleDateString("fr-FR")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+          <section className="border-t border-gray-200 pt-6">
+            <h3 className="mb-4 font-bold text-gray-900">Demandes de conversion</h3>
+            {promoConversionRequests.length === 0 ? (
+              <p className="text-sm text-gray-500">Aucune demande pour le moment.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-gray-200 text-xs text-gray-500">
+                    <tr><th className="py-3 pr-4">Utilisateur</th><th className="py-3 pr-4">Points</th><th className="py-3 pr-4">Montant</th><th className="py-3 pr-4">État</th><th className="py-3 text-right">Décision</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {promoConversionRequests.map((request) => (
+                      <tr key={request.id}>
+                        <td className="py-3 pr-4">{userById.get(request.user_id)?.name || request.user_id}</td>
+                        <td className="py-3 pr-4">{request.points} pts</td>
+                        <td className="py-3 pr-4">{Number(request.amount_fcfa).toLocaleString("fr-FR")} FCFA</td>
+                        <td className="py-3 pr-4">{request.status === "pending" ? "En attente" : request.status === "approved" ? "Validée" : "Refusée"}</td>
+                        <td className="py-3 text-right">
+                          {request.status === "pending" && (
+                            <div className="flex justify-end gap-2">
+                              <button type="button" onClick={() => handleReviewPromoConversion(request.id, "approved")} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">Valider</button>
+                              <button type="button" onClick={() => handleReviewPromoConversion(request.id, "rejected")} className="rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700">Refuser</button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
+      )} */}
+
       {view === "users" && isSuperAdmin && (
         <div className="space-y-8">
           <div className="bg-[#128686] text-white p-8 rounded-[2rem] shadow-xl shadow-[#128686]/20 flex items-center justify-between relative overflow-hidden">
