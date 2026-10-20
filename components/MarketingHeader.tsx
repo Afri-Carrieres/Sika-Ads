@@ -7,7 +7,7 @@ export type MarketingView = 'landing' | 'about' | 'legal' | 'terms' | 'contact' 
 interface MarketingHeaderProps {
   onNavigate: (view: MarketingView) => void;
   onStart?: () => void;
-  active: MarketingView;
+  active: MarketingView | null;
 }
 
 const NAV_ITEMS: { view: MarketingView; label: string }[] = [

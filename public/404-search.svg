@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 340" fill="none">
+  <style>
+    .float { animation: float 4s ease-in-out infinite; }
+    .float-late { animation: float 4.8s ease-in-out 0.6s infinite; }
+    .orbit { transform-origin: 220px 170px; animation: orbit 24s linear infinite; }
+    .pulse { animation: pulse 2.8s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: .55; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.08); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  </style>
+  <path d="M76 94a151 151 0 0 1 279 34" stroke="#7FD1D1" stroke-opacity=".36" stroke-width="2" stroke-dasharray="5 10" class="orbit" />
+  <path d="M67 239a151 151 0 0 0 287-30" stroke="#F65E06" stroke-opacity=".4" stroke-width="2" stroke-dasharray="4 11" class="orbit" />
+
+  <g class="float">
+    <path d="M112 76a16 16 0 0 1 16-16h139l57 57v156a16 16 0 0 1-16 16H128a16 16 0 0 1-16-16V76Z" fill="#F8FAFC" />
+    <path d="M267 60v42a15 15 0 0 0 15 15h42" fill="#DCEEEE" />
+    <path d="M267 60v42a15 15 0 0 0 15 15h42" stroke="#B9DCDC" stroke-width="2" />
+    <rect x="143" y="151" width="111" height="12" rx="6" fill="#DCEEEE" />
+    <rect x="143" y="174" width="76" height="9" rx="4.5" fill="#E5E7EB" />
+    <text x="143" y="231" fill="#062127" font-family="Arial, sans-serif" font-size="48" font-weight="700">404</text>
+    <path d="M144 248h90" stroke="#F65E06" stroke-linecap="round" stroke-width="5" />
+  </g>
+
+  <g class="float-late">
+    <circle cx="294" cy="204" r="48" fill="#062127" fill-opacity=".94" />
+    <circle cx="294" cy="204" r="35" fill="#0E6B6B" stroke="#7FD1D1" stroke-width="5" />
+    <path d="m319 230 31 31" stroke="#F8FAFC" stroke-linecap="round" stroke-width="13" />
+    <path d="m319 230 31 31" stroke="#F65E06" stroke-linecap="round" stroke-width="6" />
+    <path d="m283 193 22 22m0-22-22 22" stroke="#F8FAFC" stroke-linecap="round" stroke-width="5" />
+  </g>
+
+  <g class="pulse">
+    <path d="m84 119 5 11 11 5-11 5-5 11-5-11-11-5 11-5 5-11Z" fill="#F65E06" />
+    <circle cx="355" cy="98" r="7" fill="#7FD1D1" />
+    <circle cx="91" cy="264" r="5" fill="#F8FAFC" fill-opacity=".85" />
+  </g>
+</svg>

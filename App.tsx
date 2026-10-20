@@ -35,6 +35,7 @@ import LegalView from './views/LegalView';
 import TermsView from './views/TermsView';
 import ContactView from './views/ContactView';
 import PrivacyView from './views/PrivacyView';
+import NotFoundView from './views/NotFoundView';
 import MyCampaigns from './views/MyCampaigns';
 import ScrollToTop from './components/ScrollToTop';
 import "./styles/index.css";
@@ -48,7 +49,7 @@ import { validateCampaignPayment } from './services/gomboPlus';
 import { sendAdminCampaignCreatedPush } from './services/onesignalService';
 import { Clock, Loader2 } from 'lucide-react';
 
-type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'admin-login' | 'register' | 'verification-pending' | 'reset-password';
+type AppView = 'landing' | 'app' | 'about' | 'legal' | 'terms' | 'contact' | 'privacy' | 'advertise' | 'advertise-success' | 'login' | 'admin-login' | 'register' | 'verification-pending' | 'reset-password' | 'not-found';
 
 // Helper to parse current path and return view + tab
 const parsePathname = (pathname: string): { view: AppView; tab: string } => {
@@ -59,25 +60,26 @@ const parsePathname = (pathname: string): { view: AppView; tab: string } => {
   }
 
   const parts = pathWithoutLeadingSlash.split('/').filter(Boolean);
-  const firstPart = parts[0] as AppView;
+  const firstPart: string = parts[0] || '';
 
   if (firstPart === 'app') {
     return { view: 'app', tab: parts.slice(1).join('/') || 'dashboard' };
   }
 
-  if (firstPart === 'profile') {
+  if (firstPart === 'profile' && parts.length === 1) {
     return { view: 'app', tab: 'profile' };
   }
 
-  if (firstPart === 'admin' && parts[1] === 'login') {
+  if (firstPart === 'admin' && parts[1] === 'login' && parts.length === 2) {
     return { view: 'admin-login', tab: 'dashboard' };
   }
 
-  if (['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'admin-login', 'register', 'verification-pending', 'reset-password'].includes(firstPart)) {
-    return { view: firstPart, tab: 'dashboard' };
+  const publicViews: AppView[] = ['about', 'legal', 'terms', 'contact', 'privacy', 'advertise', 'advertise-success', 'login', 'admin-login', 'register', 'verification-pending', 'reset-password'];
+  if (parts.length === 1 && publicViews.includes(firstPart as AppView)) {
+    return { view: firstPart as AppView, tab: 'dashboard' };
   }
 
-  return { view: 'landing', tab: 'dashboard' };
+  return { view: 'not-found', tab: 'dashboard' };
 };
 
 const App: React.FC = () => {
@@ -381,7 +383,7 @@ const App: React.FC = () => {
     // ⚠️ Ne PAS retourner tôt ici : ça démonterait tous les composants enfants
     // et ferait perdre les données des formulaires en cours de saisie.
     // À la place, on affiche un overlay par-dessus le contenu existant.
-    const showLoadingOverlay = loading && view !== 'landing' && view !== 'reset-password';
+    const showLoadingOverlay = loading && view !== 'landing' && view !== 'reset-password' && view !== 'not-found';
 
     if (view === 'login') return <LoginView onSuccess={() => setView(redirectAfterLogin || 'app')} onGoBack={() => setView('landing')} onGoToRegister={() => setView('register')} />
     if (view === 'admin-login') return <AdminLoginView onSuccess={() => { setView('app'); setTab('admin-dashboard'); }} onGoBack={() => setView('landing')} />
@@ -629,6 +631,11 @@ const App: React.FC = () => {
         ) : view === 'privacy' ? (
           <PrivacyView
             onNavigate={(v) => setView(v as any)}
+            onStart={() => user ? setView('app') : setView('register')}
+          />
+        ) : view === 'not-found' ? (
+          <NotFoundView
+            onNavigate={(v) => setView(v)}
             onStart={() => user ? setView('app') : setView('register')}
           />
         ) : (
