@@ -116,17 +116,13 @@ serve(async (req: Request) => {
 
     const isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
 
-    if (proofRow.status === 'validated' || proofRow.status === 'rejected') {
-      if (!parsedRequest.reanalyze) {
-        return jsonResponse({ success: false, proofId, error: 'already_processed' }, 409);
-      }
-      if (!isStaff) {
-        return jsonResponse({ success: false, proofId, error: 'forbidden' }, 403);
-      }
-    }
-
     if (proofRow.userId !== user.id && !isStaff) {
       return jsonResponse({ success: false, proofId, error: 'forbidden' }, 403);
+    }
+
+    const alreadyProcessed = proofRow.status === 'validated' || proofRow.status === 'rejected';
+    if (alreadyProcessed && !(parsedRequest.reanalyze && isStaff)) {
+      return jsonResponse({ success: false, proofId, error: 'already_processed' }, 409);
     }
 
     failureStage = 'ai_provider';
@@ -144,7 +140,9 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log(`[index.ts] Validating proof ${proofId} with image and videoUrl: ${parsedRequest.videoUrl ? 'present' : 'none'}`);
+    console.log(
+      `[index.ts] Validating proof ${proofId} with image, videoUrl: ${parsedRequest.videoUrl ? 'present' : 'none'}, video frames: ${parsedRequest.videoFrameUrls?.length ?? 0}`
+    );
 
     const rawProviderText = await callAI(
       parsedRequest.imageUrl,
@@ -164,7 +162,7 @@ serve(async (req: Request) => {
       adminClient,
       proofId,
       normalizedResult,
-      parsedRequest.reanalyze && proofRow.status !== 'pending'
+      { previousStatus: proofRow.status }
     );
 
     console.log(`[index.ts] Proof ${proofId} updated successfully`);

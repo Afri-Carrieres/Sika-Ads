@@ -26,7 +26,7 @@ export async function updateProof(
   supabase: SupabaseClient,
   proofId: string,
   result: NormalizedAIResult,
-  preserveDecision = false
+  opts: { previousStatus?: string } = {}
 ): Promise<void> {
   const suggestedAction = determineAutoAction(result);
   const status = resolveStatus(suggestedAction);
@@ -37,11 +37,8 @@ export async function updateProof(
     analysisTimestamp: new Date().toISOString()
   };
 
-  const update = preserveDecision
-    ? {
-        aiValidation: result.isValid,
-        aiAnalysis: enrichedAnalysis
-      }
+  const update = opts.previousStatus === 'validated'
+    ? { aiAnalysis: enrichedAnalysis }
     : {
         aiValidation: result.isValid,
         viewsCount: result.viewsCount,

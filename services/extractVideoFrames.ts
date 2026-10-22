@@ -94,15 +94,40 @@ export async function extractAndUploadFrames(
   source: File | string,
   folder: string,
 ): Promise<string[]> {
+  const storage = supabase.storage.from('proofs');
   let frames: Blob[];
   try {
-    frames = await extractVideoFrames(source);
+    let videoSource = source;
+    if (typeof source === 'string') {
+      let storagePath: string | undefined;
+      try {
+        const sourceUrl = new URL(source);
+        const pathMatch = sourceUrl.pathname.match(
+          /\/storage\/v1\/object\/public\/proofs\/(.+)$/,
+        );
+        if (pathMatch) {
+          storagePath = decodeURIComponent(pathMatch[1]);
+        }
+      } catch {
+        storagePath = source;
+      }
+
+      if (storagePath) {
+        const { data, error } = await storage.download(storagePath);
+        if (error) {
+          throw error;
+        }
+        const fileName = storagePath.split('/').pop() || 'proof-video.mp4';
+        videoSource = new File([data], fileName, { type: data.type });
+      }
+    }
+
+    frames = await extractVideoFrames(videoSource);
   } catch (error) {
     console.warn('Video frame extraction failed; continuing without video frames.', error);
     return [];
   }
 
-  const storage = supabase.storage.from('proofs');
   const uploadedPaths: string[] = [];
   const frameUrls: string[] = [];
 

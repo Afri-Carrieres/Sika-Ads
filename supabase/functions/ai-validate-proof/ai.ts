@@ -74,7 +74,8 @@ SCORES (nombres de 0 à 100, ne jamais copier des valeurs d'exemple)
 - imageAuthenticityConfidence : authenticité apparente de la capture.
 - viewCountDetectionConfidence : fiabilité de la lecture du nombre de vues.
 - platformUICompliance : cohérence de l'interface avec la plateforme identifiée.
-- videoAuthenticityConfidence et videoConsistencyScore : renseignez-les UNIQUEMENT si des images de la vidéo vous sont réellement fournies. Sinon, mettez null (jamais 0, jamais une valeur "prudente").
+- Si une ou plusieurs images extraites de la vidéo sont fournies, videoAuthenticityConfidence et videoConsistencyScore sont OBLIGATOIRES : renvoyez chacun comme nombre entier de 0 à 100, sans les omettre et sans null. Évaluez l'authenticité de l'enregistrement et la cohérence entre les images vidéo et la capture. Si les images ne permettent pas une conclusion solide, utilisez un score prudent proche de 50 et expliquez l'incertitude dans "reason".
+- Si aucune image vidéo n'est fournie, mettez videoAuthenticityConfidence = null et videoConsistencyScore = null (non évalué, jamais 0).
 Un score faible signifie "incertain", pas "fraude".
 
 CHAMP "reason" (en français, 3 à 6 phrases)

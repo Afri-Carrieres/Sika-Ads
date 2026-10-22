@@ -631,19 +631,27 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                     <p className="text-base font-bold text-gray-800">{analysisProof.aiAnalysis.imageAuthenticityConfidence}%</p>
                   </div>
                 )}
-                {analysisProof.aiAnalysis.videoAuthenticityConfidence !== undefined && (
+                {analysisProof.videoUrl && (
                   <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
                     <p className="text-[9px] font-bold uppercase tracking-widest text-purple-600">Authenticité Vidéo</p>
-                    <p className="text-base font-bold text-purple-900">{analysisProof.aiAnalysis.videoAuthenticityConfidence}%</p>
+                    <p className="text-base font-bold text-purple-900">
+                      {analysisProof.aiAnalysis.videoAuthenticityConfidence != null
+                        ? `${analysisProof.aiAnalysis.videoAuthenticityConfidence}%`
+                        : "Non évaluée"}
+                    </p>
                   </div>
                 )}
-                {analysisProof.aiAnalysis.videoConsistencyScore !== undefined && (
+                {analysisProof.videoUrl && (
                   <div className="col-span-2 p-3 bg-indigo-50 rounded-2xl border border-indigo-100 flex items-center justify-between">
                     <div>
                       <p className="text-[9px] font-bold uppercase tracking-widest text-indigo-600">Cohérence Capture ↔ Vidéo</p>
                       <p className="text-xs text-indigo-700 font-medium">Vérification de synchronisation des vues</p>
                     </div>
-                    <span className="text-lg font-bold text-indigo-900">{analysisProof.aiAnalysis.videoConsistencyScore}%</span>
+                    <span className="text-lg font-bold text-indigo-900">
+                      {analysisProof.aiAnalysis.videoConsistencyScore != null
+                        ? `${analysisProof.aiAnalysis.videoConsistencyScore}%`
+                        : "Non évaluée"}
+                    </span>
                   </div>
                 )}
               </div>

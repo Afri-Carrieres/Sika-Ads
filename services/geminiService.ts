@@ -1,3 +1,4 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '../supabase';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -37,20 +38,18 @@ interface EdgeFunctionResponse {
 }
 
 const getFunctionErrorMessage = async (error: unknown): Promise<string> => {
-  if (typeof error === 'object' && error !== null && 'context' in error) {
-    const context = error.context;
-    if (context instanceof Response) {
-      try {
-        const body: unknown = await context.clone().json();
-        if (typeof body === 'object' && body !== null) {
-          const response = body as Record<string, unknown>;
-          const errorLabel = typeof response.error === 'string' ? response.error : 'Edge Function failed';
-          const details = typeof response.details === 'string' ? response.details : '';
-          return details ? `${errorLabel} (${details})` : errorLabel;
-        }
-      } catch {
-        // Keep the SDK error when the response body is not valid JSON.
+  if (error instanceof FunctionsHttpError) {
+    try {
+      const body: unknown = await error.context.clone().json();
+      console.error('Corps de la réponse Edge Function :', body);
+      if (typeof body === 'object' && body !== null) {
+        const response = body as Record<string, unknown>;
+        const errorLabel = typeof response.error === 'string' ? response.error : 'Edge Function failed';
+        const details = typeof response.details === 'string' ? response.details : '';
+        return details ? `${errorLabel} (${details})` : errorLabel;
       }
+    } catch (bodyError) {
+      console.error('Impossible de lire le corps de la réponse Edge Function :', bodyError);
     }
   }
 

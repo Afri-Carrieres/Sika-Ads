@@ -23,6 +23,7 @@ export interface User {
   id: string;
   name: string;
   email?: string;
+  createdAt?: string;
   role: UserRole;
   status: 'pending_verification' | 'active' | 'blocked' | 'rejected';
   balance: number;

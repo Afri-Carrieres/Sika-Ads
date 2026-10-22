@@ -67,6 +67,7 @@ import {
   LayoutTemplate,
   Radio,
   Film,
+  CalendarDays,
 } from "lucide-react";
 
 import { supabase } from "../supabase";
@@ -84,7 +85,20 @@ import {
 } from "../services/onesignalService";
 import Pagination from "../components/Pagination";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 9;
+
+const formatUserRegistrationDate = (value?: string) => {
+  if (!value) return "Date indisponible";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Date indisponible";
+
+  return date.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 const StatCard: React.FC<{
   title: string;
@@ -425,6 +439,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   );
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [userRegistrationStart, setUserRegistrationStart] = useState("");
+  const [userRegistrationEnd, setUserRegistrationEnd] = useState("");
+  const [userMinBalance, setUserMinBalance] = useState("");
+  const [userMaxBalance, setUserMaxBalance] = useState("");
   const [adminFeedback, setAdminFeedback] = useState<{
     message: string;
     type: "success" | "error" | "info";
@@ -999,10 +1017,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     setReanalyzingProofId(proof.id);
     try {
       const videoUrl = proof.videoUrl || (proof as any).video_url;
-      const videoFrameUrls = videoUrl
+      const videoSource = proof.videoStoragePath || videoUrl;
+      const videoFrameUrls = videoSource
         ? await extractAndUploadFrames(
             supabase,
-            videoUrl,
+            videoSource,
             `${proof.userId}/${proof.id}`,
           )
         : [];
@@ -1437,12 +1456,51 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   }, [allPayouts]);
 
   const filteredUsers = useMemo(() => {
-    return allUsers.filter(
-      (u) =>
-        (u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (u.email && u.email.toLowerCase().includes(searchTerm.toLowerCase())),
-    );
-  }, [allUsers, searchTerm]);
+    const minimumBalance = userMinBalance === "" ? null : Number(userMinBalance);
+    const maximumBalance = userMaxBalance === "" ? null : Number(userMaxBalance);
+    const startDate = userRegistrationStart
+      ? new Date(`${userRegistrationStart}T00:00:00`)
+      : null;
+    const endDate = userRegistrationEnd
+      ? new Date(`${userRegistrationEnd}T23:59:59.999`)
+      : null;
+
+    return allUsers.filter((user) => {
+      const matchesSearch =
+        (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+      const balance = Number(user.balance || 0);
+      const registrationDate = user.createdAt ? new Date(user.createdAt) : null;
+      const hasValidRegistrationDate =
+        registrationDate && !Number.isNaN(registrationDate.getTime());
+
+      return (
+        matchesSearch &&
+        (minimumBalance === null || balance >= minimumBalance) &&
+        (maximumBalance === null || balance <= maximumBalance) &&
+        (!startDate ||
+          (hasValidRegistrationDate && registrationDate >= startDate)) &&
+        (!endDate || (hasValidRegistrationDate && registrationDate <= endDate))
+      );
+    });
+  }, [
+    allUsers,
+    searchTerm,
+    userRegistrationStart,
+    userRegistrationEnd,
+    userMinBalance,
+    userMaxBalance,
+  ]);
+
+  useEffect(() => {
+    setUserPage(1);
+  }, [
+    searchTerm,
+    userRegistrationStart,
+    userRegistrationEnd,
+    userMinBalance,
+    userMaxBalance,
+  ]);
 
   const filteredProofs = useMemo(
     () =>
@@ -2802,7 +2860,66 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             />
           </div>
 
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto] lg:items-end">
+              <label className="block">
+                <span className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500"><CalendarDays size={14} /> Inscrit a partir du</span>
+                <input type="date" value={userRegistrationStart} onChange={(event) => setUserRegistrationStart(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Inscrit jusqu'au</span>
+                <input type="date" value={userRegistrationEnd} onChange={(event) => setUserRegistrationEnd(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Solde minimum</span>
+                <input type="number" min="0" inputMode="numeric" placeholder="0 F" value={userMinBalance} onChange={(event) => setUserMinBalance(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Solde maximum</span>
+                <input type="number" min="0" inputMode="numeric" placeholder="Sans limite" value={userMaxBalance} onChange={(event) => setUserMaxBalance(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+              </label>
+              <button type="button" onClick={() => { setUserRegistrationStart(""); setUserRegistrationEnd(""); setUserMinBalance(""); setUserMaxBalance(""); }} className="h-10 w-10 rounded-lg border border-gray-200 text-gray-500 transition-colors hover:border-[#128686] hover:bg-[#E7F4F4] hover:text-[#128686]" title="Reinitialiser les filtres" aria-label="Reinitialiser les filtres">
+                <RefreshCcw size={16} className="mx-auto" />
+              </button>
+            </div>
+          </div>
+
+          {paginatedUsers.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {paginatedUsers.map((user) => (
+                <article key={user.id} className=" min-h-[278px] rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-[170px] flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#E7F4F4] text-base font-bold text-[#128686]">{user.name?.charAt(0) || "U"}</div>
+                        <div className="min-w-0"><h4 className="truncate font-bold text-gray-900">{user.name || "Utilisateur sans nom"}</h4><p className="truncate text-xs font-medium text-gray-500" title={user.email}>{user.email || "Email indisponible"}</p></div>
+                      </div>
+                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${user.status === "active" ? "bg-green-100 text-green-700" : user.status === "pending_verification" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{user.status === "active" ? "Actif" : user.status === "pending_verification" ? "A verifier" : user.status === "rejected" ? "Refuse" : "Bloque"}</span>
+                    </div>
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                      <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Solde</p><p className="mt-1 text-sm font-bold text-gray-900">{user.balance?.toLocaleString() || 0} F</p></div>
+                      <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Inscription</p><p className="mt-1 truncate text-sm font-bold text-gray-900" title={formatUserRegistrationDate(user.createdAt)}>{formatUserRegistrationDate(user.createdAt)}</p></div>
+                    </div>
+                    <label className="mt-4 block"><span className="sr-only">Role de {user.name || "cet utilisateur"}</span>
+                      <select value={user.role} onChange={(event) => handleRoleChange(user.id, event.target.value as UserRole)} className={`w-full rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest outline-none ring-1 ring-inset focus:ring-2 focus:ring-[#128686] ${user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR ? "bg-[#D9ECEC] text-[#0E6B6B] ring-[#128686]/20" : "bg-gray-100 text-gray-600 ring-gray-200"}`}>
+                        <option value={UserRole.AMBASSADOR}>Ambassadeur</option><option value={UserRole.MODERATOR}>Moderateur</option><option value={UserRole.ADMIN}>Admin</option>
+                      </select>
+                    </label>
+                    <div className="mt-auto flex flex-wrap items-center gap-1 pt-4">
+                      {user.status === "pending_verification" && user.verification_document_path && <><button type="button" onClick={() => openVerificationDocument(user.verification_document_path!)} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]" title="Ouvrir la piece d'identite" aria-label="Ouvrir la piece d'identite"><Eye size={17} /></button><button type="button" onClick={() => handleVerificationDecision(user, "active")} className="flex h-9 w-9 items-center justify-center rounded-lg text-green-600 hover:bg-green-50" title="Valider la majorite" aria-label="Valider la majorite"><CheckCircle2 size={17} /></button><button type="button" onClick={() => handleVerificationDecision(user, "rejected")} className="flex h-9 w-9 items-center justify-center rounded-lg text-red-500 hover:bg-red-50" title="Refuser la verification" aria-label="Refuser la verification"><X size={17} /></button></>}
+                      {user.email && <button type="button" onClick={() => handleResetPassword(user.email!)} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]" title="Reinitialiser le mot de passe" aria-label="Reinitialiser le mot de passe"><Key size={17} /></button>}
+                      <button type="button" onClick={() => handleToggleUserBlock(user.id, user.status)} className={`flex h-9 w-9 items-center justify-center rounded-lg ${user.status === "active" ? "text-red-500 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}`} title={user.status === "active" ? "Bloquer l'utilisateur" : "Debloquer l'utilisateur"} aria-label={user.status === "active" ? "Bloquer l'utilisateur" : "Debloquer l'utilisateur"}>{user.status === "active" ? <Ban size={17} /> : <CheckCircle2 size={17} />}</button>
+                      <button type="button" onClick={() => handleDeleteUser(user)} className="ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" title="Supprimer definitivement" aria-label="Supprimer definitivement"><Trash2 size={17} /></button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-sm font-medium text-gray-500">Aucun utilisateur ne correspond aux filtres selectionnes.</div>}
+
+          <Pagination currentPage={userPage} totalPages={totalUserPages} onPageChange={setUserPage} totalItems={filteredUsers.length} itemsPerPage={ITEMS_PER_PAGE} />
+
+          <div className="hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
