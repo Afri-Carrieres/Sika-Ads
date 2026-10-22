@@ -4,7 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { RequestBody, FunctionResponse } from './types.ts';
-import { callAI } from './ai.ts';
+import { AIProviderError, callAI } from './ai.ts';
 import { parseAIResponse } from './parser.ts';
 import { normalizeAIResult } from './normalizer.ts';
 import { updateProof, getSupabaseClient } from './supabase.ts';
@@ -16,6 +16,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:3000',
 ];
+const FRAME_PREFIX = 'https://zgzomwsujqtzjfmfhuow.supabase.co/storage/v1/object/public/proofs/';
 
 let corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': 'https://www.sika-ads.com',
@@ -40,7 +41,10 @@ function jsonResponse(body: FunctionResponse, status = 200): Response {
 }
 
 function validateRequest(payload: any): RequestBody {
-  const { proofId, imageUrl, videoUrl } = payload ?? {};
+  const { proofId, imageUrl, videoUrl, videoFrameUrls, reanalyze } = payload ?? {};
+  const frames = (Array.isArray(videoFrameUrls) ? videoFrameUrls : [videoFrameUrls])
+    .filter((u: unknown): u is string => typeof u === 'string' && u.startsWith(FRAME_PREFIX))
+    .slice(0, 4);
   if (!proofId || typeof proofId !== 'string') {
     throw new Error('proofId is required and must be a string');
   }
@@ -50,9 +54,11 @@ function validateRequest(payload: any): RequestBody {
   return {
     proofId,
     imageUrl,
-    videoUrl: typeof videoUrl === 'string' && videoUrl.trim() ? videoUrl.trim() : undefined
+    videoUrl: typeof videoUrl === 'string' && videoUrl.trim() ? videoUrl.trim() : undefined,
+    videoFrameUrls: frames,
+    reanalyze: reanalyze === true
   };
-}
+};
 
 serve(async (req: Request) => {
   recomputeCors(req);
@@ -83,6 +89,7 @@ serve(async (req: Request) => {
   }
 
   let proofId = 'unknown';
+  let failureStage = 'request_parsing';
 
   try {
     const body = await req.json();
@@ -90,6 +97,7 @@ serve(async (req: Request) => {
     const parsedRequest = validateRequest(body);
     proofId = parsedRequest.proofId;
 
+    failureStage = 'proof_lookup';
     const { data: proofRow, error: proofError } = await adminClient
       .from('proofs')
       .select('userId, status')
@@ -100,10 +108,6 @@ serve(async (req: Request) => {
       return jsonResponse({ success: false, proofId, error: 'proof_not_found' }, 404);
     }
 
-    if (proofRow.status === 'validated' || proofRow.status === 'rejected') {
-      return jsonResponse({ success: false, proofId, error: 'already_processed' }, 409);
-    }
-
     const { data: callerProfile } = await adminClient
       .from('users')
       .select('role')
@@ -112,10 +116,20 @@ serve(async (req: Request) => {
 
     const isStaff = callerProfile?.role === 'ADMIN' || callerProfile?.role === 'MODERATOR';
 
+    if (proofRow.status === 'validated' || proofRow.status === 'rejected') {
+      if (!parsedRequest.reanalyze) {
+        return jsonResponse({ success: false, proofId, error: 'already_processed' }, 409);
+      }
+      if (!isStaff) {
+        return jsonResponse({ success: false, proofId, error: 'forbidden' }, 403);
+      }
+    }
+
     if (proofRow.userId !== user.id && !isStaff) {
       return jsonResponse({ success: false, proofId, error: 'forbidden' }, 403);
     }
 
+    failureStage = 'ai_provider';
     const apiKey = Deno.env.get('RODIUMAI_API_KEY');
     if (!apiKey) {
       console.error('[index.ts] Missing RODIUMAI_API_KEY secret');
@@ -132,27 +146,46 @@ serve(async (req: Request) => {
 
     console.log(`[index.ts] Validating proof ${proofId} with image and videoUrl: ${parsedRequest.videoUrl ? 'present' : 'none'}`);
 
-    const rawProviderText = await callAI(parsedRequest.imageUrl, apiKey, parsedRequest.videoUrl);
+    const rawProviderText = await callAI(
+      parsedRequest.imageUrl,
+      apiKey,
+      parsedRequest.videoUrl,
+      { videoFrameUrls: parsedRequest.videoFrameUrls }
+    );
+
+    failureStage = 'ai_response_parsing';
     const rawResult = parseAIResponse(rawProviderText);
     const normalizedResult = normalizeAIResult(rawResult);
 
     console.log(`[index.ts] Normalized result for ${proofId}:`, normalizedResult);
 
-    await updateProof(adminClient, proofId, normalizedResult);
+    failureStage = 'proof_update';
+    await updateProof(
+      adminClient,
+      proofId,
+      normalizedResult,
+      parsedRequest.reanalyze && proofRow.status !== 'pending'
+    );
 
     console.log(`[index.ts] Proof ${proofId} updated successfully`);
 
     return jsonResponse({ success: true, proofId, result: normalizedResult });
   } catch (error) {
-    console.error(`[index.ts] Error while processing proof ${proofId}:`, error);
+    console.error(`[index.ts] Error at stage ${failureStage} while processing proof ${proofId}:`, error);
+    const providerFailure = failureStage === 'ai_provider';
+    const details = error instanceof AIProviderError
+      ? `ai_provider_http_${error.status}`
+      : providerFailure
+        ? 'ai_provider_network_or_request'
+        : failureStage;
     return jsonResponse(
       {
         success: false,
         proofId,
-        error: 'Validation failed',
-        details: 'internal_error'
+        error: providerFailure ? 'AI provider request failed' : 'Validation failed',
+        details
       },
-      500
+      providerFailure ? 502 : 500
     );
   }
 });

@@ -3,6 +3,7 @@ import { Proof, Notification, AIAnalysis, Campaign } from '../types';
 import { Upload, CheckCircle2, XCircle, Clock, Trash2, Eye, X, Image as ImageIcon, FileText, AlertCircle, Loader2, BrainCircuit, ShieldCheck, ShieldAlert, ChevronDown, Info, Search, Sparkles, Video, Play, Film } from 'lucide-react';
 import { supabase } from '../supabase';
 import { validateProofWithAI } from '../services/geminiService';
+import { extractAndUploadFrames } from '../services/extractVideoFrames';
 import { sendAdminProofSubmittedPush } from '../services/onesignalService';
 import Pagination from '../components/Pagination';
 import { useUserData } from '../hooks/useUserData';
@@ -257,11 +258,17 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     return data?.id || null;
   };
 
-  const performBackgroundAIAnalysis = async (file: File, proofId: string, userId: string, videoUrl?: string) => {
+  const performBackgroundAIAnalysis = async (
+    file: File,
+    proofId: string,
+    userId: string,
+    videoUrl?: string,
+    videoFrameUrls: string[] = []
+  ) => {
     try {
       console.log("Starting background AI analysis with image and optional video...", { hasVideo: !!videoUrl });
       const base64 = await fileToBase64(file);
-      const aiResult = await validateProofWithAI(base64, proofId, videoUrl);
+      const aiResult = await validateProofWithAI(base64, proofId, videoUrl, videoFrameUrls);
 
       const action = aiResult.suggestedAction || 'manual_review';
       console.log(`Background AI analysis completed. Action: ${action}`);
@@ -373,15 +380,19 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
         videoData
       );
 
-      setUploadProgress(100);
-
       // 4. Lancement de l'analyse IA croisée en arrière-plan
       if (proofId) {
         void sendAdminProofSubmittedPush(
           campaignName,
           session.user.user_metadata?.full_name || session.user.email || 'Un utilisateur',
         );
-        performBackgroundAIAnalysis(selectedFile, proofId, userId, videoData?.videoUrl);
+        const videoFrameUrls = selectedVideo
+          ? await extractAndUploadFrames(supabase, selectedVideo, `${userId}/${proofId}`)
+          : [];
+        setUploadProgress(100);
+        performBackgroundAIAnalysis(selectedFile, proofId, userId, videoData?.videoUrl, videoFrameUrls);
+      } else {
+        setUploadProgress(100);
       }
 
       addNotification({

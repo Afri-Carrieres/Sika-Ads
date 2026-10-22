@@ -18,13 +18,15 @@ export function getSupabaseClient(): SupabaseClient {
 function resolveStatus(action: 'approve' | 'reject' | 'manual_review'): 'validated' | 'rejected' | 'pending' {
   if (action === 'approve') return 'validated';
   if (action === 'reject') return 'rejected';
+  if (action === 'manual_review') return 'pending';
   return 'pending';
 }
 
 export async function updateProof(
   supabase: SupabaseClient,
   proofId: string,
-  result: NormalizedAIResult
+  result: NormalizedAIResult,
+  preserveDecision = false
 ): Promise<void> {
   const suggestedAction = determineAutoAction(result);
   const status = resolveStatus(suggestedAction);
@@ -35,15 +37,22 @@ export async function updateProof(
     analysisTimestamp: new Date().toISOString()
   };
 
+  const update = preserveDecision
+    ? {
+        aiValidation: result.isValid,
+        aiAnalysis: enrichedAnalysis
+      }
+    : {
+        aiValidation: result.isValid,
+        viewsCount: result.viewsCount,
+        aiAnalysis: enrichedAnalysis,
+        status,
+        rejectionReason: status === 'rejected' ? result.reason : null
+      };
+
   const { error } = await supabase
     .from('proofs')
-    .update({
-      aiValidation: result.isValid,
-      viewsCount: result.viewsCount,
-      aiAnalysis: enrichedAnalysis,
-      status,
-      rejectionReason: status === 'rejected' ? result.reason : null
-    })
+    .update(update)
     .eq('id', proofId);
 
   if (error) {

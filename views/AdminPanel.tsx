@@ -71,6 +71,8 @@ import {
 
 import { supabase } from "../supabase";
 import { useUserData } from "../hooks/useUserData";
+import { validateProofWithAI } from "../services/geminiService";
+import { extractAndUploadFrames } from "../services/extractVideoFrames";
 import {
   gomboAdminApproveWithdrawal,
   gomboAdminRejectWithdrawal,
@@ -142,7 +144,10 @@ const ProofReviewWorkspace: React.FC<{
   onPreview: (media: { url: string; type: "image" | "video" }) => void;
   onApprove: (proof: Proof) => void;
   onReject: (proof: Proof) => void;
-}> = ({ proofs, selectedProof, onSelect, onPreview, onApprove, onReject }) => {
+  onReanalyze: (proof: Proof) => void;
+  reanalyzingProofId: string | null;
+}> = ({ proofs, selectedProof, onSelect, onPreview, onApprove, onReject, onReanalyze, reanalyzingProofId }) => {
+  const isReanalyzing = selectedProof?.id === reanalyzingProofId;
   const metrics = selectedProof
     ? [
         {
@@ -317,6 +322,16 @@ const ProofReviewWorkspace: React.FC<{
             ) : null}
           </section>
 
+          <button
+            type="button"
+            onClick={() => onReanalyze(selectedProof)}
+            disabled={Boolean(reanalyzingProofId)}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#128686] px-4 py-2.5 text-sm font-bold text-[#0e6b6b] transition-colors hover:bg-[#f0fafa] disabled:cursor-wait disabled:opacity-60"
+          >
+            {isReanalyzing ? <Loader2 size={17} className="animate-spin" /> : <RefreshCcw size={16} />}
+            {isReanalyzing ? "Nouvelle analyse en cours…" : reanalyzingProofId ? "Une réanalyse est en cours…" : "Réanalyser avec l’IA"}
+          </button>
+
           {selectedProof.status === "pending" ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button type="button" onClick={() => onApprove(selectedProof)} className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700">
@@ -441,6 +456,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [selectedProofId, setSelectedProofId] = useState<string | null>(null);
   const [viewsInput, setViewsInput] = useState<string>("");
   const [isValidating, setIsValidating] = useState(false);
+  const [reanalyzingProofId, setReanalyzingProofId] = useState<string | null>(null);
   const [rejectingProof, setRejectingProof] = useState<Proof | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
@@ -975,6 +991,42 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     } catch (error) {
       console.error(error);
       return false;
+    }
+  };
+
+  const handleReanalyzeProof = async (proof: Proof) => {
+    if (reanalyzingProofId) return;
+    setReanalyzingProofId(proof.id);
+    try {
+      const videoUrl = proof.videoUrl || (proof as any).video_url;
+      const videoFrameUrls = videoUrl
+        ? await extractAndUploadFrames(
+            supabase,
+            videoUrl,
+            `${proof.userId}/${proof.id}`,
+          )
+        : [];
+
+      await validateProofWithAI(
+        proof.downloadURL,
+        proof.id,
+        videoUrl,
+        videoFrameUrls,
+        3,
+        { reanalyze: true, throwOnError: true },
+      );
+      await fetchAllProofs();
+      showFeedback("La preuve a été réanalysée avec succès.", "success");
+    } catch (error) {
+      console.error("Erreur lors de la réanalyse de la preuve :", error);
+      showFeedback(
+        error instanceof Error
+          ? `Échec de la réanalyse : ${error.message}`
+          : "Impossible de réanalyser cette preuve. Réessayez.",
+        "error",
+      );
+    } finally {
+      setReanalyzingProofId(null);
     }
   };
 
@@ -4053,6 +4105,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           }
           onSelect={setSelectedProofId}
           onPreview={setPreviewMedia}
+          onReanalyze={handleReanalyzeProof}
+          reanalyzingProofId={reanalyzingProofId}
           onApprove={(proof) => {
             setValidatingProof(proof);
             setViewsInput(proof.aiAnalysis?.viewsCount?.toString() || "0");

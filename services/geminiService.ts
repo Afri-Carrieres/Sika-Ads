@@ -36,6 +36,27 @@ interface EdgeFunctionResponse {
   details?: string;
 }
 
+const getFunctionErrorMessage = async (error: unknown): Promise<string> => {
+  if (typeof error === 'object' && error !== null && 'context' in error) {
+    const context = error.context;
+    if (context instanceof Response) {
+      try {
+        const body: unknown = await context.clone().json();
+        if (typeof body === 'object' && body !== null) {
+          const response = body as Record<string, unknown>;
+          const errorLabel = typeof response.error === 'string' ? response.error : 'Edge Function failed';
+          const details = typeof response.details === 'string' ? response.details : '';
+          return details ? `${errorLabel} (${details})` : errorLabel;
+        }
+      } catch {
+        // Keep the SDK error when the response body is not valid JSON.
+      }
+    }
+  }
+
+  return error instanceof Error ? error.message : 'Unknown Edge Function error';
+};
+
 // 1. Initialisation (Singleton)
 
 const fallbackAnalysis = (imageUrl: string): ProofValidationResult => {
@@ -140,7 +161,13 @@ const toBase64 = async (imageUrl: string): Promise<{ data: string; mimeType: str
   const blob = await response.blob();
   const mimeType = blob.type || "image/jpeg";
   const buffer = await blob.arrayBuffer();
-  const data = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  const data = btoa(binary);
 
   return { data, mimeType };
 };
@@ -169,7 +196,9 @@ export const validateProofWithAI = async (
   imageUrl: string,
   proofId: string,
   videoUrl?: string,
-  retries = 3
+  videoFrameUrls: string[] = [],
+  retries = 3,
+  options: { reanalyze?: boolean; throwOnError?: boolean } = {}
 ): Promise<ProofValidationResult> => {
 
   if (!proofId) {
@@ -193,7 +222,9 @@ export const validateProofWithAI = async (
           body: {
             proofId,
             imageUrl: `data:${mimeType};base64,${base64Clean}`,
-            videoUrl: videoUrl || undefined
+            videoUrl: videoUrl || undefined,
+            videoFrameUrls,
+            reanalyze: options.reanalyze
           }
         }
       );
@@ -221,10 +252,17 @@ export const validateProofWithAI = async (
         continue;
       }
 
-      console.warn('Analyse IA indisponible, utilisation du fallback local.', error);
+      const errorMessage = await getFunctionErrorMessage(error);
+      console.warn('Analyse IA indisponible, utilisation du fallback local.', errorMessage, error);
+      if (options.throwOnError) {
+        throw new Error(errorMessage, { cause: error });
+      }
       return fallbackAnalysis(imageUrl);
     }
   }
 
+  if (options.throwOnError) {
+    throw new Error('AI proof analysis failed after all retry attempts.');
+  }
   return fallbackAnalysis(imageUrl);
 };
