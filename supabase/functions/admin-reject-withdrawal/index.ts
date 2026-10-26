@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com', 'http://localhost:3000'];
 
 serve(async (req: Request) => {
   const origin = req.headers.get('Origin');
@@ -51,50 +51,15 @@ serve(async (req: Request) => {
       });
     }
 
-    const claim = await supabase
-      .from('withdrawals')
-      .update({
-        status: 'failed',
-        failureReason: 'rejected_by_admin',
-        refundedBy: user.id,
-        refundedAt: new Date().toISOString(),
-      })
-      .eq('id', withdrawalId)
-      .in('status', ['pending', 'pending_approval'])
-      .select('*')
-      .maybeSingle();
+    const { data: rejected, error: rejectErr } = await supabase.rpc('reject_withdrawal', {
+      p_withdrawal_id: withdrawalId,
+    });
 
-    if (claim.error) throw claim.error;
-    if (!claim.data) {
+    if (rejectErr) throw rejectErr;
+    if (!rejected) {
       return new Response(JSON.stringify({ error: 'Withdrawal already processed' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
-    }
-
-    const withdrawal = claim.data;
-
-    const amount = Number(withdrawal.amount || 0);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
-
-    const balanceDebited = Boolean(withdrawal.balanceDebited);
-    const userId = String(withdrawal.userId || '');
-
-    if (balanceDebited && userId) {
-      const { data: userData } = await supabase
-        .from('users').select('balance').eq('id', userId).single();
-
-      const currentBalance = Number(userData?.balance || 0);
-      await supabase.from('users').update({
-        balance: currentBalance + amount
-      }).eq('id', userId);
-
-      await supabase.from('withdrawals').update({
-        refundedAt: new Date().toISOString(), refundedBy: user.id
-      }).eq('id', withdrawalId);
     }
 
     return new Response(JSON.stringify({ success: true }), {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff, ExternalLink } from 'lucide-react';
+import { User as UserIcon, Camera, Phone, Mail, Save, Trash2, AlertTriangle, Loader2, X, CheckCircle2, Lock, ShieldCheck, AlertCircle, Bell, BellOff, ExternalLink, Clock } from 'lucide-react';
 import { useUserData } from '@/hooks/useUserData';
 import { useOneSignal } from '@/hooks/useOneSignal';
 import { User, UserRole } from '../types';
@@ -98,9 +98,10 @@ const WhatsAppChannelCard: React.FC = () => {
 };
 
 const ProfilePage: React.FC = () => {
-  const {userData} = useUserData();
+  const {userData, loading: loadingUser} = useUserData();
   const [user, setUser] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   // Form States
   const [displayName, setDisplayName] = useState('');
@@ -123,6 +124,14 @@ const ProfilePage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+
+  //  if (loadingUser) {
+  //     return (
+  //       <div className="flex items-center justify-center h-96">
+  //         <Clock className="animate-spin text-[#128686]" size={40} />
+  //       </div>
+  //     );
+  //   }
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -152,6 +161,15 @@ const ProfilePage: React.FC = () => {
     };
     fetchUserData();
   }, []);
+
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Clock className="animate-spin text-[#128686]" size={40} />
+      </div>
+    );
+  }
+
 
   // --- AVATAR MANAGEMENT ---
 

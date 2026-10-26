@@ -30,7 +30,7 @@ const WalletView: React.FC<WalletViewProps> = ({ onWithdrawalRequested }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
-  const MIN_WITHDRAWAL = 2000;
+  const MIN_WITHDRAWAL = 1000;
 
   const loadWithdrawals = async () => {
     if (!user?.id) return;

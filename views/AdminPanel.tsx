@@ -416,6 +416,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   >("Total Subscriptions");
   const [isSendingPush, setIsSendingPush] = useState(false);
 
+  const {loading: loadingUser } = useUserData();
+
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [statsCampaign, setStatsCampaign] = useState<Campaign | null>(null);

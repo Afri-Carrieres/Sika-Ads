@@ -2,8 +2,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { CATEGORIES } from '../constants';
 import { supabase } from '../supabase';
+import { useUserData } from '@/hooks/useUserData';
 import { Campaign } from '../types';
-import { Share2, Download, X, Instagram, Facebook, MessageCircle, Copy, Check, Loader2, Smartphone, TrendingUp, Sparkles, CheckCircle2, PartyPopper, Ban, Lock, Info, Zap, PauseCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Share2, Download, X, Instagram, Facebook, MessageCircle, Copy, Check, Loader2, Smartphone, TrendingUp, Sparkles, CheckCircle2, PartyPopper, Ban, Lock, Info, Zap, PauseCircle, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 
 interface CampaignMarketplaceProps {
   onShareCampaign: (campaignId: string) => void;
@@ -11,6 +12,8 @@ interface CampaignMarketplaceProps {
 
 
 const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampaign }) => {
+  const { loading: loadingUser } = useUserData();
+
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showGlobalSuccess, setShowGlobalSuccess] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
@@ -64,6 +67,9 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
       active = false;
     };
   }, [referrerId]);
+
+  
+
 
 
   // Récupération temps réel des campagnes Supabase
@@ -199,6 +205,14 @@ const CampaignMarketplace: React.FC<CampaignMarketplaceProps> = ({ onShareCampai
     }
     return { label: 'Active', className: 'bg-green-500 text-white', icon: Zap };
   };
+
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Clock className="animate-spin text-[#128686]" size={40} />
+      </div>
+    );
+  }
 
   return (
     <>

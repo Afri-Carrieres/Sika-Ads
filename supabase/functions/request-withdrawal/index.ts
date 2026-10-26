@@ -1,9 +1,9 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com'];
+const ALLOWED_ORIGINS = ['https://www.sika-ads.com', 'https://sikaads-7b9bc.web.app', 'https://sikaads-7b9bc.firebaseapp.com', 'http://localhost:3000'];
 
-const MIN_WITHDRAWAL = 2000;
+const MIN_WITHDRAWAL = 1000;
 
 serve(async (req: Request) => {
   const origin = req.headers.get('Origin');
@@ -25,11 +25,10 @@ serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data: { user }, error: authErr } = await supabase.auth.getUser();
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token);
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -76,60 +75,33 @@ serve(async (req: Request) => {
       });
     }
 
-    const { data: userData, error: userErr } = await supabase
-      .from('users').select('balance, name').eq('id', user.id).single();
-
-    if (userErr || !userData) {
-      return new Response(JSON.stringify({ error: 'user_not_found' }), {
-        status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
-
-    const balance = Number(userData.balance || 0);
-
     const withdrawalId = `${user.id}_${clientReqId}`;
 
-    const { error: insertErr } = await supabase.from('withdrawals').insert({
-      id: withdrawalId,
-      userId: user.id,
-      userName: userData.name || 'Utilisateur',
-      amount: numAmount,
-      provider: providerLower,
-      phone: phoneTrimmed,
-      country: countryUpper,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      clientRequestId: clientReqId,
-      balanceDebited: true,
-      debitedAt: new Date().toISOString(),
+    const { data: createdWithdrawalId, error: requestErr } = await supabase.rpc('request_withdrawal', {
+      p_user_id: user.id,
+      p_withdrawal_id: withdrawalId,
+      p_amount: numAmount,
+      p_provider: providerLower,
+      p_phone: phoneTrimmed,
+      p_country: countryUpper,
+      p_client_request_id: clientReqId,
     });
 
-    if (insertErr) {
-      if (insertErr.code === '23505') {
-        return new Response(JSON.stringify({ withdrawalId }), {
-          status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    if (requestErr) {
+      if (requestErr.message.includes('insufficient_balance')) {
+        return new Response(JSON.stringify({ error: 'insufficient_balance' }), {
+          status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
         });
       }
-      throw insertErr;
+      if (requestErr.message.includes('user_not_found')) {
+        return new Response(JSON.stringify({ error: 'user_not_found' }), {
+          status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+      throw requestErr;
     }
 
-    const { data: debited, error: updateErr } = await supabase
-      .from('users')
-      .update({ balance: balance - numAmount })
-      .eq('id', user.id)
-      .gte('balance', numAmount)
-      .select('id');
-
-    if (updateErr) throw updateErr;
-
-    if (!debited || debited.length === 0) {
-      await supabase.from('withdrawals').delete().eq('id', withdrawalId);
-      return new Response(JSON.stringify({ error: 'insufficient_balance' }), {
-        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
-
-    return new Response(JSON.stringify({ withdrawalId }), {
+    return new Response(JSON.stringify({ withdrawalId: createdWithdrawalId }), {
       status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   } catch (error) {

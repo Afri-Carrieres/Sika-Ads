@@ -19,10 +19,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   const [category, setCategory] = useState('');
 
   const PACKS = [
-    { id: 'starter', label: 'Starter', price: 1000, color: 'bg-blue-50 border-blue-200 text-blue-400' },
+    { id: 'Basic', label: 'Basic', price: 1000, color: 'bg-blue-50 border-blue-200 text-blue-400' },
+    { id: 'starter', label: 'Starter', price: 2500, color: 'bg-green-50 border-green-200 text-green-400' },
     { id: 'boost', label: 'Boost', price: 5000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
-    { id: 'business', label: 'Business', price: 25000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
-    { id: 'pro', label: 'Pro', price: 50000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
+    { id: 'business', label: 'Business', price: 10000, color: 'bg-[#F7DEFF] border-[#9ED0D0] text-[#620F7D]' },
+    { id: 'pro', label: 'Pro', price: 25000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
+    { id: 'premium', label: 'Premium', price: 50000, color: 'bg-[#FFF6DE] border-yellow-200 text-[#FFC72D]' },
   ];
 
   // --- State ---
@@ -246,7 +248,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
 
               <div className="space-y-6">
                 {/* Packages */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {PACKS.map((pack) => (
                     <button
                       key={pack.id}

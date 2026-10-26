@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { User } from '../types';
-import { Wallet, MousePointerClick, TrendingUp, ArrowUpRight, Copy, Check, BellRing, X, Sparkles, History, Filter, Calendar, Share2 } from 'lucide-react';
+import { Wallet, MousePointerClick, TrendingUp, ArrowUpRight, Copy, Check, BellRing, X, Sparkles, History, Filter, Calendar, Share2, Clock } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { supabase } from '../supabase';
 import NotificationBell from '../components/NotificationBell';
 import { useOneSignal } from '../hooks/useOneSignal';
+import { useUserData } from '@/hooks/useUserData';
 
 interface AmbassadorDashboardProps {
   onNavigateToWallet: () => void;
@@ -57,6 +58,8 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
   const [withdrawalDocs, setWithdrawalDocs] = useState<any[]>([]);
   const [shareCount, setShareCount] = useState<number>(0);
 
+  const {loading: loadingUser } = useUserData();
+
   // Hook pour les notifications push
   const { permission, isSubscribed, requestPermission } = useOneSignal({
     userId: userData?.id || null
@@ -76,6 +79,8 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
       return null;
     }
   };
+
+
 
   useEffect(() => {
     let active = true;
@@ -283,6 +288,15 @@ const AmbassadorDashboard: React.FC<AmbassadorDashboardProps> = ({ onNavigateToW
 
     return Object.entries(days).map(([name, amount]) => ({ name, earnings: Math.round(amount) }));
   }, [proofDocs]);
+
+  
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Clock className="animate-spin text-[#128686]" size={40} />
+      </div>
+    );
+  }
 
   if (!displayUser) {
     return (
