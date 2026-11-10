@@ -1,0 +1,115 @@
+╔════════════════════════════════════════════════════════════════════════╗
+║                  🚀 QUICK START - PWA iOS SikaAds                      ║
+║                                                                        ║
+║                    Temps estimé: 20-30 minutes                        ║
+╚════════════════════════════════════════════════════════════════════════╝
+
+
+ÉTAPE 1: INSTALLER LES DÉPENDANCES (1-2 min)
+─────────────────────────────────────────────────────────────────────────
+
+  npm install --save-dev sharp
+
+
+ÉTAPE 2: GÉNÉRER LES ICONS (30 sec)
+─────────────────────────────────────────────────────────────────────────
+
+  npm run generate-icons
+
+  ✓ Résultat: public/icons/ avec 13 fichiers PNG
+
+
+ÉTAPE 3: CRÉER LES SCREENSHOTS (5-10 min MANUEL)
+─────────────────────────────────────────────────────────────────────────
+
+  1. Prendre 2 screenshots:
+     - Mobile (540x720 px)
+     - Tablet (1280x720 px)
+
+  2. Placer dans: public/screenshots/
+     - screenshot-540x720.png
+     - screenshot-1280x720.png
+
+  💡 Alternatives:
+     - Canva: https://www.canva.com/
+     - Figma: https://www.figma.com/
+
+
+ÉTAPE 4: TESTER LOCALEMENT (5-10 min)
+─────────────────────────────────────────────────────────────────────────
+
+  npm run dev
+
+  ✓ Ouvrir: http://localhost:3000
+  ✓ iOS Safari: Share → Add to Home Screen
+  ✓ Vérifier icon + fullscreen + offline
+
+
+ÉTAPE 5: VÉRIFIER AVEC LIGHTHOUSE (5 min)
+─────────────────────────────────────────────────────────────────────────
+
+  npm run pwa:audit
+
+  ✓ Chrome DevTools → Lighthouse → Progressive Web App
+  ✓ Cible: Score PWA > 90
+
+
+ÉTAPE 6: DÉPLOYER EN PRODUCTION
+─────────────────────────────────────────────────────────────────────────
+
+  npm run build
+  git add .
+  git commit -m "✨ PWA iOS improvements"
+  git push origin main
+
+  ✓ Vercel déploie automatiquement
+
+
+════════════════════════════════════════════════════════════════════════
+
+COMMANDES DISPONIBLES:
+
+  npm run dev              → Développement local
+  npm run build            → Build production
+  npm run preview          → Preview build
+  npm run generate-icons   → Générer 13 icons
+  npm run pwa:setup        → Generate icons + build
+  npm run pwa:audit        → Test Lighthouse
+
+
+════════════════════════════════════════════════════════════════════════
+
+DOCUMENTATION COMPLÈTE:
+
+  📋 PWA_iOS_IMPROVEMENTS.md    → Référence technique
+  🚀 PWA_INSTALLATION_GUIDE.md  → Guide détaillé
+  📝 CHANGES_SUMMARY.md         → Changements
+
+
+════════════════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING RAPIDE:
+
+  ❓ App ne s'installe pas?
+     → Vérifier HTTPS activé
+     → Vérifier manifest valide (DevTools)
+     → Vérifier icons existent
+
+  ❓ Icons ne s'affichent pas?
+     → Régénérer: npm run generate-icons
+     → Vérifier tailles (192x192, pas 192x256)
+     → Vérifier format PNG
+
+  ❓ Offline ne fonctionne pas?
+     → Hard refresh: Ctrl+Shift+R
+     → Vérifier Service Worker (DevTools)
+     → Vérifier globPatterns dans vite.config.ts
+
+
+════════════════════════════════════════════════════════════════════════
+
+STATUS: ✅ PRÊT POUR PRODUCTION
+
+Bonne chance! 🎉
+
+════════════════════════════════════════════════════════════════════════

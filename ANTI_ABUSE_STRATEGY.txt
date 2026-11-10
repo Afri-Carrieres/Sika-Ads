@@ -1,0 +1,131 @@
+════════════════════════════════════════════════════════════════
+  🔒 STRATÉGIE ANTI-ABUS - SikaAds
+════════════════════════════════════════════════════════════════
+
+PROBLÈME IDENTIFIÉ:
+  - Utilisateurs créent campagnes de test
+  - Soumettent preuves non conformes
+  - Spamment avec fausses soumissions
+  - Abusent du système
+
+════════════════════════════════════════════════════════════════
+  SOLUTION: 7 COUCHES DE SÉCURITÉ
+════════════════════════════════════════════════════════════════
+
+1️⃣ VALIDATION FRONTEND (UX Prevention)
+   ✓ Limite soumissions: 5/jour, 50/semaine
+   ✓ Valide taille image: 50KB-2MB
+   ✓ Valide résolution: min 540x720
+   ✓ Google reCAPTCHA v3 (anti-bot)
+   ✓ Validation budget: 10k-500k XOF
+
+2️⃣ VALIDATION BACKEND (Sécurité stricte)
+   ✓ Check suspension utilisateur
+   ✓ Rate limiting (Redis)
+   ✓ Duplicate detection (hash)
+   ✓ Vérification compte age (new acc = plus strict)
+   ✓ Historical checks (rejections antérieures)
+
+3️⃣ CONTENT VERIFICATION (AI/ML)
+   ✓ Google Cloud Vision API
+   ✓ Détection texte (view count)
+   ✓ Détection screenshot (mobile interface)
+   ✓ Watermark detection (Photoshop, Canva)
+   ✓ Manipulation detection (forensics)
+   ✓ Score: 0-1 (0.3=reject, 0.6=review, 0.6+=approve)
+
+4️⃣ REPUTATION SYSTEM (Blocage progressif)
+   ✓ 1er rejet: Email warning
+   ✓ 3 rejets: Suspension 24h
+   ✓ 7 rejets: Suspension 7 jours
+   ✓ 15 rejets: Ban permanent
+   ✓ Si score < 0.2 + 3 rejets: Ban instant
+
+5️⃣ VERIFICATION REQUIREMENTS (Progressive)
+   New account (< 7j):
+     - Email verified (requis)
+     - Phone verified (requis)
+     - Payment method (requis)
+     - Max 1 campaign
+
+   Young account (7-30j):
+     - All above
+     - Max 5 campaigns
+
+   Established (> 30j):
+     - All above
+     - Unlimited campaigns
+
+6️⃣ MANUAL REVIEW DASHBOARD (Admin)
+   ✓ Queue: Submissions flagged by AI (score < 0.6)
+   ✓ Show: Image + AI analysis + user history
+   ✓ Admin actions: Approve / Reject with reason
+   ✓ Impact: Release payment ou increment violation
+
+7️⃣ MONITORING & ALERTS
+   ✓ Auto-flag: AI score < 0.6
+   ✓ Auto-flag: 3+ rejections by user
+   ✓ Auto-flag: Image similarity > 95%
+   ✓ Alert: User with 5+ rejections
+   ✓ Dashboard: Admin notifications
+
+════════════════════════════════════════════════════════════════
+  DATABASE SCHEMA
+════════════════════════════════════════════════════════════════
+
+user_abuse_tracking:
+  - user_id (UUID)
+  - rejected_submissions (INT)
+  - rejected_campaigns (INT)
+  - is_suspended (BOOLEAN)
+  - suspension_until (TIMESTAMP)
+  - last_violation (TIMESTAMP)
+
+campaign_submissions:
+  - id, campaign_id, user_id
+  - status: pending/verified/rejected/suspended
+  - image_hash (for duplicates)
+  - content_score: 0-1
+  - flagged_for_review (BOOLEAN)
+  - admin_review_status
+
+════════════════════════════════════════════════════════════════
+  TIMELINE IMPLÉMENTATION
+════════════════════════════════════════════════════════════════
+
+PHASE 1 (WEEK 1 - URGENT):
+  [ ] Rate limiting (Redis)
+  [ ] Basic image validation
+  [ ] Rejection counter
+  [ ] Auto-suspension (24h)
+  [ ] Email notifications
+  Temps: 2-3 jours
+
+PHASE 2 (WEEK 2-3):
+  [ ] Google Cloud Vision API
+  [ ] Content AI scoring
+  [ ] Duplicate detection
+  [ ] Phone verification
+  Temps: 3-5 jours
+
+PHASE 3 (WEEK 4+):
+  [ ] Advanced forensics
+  [ ] Admin dashboard
+  [ ] ID verification
+  [ ] Progressive requirements
+  Temps: 5-7 jours
+
+════════════════════════════════════════════════════════════════
+  FICHIERS CRÉÉS
+════════════════════════════════════════════════════════════════
+
+services/validation/:
+  ✓ campaign-validator.ts (Valide campagnes)
+  ✓ proof-validator.ts (Valide preuves)
+
+À créer:
+  - rate-limiter.ts (Redis)
+  - ai-content-analyzer.ts (Google Vision)
+  - user-abuse-handler.ts (Reputation)
+  - admin-dashboard.ts (Manual review)
+

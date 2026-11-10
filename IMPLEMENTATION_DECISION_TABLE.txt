@@ -1,0 +1,168 @@
+════════════════════════════════════════════════════════════════════════════
+                    TABLE DE DÉCISION - BLOQUAGE ABUS
+════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 1: CRÉATION CAMPAGNE
+─────────────────────────────────────────────────────────────────────────
+
+  INPUT:                          │ DECISION           │ ACTION
+  ─────────────────────────────────────────────────────────────────────
+  Account suspended               │ REJECT             │ Show "Account suspended"
+  Rate limit exceeded (>10/week)  │ REJECT             │ Show "Weekly limit reached"
+  Budget < 10,000 XOF            │ REJECT             │ Show "Min budget 10,000"
+  Budget > 500,000 XOF           │ REJECT             │ Show "Max budget 500,000"
+  Image invalid                  │ REJECT             │ Show specific error
+  Account age < 7d + not verified │ REJECT             │ Show "Verify phone/payment"
+  AI score < 0.5                 │ REJECT             │ Show "Non-compliant content"
+  All valid                      │ APPROVE            │ Create campaign
+  ─────────────────────────────────────────────────────────────────────
+
+SCENARIO 2: SOUMISSION PREUVE
+─────────────────────────────────────────────────────────────────────────
+
+  INPUT:                          │ DECISION           │ ACTION
+  ─────────────────────────────────────────────────────────────────────
+  Account suspended               │ REJECT             │ Show "Account suspended"
+  Rate limit (>5/day)             │ REJECT             │ Show "Daily limit reached"
+  Rate limit (>50/week)           │ REJECT             │ Show "Weekly limit reached"
+  File size < 50KB               │ REJECT             │ Show "File too small"
+  File size > 2MB                │ REJECT             │ Show "File too large"
+  Format != PNG/JPG              │ REJECT             │ Show "Only PNG/JPG"
+  Resolution < 540x720           │ REJECT             │ Show "Min 540x720"
+  Duplicate (same file 24h)      │ REJECT             │ Show "Already submitted"
+  AI score < 0.3                 │ REJECT + LOG       │ Reject + count violation
+                                 │                    │ (increment counter)
+  AI score 0.3-0.6               │ APPROVE + FLAG     │ Approve but flag for
+                                 │                    │ manual review (admin queue)
+  AI score > 0.6                 │ APPROVE            │ Accept and process payment
+  ─────────────────────────────────────────────────────────────────────
+
+SCENARIO 3: GESTION VIOLATIONS
+─────────────────────────────────────────────────────────────────────────
+
+  REJECTION COUNT │ ACTION               │ EMAIL NOTIFICATION
+  ────────────────┼──────────────────────┼─────────────────────────────
+  1               │ NONE                 │ "Proof rejected" + guidelines
+  2               │ NONE                 │ "Second rejection" + help
+  3               │ SUSPEND 24H          │ "⚠️ Account suspended 24h"
+  4-6             │ SUSPENDED (24h)      │ "Still suspended"
+  7               │ SUSPEND 7D           │ "🔴 Account suspended 7d"
+  8-14            │ SUSPENDED (7d)       │ "Still suspended"
+  15              │ BAN                  │ "❌ Permanently banned"
+  ────────────────┼──────────────────────┼─────────────────────────────
+  
+  SPECIAL: If AI_SCORE < 0.2 AND REJECTIONS >= 3 → BAN INSTANTLY
+
+SCENARIO 4: VÉRIFICATION PROGRESSIVE (Account Age)
+─────────────────────────────────────────────────────────────────────────
+
+  ACCOUNT AGE     │ REQUIREMENTS        │ LIMITS
+  ─────────────────────────────────────────────────────────────────────
+  < 7 days        │ Email (requis)      │ Max 1 campaign
+                  │ Phone (requis)      │ Max 5 submissions/day
+                  │ Payment (requis)    │
+  ─────────────────────────────────────────────────────────────────────
+  7-30 days       │ All above           │ Max 5 campaigns
+                  │                     │ Max 5 submissions/day
+  ─────────────────────────────────────────────────────────────────────
+  > 30 days       │ All above           │ Unlimited campaigns
+                  │                     │ Max 5 submissions/day (always)
+  ─────────────────────────────────────────────────────────────────────
+  Top earners     │ All above           │ ID verification (for KYC)
+  (> 1M XOF)      │ ID verification     │
+  ─────────────────────────────────────────────────────────────────────
+
+SCENARIO 5: ADMIN MANUAL REVIEW
+─────────────────────────────────────────────────────────────────────────
+
+  AUTO-FLAGGED ITEMS:
+  ─────────────────────────────────────────────────────────────────────
+  ✓ AI score 0.3-0.6 (low confidence)
+  ✓ User has 3+ rejections
+  ✓ Image similarity > 95% (duplicate)
+  ✓ User with pattern of bad submissions
+
+  ADMIN ACTIONS:
+  ─────────────────────────────────────────────────────────────────────
+  APPROVE:
+    - Change status to "verified"
+    - Release payment to user wallet
+    - Send "Payment approved" email
+
+  REJECT:
+    - Change status to "rejected"
+    - Increment user violation counter
+    - Send "Proof rejected" email
+    - If counter reaches 3/7/15 → Auto-suspend/ban
+
+SCENARIO 6: FRAUD DETECTION PATTERNS
+─────────────────────────────────────────────────────────────────────────
+
+  PATTERN DETECTED           │ AUTO-ACTION
+  ─────────────────────────────────────────────────────────────────────
+  > 10 submissions/day       │ Suspend, manual review
+  Same image 5+ times        │ Reject all, notify admin
+  Different accounts same IP │ Flag all accounts for review
+  Submission right after     │ Automatic rejection (bot pattern)
+  campaign creation          │
+  Always low AI scores       │ Suspend after 3, then ban
+  Never passing verification │ Pattern analysis, manual review
+  ─────────────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════════════════
+                         CODE FLOW EXAMPLE
+════════════════════════════════════════════════════════════════════════════
+
+USER SUBMITS PROOF:
+  │
+  ├─> Check suspension? → YES → BLOCK
+  │                    → NO → Continue
+  │
+  ├─> Check rate limit? → YES → BLOCK (too many today/week)
+  │                    → NO → Continue
+  │
+  ├─> Validate file? → INVALID → BLOCK
+  │                 → VALID → Continue
+  │
+  ├─> AI Content Analysis:
+  │   ├─> Score < 0.3? → AUTO-REJECT + Increment violation counter
+  │   │
+  │   ├─> Score 0.3-0.6? → FLAG FOR ADMIN REVIEW
+  │   │                     (Add to admin queue)
+  │   │
+  │   └─> Score > 0.6? → APPROVE (release payment)
+  │
+  └─> Check violation count:
+      ├─> Count == 3? → Suspend 24h
+      ├─> Count == 7? → Suspend 7d
+      ├─> Count == 15? → Ban
+      └─> Count < 3? → Just warning email
+
+════════════════════════════════════════════════════════════════════════════
+                        METRICS & MONITORING
+════════════════════════════════════════════════════════════════════════════
+
+DASHBOARD ADMIN:
+  - Submissions pending review: [count]
+  - Auto-rejected today: [count]
+  - Users suspended: [count]
+  - Users banned: [count]
+  - Average AI score: [0-1]
+  - False positive rate: [%]
+
+ALERTS:
+  - User with 5+ rejections → Email admin
+  - Submission AI score = 0.0 → Instant flag
+  - Pattern detected (10+ same image) → Instant flag
+  - New account with 3 rejections in 1h → Suspend
+
+REPORTING (Weekly):
+  - Total submissions: [count]
+  - Auto-approved: [%]
+  - Manual review: [%]
+  - Auto-rejected: [%]
+  - Users suspended: [count]
+  - Users banned: [count]
+
+════════════════════════════════════════════════════════════════════════════
+

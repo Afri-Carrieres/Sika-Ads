@@ -3,12 +3,16 @@
 export type SuggestedAction = 'approve' | 'reject' | 'manual_review';
 
 export interface RequestBody {
-  proofId: string;
+  proofId?: string;
+  preflight?: boolean;
   imageUrl: string;
   videoUrl?: string;
   /** Images extraites côté client depuis le bucket public proofs, ordre chronologique, max 4. */
   videoFrameUrls?: string[];
   reanalyze?: boolean;
+  campaignName?: string;
+  campaignId?: string;
+  expectedPlatform?: string;
 }
 
 /**
@@ -59,6 +63,8 @@ export interface NormalizedAIResult {
 export interface FunctionResponse {
   success: boolean;
   proofId: string;
+  submissionAllowed?: boolean;
+  validationToken?: string;
   result?: NormalizedAIResult;
   error?: string;
   details?: string;

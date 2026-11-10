@@ -26,6 +26,8 @@ export interface ProofValidationResult {
   videoConsistencyScore?: number;
   suggestedAction?: 'approve' | 'reject' | 'manual_review';
   fraudEvidenceDetails: string[];
+  submissionAllowed?: boolean;
+  validationToken?: string;
 }
 
 // Shape returned by the ai-validate-proof Edge Function (see index.ts / types.ts).
@@ -33,6 +35,8 @@ interface EdgeFunctionResponse {
   success: boolean;
   proofId: string;
   result?: ProofValidationResult;
+  submissionAllowed?: boolean;
+  validationToken?: string;
   error?: string;
   details?: string;
 }
@@ -193,37 +197,54 @@ const resizeImage = (dataUrl: string, maxWidth = 1024): Promise<string> => {
 //    mettre à jour la ligne correspondante dans la table `proofs`.
 export const validateProofWithAI = async (
   imageUrl: string,
-  proofId: string,
+  proofId: string | null,
   videoUrl?: string,
   videoFrameUrls: string[] = [],
   retries = 3,
-  options: { reanalyze?: boolean; throwOnError?: boolean } = {}
+  options: {
+    reanalyze?: boolean;
+    throwOnError?: boolean;
+    preflight?: boolean;
+    campaignName?: string;
+    campaignId?: string;
+    expectedPlatform?: string;
+  } = {}
 ): Promise<ProofValidationResult> => {
 
-  if (!proofId) {
-    console.error('validateProofWithAI: proofId manquant, utilisation du fallback local.');
-    return fallbackAnalysis(imageUrl);
+  if (!proofId && !options.preflight) {
+    throw new Error("Un identifiant de preuve est requis pour l'analyse.");
   }
 
-  // Conversion initiale et redimensionnement pour optimiser les tokens et la performance
-  const { data, mimeType } = await toBase64(imageUrl);
+  let base64Clean: string;
+  let mimeType: string;
 
-  // Redimensionnement
-  const resizedData = await resizeImage(`data:${mimeType};base64,${data}`);
-  const base64Clean = resizedData.split(",")[1];
+  if (options.preflight) {
+    const image = await toBase64(imageUrl);
+    mimeType = image.mimeType;
+    base64Clean = image.data;
+  } else {
+    const image = await toBase64(imageUrl);
+    mimeType = image.mimeType;
+    const resizedData = await resizeImage(`data:${mimeType};base64,${image.data}`);
+    base64Clean = resizedData.split(",")[1];
+  }
 
   // Boucle de tentatives (Retry)
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      const { data: responseData, error } = await supabase.functions.invoke<EdgeFunctionResponse>(
+      const { data: responseData, error } = await supabase.functions.invoke(
         'ai-validate-proof',
         {
           body: {
             proofId,
+            preflight: options.preflight === true,
             imageUrl: `data:${mimeType};base64,${base64Clean}`,
             videoUrl: videoUrl || undefined,
             videoFrameUrls,
-            reanalyze: options.reanalyze
+            reanalyze: options.reanalyze,
+            campaignName: options.campaignName,
+            campaignId: options.campaignId,
+            expectedPlatform: options.expectedPlatform,
           }
         }
       );
@@ -240,7 +261,11 @@ export const validateProofWithAI = async (
         throw new Error('Edge Function response is missing the result field.');
       }
 
-      return normalizeAIResult(responseData.result);
+      return {
+        ...normalizeAIResult(responseData.result),
+        submissionAllowed: responseData.submissionAllowed,
+        validationToken: responseData.validationToken,
+      };
     } catch (error: any) {
       const isTransientError = /429|500|502|503|network|fetch|cors|Failed to fetch/i.test(error?.message || '');
 

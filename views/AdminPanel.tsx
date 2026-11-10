@@ -151,16 +151,20 @@ const StatCard: React.FC<{
   );
 };
 
+type ProofStatusFilter = "all" | "pending" | "validated" | "rejected";
+
 const ProofReviewWorkspace: React.FC<{
   proofs: Proof[];
   selectedProof: Proof | null;
+  statusFilter: ProofStatusFilter;
+  onStatusFilterChange: (status: ProofStatusFilter) => void;
   onSelect: (proofId: string) => void;
   onPreview: (media: { url: string; type: "image" | "video" }) => void;
   onApprove: (proof: Proof) => void;
   onReject: (proof: Proof) => void;
   onReanalyze: (proof: Proof) => void;
   reanalyzingProofId: string | null;
-}> = ({ proofs, selectedProof, onSelect, onPreview, onApprove, onReject, onReanalyze, reanalyzingProofId }) => {
+}> = ({ proofs, selectedProof, statusFilter, onStatusFilterChange, onSelect, onPreview, onApprove, onReject, onReanalyze, reanalyzingProofId }) => {
   const isReanalyzing = selectedProof?.id === reanalyzingProofId;
   const metrics = selectedProof
     ? [
@@ -200,13 +204,29 @@ const ProofReviewWorkspace: React.FC<{
       <aside className="flex h-[min(44vh,380px)] min-h-[260px] min-w-0 flex-col overflow-hidden rounded-xl border border-[#202633] bg-[#062127] text-white shadow-sm sm:h-[min(44vh,440px)] sm:min-h-[300px] xl:h-[min(760px,calc(100vh-220px))] xl:min-h-[360px]">
         <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-4">
           <div>
-            <h3 className="font-semibold">Preuves à réviser</h3>
+            <h3 className="font-semibold">Preuves</h3>
             <p className="mt-1 text-xs text-gray-400">
-              {proofs.length} preuve{proofs.length === 1 ? "" : "s"} soumise{proofs.length === 1 ? "" : "s"}
+              {proofs.length} résultat{proofs.length === 1 ? "" : "s"}
             </p>
           </div>
           {/* <Shield size={18} className="text-teal-300" /> */}
         </header>
+        <div className="shrink-0 border-b border-white/10 px-4 py-3">
+          <label htmlFor="proof-status-filter" className="mb-1.5 block text-xs font-medium text-gray-300">
+            Filtrer par statut
+          </label>
+          <select
+            id="proof-status-filter"
+            value={statusFilter}
+            onChange={(event) => onStatusFilterChange(event.target.value as ProofStatusFilter)}
+            className="w-full rounded-md border border-white/15 bg-[#10141d] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
+          >
+            <option value="pending">En attente</option>
+            <option value="validated">Validées</option>
+            <option value="rejected">Rejetées</option>
+            <option value="all">Tous les statuts</option>
+          </select>
+        </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {proofs.map((proof) => {
             const isSelected = proof.id === selectedProof?.id;
@@ -246,7 +266,7 @@ const ProofReviewWorkspace: React.FC<{
           })}
           {proofs.length === 0 && (
             <p className="px-4 py-10 text-center text-sm text-gray-400">
-              Aucune preuve à réviser.
+              Aucune preuve ne correspond à ce filtre.
             </p>
           )}
         </div>
@@ -505,9 +525,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   );
 
   // --- Proof Validation Filters ---
-  const [proofStatusFilter, setProofStatusFilter] = useState<
-    "all" | "pending" | "validated" | "rejected"
-  >("pending");
+  const [proofStatusFilter, setProofStatusFilter] =
+    useState<ProofStatusFilter>("pending");
   const [suggestedActionFilter, setSuggestedActionFilter] = useState<
     "all" | "approve" | "reject" | "manual_review"
   >("all");
@@ -4216,12 +4235,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       ══════════════════════════════════════════ */}
       {view === "validation" && (
         <ProofReviewWorkspace
-          proofs={allProofs}
-          selectedProof={
-            allProofs.find((proof) => proof.id === selectedProofId) ??
-            allProofs[0] ??
-            null
-          }
+          proofs={filteredProofs}
+          selectedProof={selectedProof}
+          statusFilter={proofStatusFilter}
+          onStatusFilterChange={setProofStatusFilter}
           onSelect={setSelectedProofId}
           onPreview={setPreviewMedia}
           onReanalyze={handleReanalyzeProof}

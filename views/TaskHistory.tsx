@@ -5,6 +5,7 @@ import { supabase } from '../supabase';
 import { validateProofWithAI } from '../services/geminiService';
 import { extractAndUploadFrames } from '../services/extractVideoFrames';
 import { sendAdminProofSubmittedPush } from '../services/onesignalService';
+import { ProofValidator } from '../services/validation/proof-validator';
 import Pagination from '../components/Pagination';
 import { useUserData } from '../hooks/useUserData';
 
@@ -171,8 +172,8 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     setUploadError('');
 
     if (file) {
-      if (!file.type.startsWith('image/')) {
-        setUploadError('Veuillez sélectionner une image valide (JPG, PNG).');
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        setUploadError('Seules les images JPG et PNG sont acceptées.');
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
@@ -215,6 +216,8 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     fileName: string,
     size: number,
     type: string,
+    imageHash: string,
+    validationToken: string,
     videoData?: {
       videoUrl?: string;
       videoStoragePath?: string;
@@ -222,9 +225,9 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
       videoSize?: number;
       videoType?: string;
     }
-  ): Promise<string | null> => {
+  ): Promise<string> => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) return null;
+    if (!session?.user) throw new Error('Votre session a expiré. Reconnectez-vous puis réessayez.');
 
     const proofData: any = {
       userId: session.user.id,
@@ -236,6 +239,8 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
       downloadURL: downloadURL,
       size: size,
       type: type,
+      imageHash,
+      validationToken,
       status: 'pending',
       aiValidation: false,
       submittedAt: new Date().toISOString()
@@ -252,10 +257,11 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     const { data, error } = await supabase.from('proofs').insert(proofData).select('id').single();
     if (error) {
       console.error("Error saving proof:", error);
-      return null;
+      throw error;
     }
 
-    return data?.id || null;
+    if (!data?.id) throw new Error("La preuve n’a pas pu être enregistrée.");
+    return data.id;
   };
 
   const performBackgroundAIAnalysis = async (
@@ -314,18 +320,39 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     setIsAnalyzingAI(true);
     setIsUploading(true);
     setUploadError('');
+    let uploadedImagePath: string | null = null;
+    let uploadedVideoPath: string | null = null;
+    let proofSaved = false;
 
     try {
       const timestamp = Date.now();
       const userId = session.user.id;
       const safeCampaignName = campaignName.replace(/[^a-zA-Z0-9]/g, '_');
+      const selectedCampaign = campaigns.find((campaign) => campaign.id === campaignId);
+      if (!selectedCampaign || selectedCampaign.status !== 'active') {
+        throw new Error('Sélectionnez une campagne active avant de soumettre une preuve.');
+      }
+
+      setUploadProgress(5);
+      const validation = await new ProofValidator().validate({
+        userId,
+        imageFile: selectedFile,
+        campaignName: selectedCampaign.title,
+        campaignId: selectedCampaign.id,
+        expectedPlatform: selectedCampaign.platform,
+      });
+      if (!validation.valid || !validation.validationToken) {
+        throw new Error(
+          validation.errors.join(' ') || 'La vérification sécurisée de la preuve a échoué.',
+        );
+      }
 
       // 1. Upload de la capture d'écran
       const imageExtension = selectedFile.type.split('/')[1] || 'jpg';
       const imageFileName = `preuve_${safeCampaignName}_${timestamp}.${imageExtension}`;
       const imageStoragePath = `${userId}/${imageFileName}`;
 
-      setUploadProgress(20);
+      setUploadProgress(25);
       const { error: uploadImgErr } = await supabase.storage
         .from('proofs')
         .upload(imageStoragePath, selectedFile, {
@@ -333,6 +360,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
           upsert: false
         });
       if (uploadImgErr) throw uploadImgErr;
+      uploadedImagePath = imageStoragePath;
 
       const { data: urlData } = supabase.storage.from('proofs').getPublicUrl(imageStoragePath);
       const downloadURL = urlData.publicUrl;
@@ -346,7 +374,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
         const videoFileName = `video_${safeCampaignName}_${timestamp}.${videoExtension}`;
         const videoStoragePath = `${userId}/${videoFileName}`;
 
-        setUploadProgress(65);
+        setUploadProgress(60);
         const { error: uploadVidErr } = await supabase.storage
           .from('proofs')
           .upload(videoStoragePath, selectedVideo, {
@@ -355,8 +383,9 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
           });
 
         if (uploadVidErr) {
-          console.warn("Échec upload vidéo, continuation avec la capture:", uploadVidErr);
+            console.warn("Échec upload vidéo, continuation avec la capture:", uploadVidErr);
         } else {
+          uploadedVideoPath = videoStoragePath;
           const { data: vidUrlData } = supabase.storage.from('proofs').getPublicUrl(videoStoragePath);
           videoData = {
             videoUrl: vidUrlData.publicUrl,
@@ -377,27 +406,26 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
         imageFileName,
         selectedFile.size,
         selectedFile.type,
+        validation.imageHash,
+        validation.validationToken,
         videoData
       );
+      proofSaved = true;
 
       // 4. Lancement de l'analyse IA croisée en arrière-plan
-      if (proofId) {
-        void sendAdminProofSubmittedPush(
-          campaignName,
-          session.user.user_metadata?.full_name || session.user.email || 'Un utilisateur',
-        );
-        const videoFrameUrls = selectedVideo
-          ? await extractAndUploadFrames(supabase, selectedVideo, `${userId}/${proofId}`)
-          : [];
-        setUploadProgress(100);
-        performBackgroundAIAnalysis(selectedFile, proofId, userId, videoData?.videoUrl, videoFrameUrls);
-      } else {
-        setUploadProgress(100);
-      }
+      void sendAdminProofSubmittedPush(
+        campaignName,
+        session.user.user_metadata?.full_name || session.user.email || 'Un utilisateur',
+      );
+      const videoFrameUrls = selectedVideo
+        ? await extractAndUploadFrames(supabase, selectedVideo, `${userId}/${proofId}`)
+        : [];
+      setUploadProgress(100);
+      performBackgroundAIAnalysis(selectedFile, proofId, userId, videoData?.videoUrl, videoFrameUrls);
 
       addNotification({
         title: '✅ Preuve envoyée avec succès !',
-        message: `Votre preuve pour "${campaignName}" ${selectedVideo ? 'avec enregistrement vidéo ' : ''}a été transmise avec succès. Analyse IA en cours...`,
+        message: `Votre preuve pour "${campaignName}" ${selectedVideo ? 'avec enregistrement vidéo ' : ''}a été transmise avec succès. ${validation.warnings.join(' ')} Analyse IA en cours...`,
         type: 'status'
       });
 
@@ -412,7 +440,16 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
     } catch (error) {
       console.error("Error in upload workflow:", error);
       const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
-      setUploadError('Une erreur est survenue lors de la transmission de votre preuve.');
+      const cleanupPaths = proofSaved ? [] : [uploadedImagePath, uploadedVideoPath].filter(
+        (path): path is string => path !== null,
+      );
+      if (cleanupPaths.length > 0) {
+        const { error: cleanupError } = await supabase.storage.from('proofs').remove(cleanupPaths);
+        if (cleanupError) {
+          console.error("Impossible de supprimer les fichiers de preuve non enregistrés:", cleanupError);
+        }
+      }
+      setUploadError(errorMessage);
       addNotification({
         title: '❌ Erreur lors de l\'envoi',
         message: errorMessage || 'Veuillez vérifier votre connexion et réessayer.',
@@ -736,7 +773,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                     <span className="text-[9px] font-bold text-[#128686] uppercase bg-[#E7F4F4] px-2 py-0.5 rounded-full">Requis</span>
                   </div>
                   <div className={`border-2 border-dashed rounded-[1.8rem] p-5 flex flex-col items-center justify-center transition-all relative overflow-hidden group cursor-pointer ${selectedFile ? 'border-[#7FD1D1]/60 bg-[#E7F4F4]/20' : 'border-gray-200 hover:border-[#7FD1D1]/60 hover:bg-gray-50'}`}>
-                    <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleFileSelect} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                    <input type="file" accept="image/png,image/jpeg" onChange={handleFileSelect} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                     {selectedFile ? (
                       <div className="text-center relative z-0">
                         <div className="bg-[#D9ECEC] w-10 h-10 rounded-xl flex items-center justify-center text-[#128686] mx-auto mb-2"><ImageIcon size={20} /></div>
@@ -747,7 +784,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ proofs, setProofs, addNotific
                       <div className="text-center relative z-0">
                         <div className="bg-gray-100 w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-[#128686] group-hover:bg-[#E7F4F4] transition-colors mx-auto mb-2"><Upload size={20} /></div>
                         <p className="text-xs font-bold text-gray-700">Choisir la capture d'écran</p>
-                        <p className="text-[9px] text-gray-400 mt-0.5 font-medium">Max 5 MB • JPG, PNG</p>
+                        <p className="text-[9px] text-gray-400 mt-0.5 font-medium">Max 2 MB • JPG, PNG</p>
                       </div>
                     )}
                   </div>

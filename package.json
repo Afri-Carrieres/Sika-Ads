@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "email": "email dev",
-    "email:dev": "node server/email-server.mjs"
+    "email:dev": "node server/email-server.mjs",
+    "generate-icons": "node scripts/generate-icons.js",
+    "pwa:setup": "npm run generate-icons && npm run build",
+    "pwa:audit": "npm run build && npm run preview"
   },
   "dependencies": {
     "@dataconnect/admin-generated": "file:src/dataconnect-admin-generated",

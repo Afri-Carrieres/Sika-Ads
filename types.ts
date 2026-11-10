@@ -56,7 +56,7 @@ export interface Campaign {
   advertiserName?: string;
   advertiserPhone?: string;
   advertiserEmail?: string; // ✅ Email pour contact
-  paymentStatus?: 'pending_payment' | 'paid' | 'failed';
+  paymentStatus?: 'pending' | 'pending_payment' | 'paid' | 'failed';
   paymentReference?: string;
   paymentOperator?: string;
   adminStatus?: 'pending_review' | 'approved' | 'rejected';
@@ -71,10 +71,11 @@ export interface Campaign {
   paymentConfirmedAt?: any;
   paymentConfirmedBy?: string;
   // Statut de paiement pour les campagnes créées par les utilisateurs
-  campaignPaymentStatus?: 'pending_payment' | 'payment_received' | 'payment_verified' | 'payment_rejected';
+  campaignPaymentStatus?: 'pending_payment' | 'payment_received' | 'payment_verified' | 'payment_rejected' | 'payment_failed';
   paymentAmount?: number;
   paymentDate?: string;
   paymentMethod?: string;
+  moderationToken?: string;
   // ✅ Champs manquants ajoutés
   platform?: string; // WhatsApp | Facebook | Instagram
   maxAmbassadors?: number; // Nombre d'ambassadeurs estimés

@@ -145,12 +145,21 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.webmanifest">
   <!-- PWA theme color -->
-  <meta name="theme-color" content="#128686" />
-  <!-- Apple meta tags for iOS -->
+  <meta name="theme-color" content="#22c55e" />
+
+  <!-- Apple meta tags for iOS - Critical for PWA Installation -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="SikaAds" />
-  <link rel="apple-touch-icon" href="/Web-Icon.png">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Apple Touch Icons - Multiple sizes for different devices -->
+  <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" sizes="180x180" />
+  <link rel="apple-touch-icon" href="/icons/apple-icon-152.png" sizes="152x152" />
+  <link rel="apple-touch-icon" href="/icons/apple-icon-167.png" sizes="167x167" />
+
+  <!-- Alternative viewport for iOS optimization -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes, maximum-scale=5" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />

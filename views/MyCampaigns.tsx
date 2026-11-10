@@ -20,6 +20,7 @@ import {
   ChevronRight,
   PlusCircle,
   Edit3,
+  Trash2,
   Upload,
   Image as ImageIcon,
   Globe,
@@ -47,6 +48,11 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
   const [stats, setStats] = useState<Record<string, CampaignStats>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingCampaignId, setDeletingCampaignId] = useState<string | null>(null);
+  const [deleteFeedback, setDeleteFeedback] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   // Constants for campaign editing & budget
   const CPV = 5; // Coût par vue
@@ -56,10 +62,12 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
   const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 Mo
 
   const PACKS = [
-    { id: "starter", label: "Starter", price: 1000, color: "bg-blue-50 border-blue-200 text-blue-700" },
-    { id: "boost", label: "Boost", price: 5000, color: "bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]" },
-    { id: "business", label: "Business", price: 25000, color: "bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]" },
-    { id: "pro", label: "Pro", price: 50000, color: "bg-orange-50 border-orange-200 text-orange-700" },
+    { id: 'Basic', label: 'Basic', price: 1000, color: 'bg-blue-50 border-blue-200 text-blue-400' },
+    { id: 'starter', label: 'Starter', price: 2500, color: 'bg-green-50 border-green-200 text-green-400' },
+    { id: 'boost', label: 'Boost', price: 5000, color: 'bg-[#E7F4F4] border-[#9ED0D0] text-[#0E6B6B]' },
+    { id: 'business', label: 'Business', price: 10000, color: 'bg-[#F7DEFF] border-[#9ED0D0] text-[#620F7D]' },
+    { id: 'pro', label: 'Pro', price: 25000, color: 'bg-orange-50 border-orange-200 text-orange-700' },
+    { id: 'premium', label: 'Premium', price: 50000, color: 'bg-[#FFF6DE] border-yellow-200 text-[#FFC72D]' },
   ];
 
   // Helper: check if a campaign is not yet paid / pending payment / failed
@@ -76,6 +84,89 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
       !campaign.paymentConfirmed;
     const isPending = campaign.status === "pending";
     return !campaign.paymentConfirmed && (isUnpaid || isFailed || isPending);
+  };
+
+  const canDeleteCampaign = (campaign: Campaign) => {
+    return (
+      campaign.createdBy === "user" &&
+      !campaign.paymentConfirmed &&
+      ["pending", "failed", "rejected"].includes(campaign.status) &&
+      (campaign.paymentStatus == null ||
+        ["pending", "pending_payment", "failed"].includes(campaign.paymentStatus)) &&
+      (campaign.campaignPaymentStatus == null ||
+        ["pending_payment", "payment_failed", "payment_rejected"].includes(
+          campaign.campaignPaymentStatus,
+        ))
+    );
+  };
+
+  const handleDeleteCampaign = async (campaign: Campaign) => {
+    if (!user || !canDeleteCampaign(campaign) || deletingCampaignId) return;
+    if (
+      !window.confirm(
+        `Supprimer définitivement la campagne « ${campaign.title} » ? Cette action est irréversible.`,
+      )
+    ) {
+      return;
+    }
+
+    setDeletingCampaignId(campaign.id);
+    setDeleteFeedback(null);
+    try {
+      const { data, error: deleteError } = await supabase
+        .from("campaigns")
+        .delete()
+        .eq("id", campaign.id)
+        .eq("advertiserId", user.id)
+        .select("id")
+        .maybeSingle();
+
+      if (deleteError) throw deleteError;
+      if (!data) {
+        throw new Error(
+          "La campagne n’a pas pu être supprimée. Elle est peut-être déjà payée ou traitée.",
+        );
+      }
+
+      setCampaigns((previous) => previous.filter((item) => item.id !== campaign.id));
+      setStats((previous) => {
+        const next = { ...previous };
+        delete next[campaign.id];
+        return next;
+      });
+
+      const storagePath = campaign.imageUrl.match(
+        /\/storage\/v1\/object\/public\/campaign-visuals\/([^?#]+)/,
+      )?.[1];
+      if (storagePath) {
+        try {
+          const { error: storageError } = await supabase.storage
+            .from("campaign-visuals")
+            .remove([decodeURIComponent(storagePath)]);
+          if (storageError) {
+            console.warn("Impossible de supprimer l’image de la campagne :", storageError);
+          }
+        } catch (storageError) {
+          console.warn("Impossible de supprimer l’image de la campagne :", storageError);
+        }
+      }
+
+      setDeleteFeedback({
+        message: "La campagne impayée a été supprimée.",
+        type: "success",
+      });
+    } catch (deleteError) {
+      console.error("Erreur lors de la suppression de la campagne :", deleteError);
+      setDeleteFeedback({
+        message:
+          deleteError instanceof Error
+            ? deleteError.message
+            : "Impossible de supprimer cette campagne.",
+        type: "error",
+      });
+    } finally {
+      setDeletingCampaignId(null);
+    }
   };
 
   // Edit Campaign State
@@ -509,6 +600,19 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
         </button>
       </div>
 
+      {deleteFeedback && (
+        <div
+          role={deleteFeedback.type === "error" ? "alert" : "status"}
+          className={`rounded-xl border px-4 py-3 text-sm font-semibold ${
+            deleteFeedback.type === "error"
+              ? "border-rose-200 bg-rose-50 text-rose-700"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {deleteFeedback.message}
+        </div>
+      )}
+
       {totalCampaigns === 0 ? (
         <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center max-w-xl mx-auto shadow-sm">
           <Megaphone className="mx-auto text-slate-300 mb-4" size={48} />
@@ -723,6 +827,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
                     <div className="pt-4 border-t border-slate-100 flex items-center gap-2">
                       <button
                         onClick={() => handleOpenEdit(campaign)}
+                        disabled={deletingCampaignId === campaign.id}
                         className="flex-1 py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition duration-150 cursor-pointer"
                       >
                         <Edit3 size={14} />
@@ -746,6 +851,21 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
                         >
                           <CreditCard size={14} />
                           {isFailed ? "Réessayer" : "Payer"}
+                        </button>
+                      )}
+
+                      {canDeleteCampaign(campaign) && (
+                        <button
+                          onClick={() => void handleDeleteCampaign(campaign)}
+                          disabled={deletingCampaignId !== null}
+                          className="flex-1 py-2.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition duration-150 disabled:cursor-wait disabled:opacity-60"
+                        >
+                          {deletingCampaignId === campaign.id ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                          Supprimer
                         </button>
                       )}
                     </div>
@@ -850,7 +970,7 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
                   </div>
 
                   {/* Packs prédéfinis */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {PACKS.map((pack) => (
                       <button
                         key={pack.id}

@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 // Added ArrowLeft and LayoutGrid to the imports
 import { Upload, Smartphone, Globe, ShieldCheck, ArrowRight, ArrowLeft, X, Check, LayoutGrid, Users, Target, Coins, AlertCircle, Loader2, Image as ImageIcon, Briefcase, Phone, MessageCircle } from 'lucide-react';
 import { supabase } from '../supabase';
+import { CampaignValidator } from '../services/validation/campaign-validator';
 
 interface CreateCampaignProps {
   onSuccess: (campaignDraft: any, amount: number) => void;
@@ -45,6 +46,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- Derived Calculations ---
@@ -87,11 +89,17 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        setSubmissionError('L’image doit être au format JPG ou PNG.');
+        e.target.value = '';
+        return;
+      }
       if (file.size > MAX_IMAGE_SIZE) {
         alert(`L'image sélectionnée est trop lourde (${(file.size / (1024 * 1024)).toFixed(1)} Mo). La taille maximale autorisée est de 5 Mo.`);
         e.target.value = '';
         return;
       }
+      setSubmissionError('');
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
@@ -161,8 +169,33 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
     }
 
     setIsSubmitting(true);
+    setSubmissionError('');
+    let uploadedImagePath: string | null = null;
 
     try {
+      if (title.trim().length < 5 || title.trim().length > 100) {
+        setSubmissionError('Le titre doit contenir entre 5 et 100 caractères.');
+        return;
+      }
+      if (description.trim().length < 10 || description.trim().length > 300) {
+        setSubmissionError('La description doit contenir entre 10 et 300 caractères.');
+        return;
+      }
+      if (!['image/jpeg', 'image/png'].includes(imageFile.type)) {
+        setSubmissionError('L’image doit être au format JPG ou PNG.');
+        return;
+      }
+
+      const { data: accountCheck, error: accountError } = await supabase.rpc(
+        'check_campaign_creation',
+        { requested_budget: budget },
+      );
+      if (accountError) throw accountError;
+      if (!accountCheck?.allowed) {
+        setSubmissionError(accountCheck?.message || 'La création de cette campagne n’est pas autorisée.');
+        return;
+      }
+
       // Upload image to Supabase Storage
       const timestamp = Date.now();
       const fileExt = imageFile.name.split('.').pop();
@@ -174,12 +207,34 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
         .upload(filePath, imageFile);
 
       if (uploadError) throw uploadError;
+      uploadedImagePath = filePath;
 
       const { data: urlData } = supabase.storage
         .from('campaign-visuals')
         .getPublicUrl(filePath);
 
       const imageUrl = urlData.publicUrl;
+
+      const validation = await new CampaignValidator().validate({
+        userId: session.user.id,
+        name: title,
+        description,
+        budget,
+        imageFile,
+        imageUrl,
+      });
+
+      if (!validation.valid || !validation.moderationToken) {
+        await supabase.storage.from('campaign-visuals').remove([filePath]);
+        uploadedImagePath = null;
+        setSubmissionError(
+          validation.errors.join(' ') || 'La vérification de contenu est indisponible.',
+        );
+        return;
+      }
+      if (validation.warnings.length > 0) {
+        setSubmissionError(validation.warnings.join(' '));
+      }
 
       // Draft only: database write happens after payment in App.tsx
       const campaignDraft = {
@@ -207,6 +262,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
         createdBy: 'user',
         paymentStatus: 'pending',
         paymentConfirmed: false,
+        moderationToken: validation.moderationToken,
         budgetPack: selectedPackId ? PACKS.find(p => p.id === selectedPackId)?.label : 'Custom',
       };
 
@@ -214,7 +270,19 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
 
     } catch (error) {
       console.error("Erreur création campagne:", error);
-      alert("Une erreur est survenue.");
+      if (uploadedImagePath) {
+        const { error: cleanupError } = await supabase.storage
+          .from('campaign-visuals')
+          .remove([uploadedImagePath]);
+        if (cleanupError) {
+          console.warn("Impossible de supprimer l’image de campagne non utilisée:", cleanupError);
+        }
+      }
+      setSubmissionError(
+        error instanceof Error
+          ? error.message
+          : "Une erreur est survenue pendant la vérification de la campagne.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -299,7 +367,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     {/* Text Column */}
                     <div className="text-center sm:text-left space-y-1">
-                      <h4 className="text-xl font-bold text-[#0B2B33]">Pour un budget de +50 000 FCFA ?</h4>
+                      <h4 className="text-xl font-bold text-[#0B2B33]">Pour un budget supérieur à 500 000 FCFA ?</h4>
                       <p className="text-[#128686] font-semibold">Contactez nous!</p>
                     </div>
 
@@ -449,7 +517,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                         ref={fileInputRef}
                         type="file"
                         className="hidden"
-                        accept="image/*"
+                        accept="image/jpeg,image/png"
                         onChange={handleImageSelect}
                       />
                     </div>
@@ -470,6 +538,12 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                 </button>
               )}
 
+              {submissionError && (
+                <p role="alert" className="w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+                  {submissionError}
+                </p>
+              )}
+
               <button
                 onClick={() => {
                   if (step === 1) {
@@ -480,7 +554,7 @@ const CreateCampaign: React.FC<CreateCampaignProps> = ({ onSuccess, onCancel }) 
                   }
                 }}
                 disabled={
-                  (step === 1 && (!!budgetError || budget < MIN_BUDGET)) ||
+                  (step === 1 && (!!budgetError || budget < MIN_BUDGET || budget > MAX_BUDGET)) ||
                   (step === 2 && (!title || !description || !imageFile || !category || !platform || isSubmitting))
                 } className="flex-1 py-4 bg-[#128686] text-white rounded-2xl font-bold uppercase tracking-widest text-[10px] md:text-xs shadow-xl shadow-[#128686]/20 hover:bg-[#0E6B6B] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100"
               >
