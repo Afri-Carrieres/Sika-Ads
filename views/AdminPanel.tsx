@@ -404,6 +404,16 @@ interface AdminPanelProps {
   activeTab?: string;
 }
 
+interface UserAbuseStatus {
+  user_id: string;
+  rejected_submissions: number;
+  rejected_campaigns: number;
+  is_suspended: boolean;
+  suspension_reason: string | null;
+  suspension_until: string | null;
+  last_violation: string | null;
+}
+
 const AdminPanel: React.FC<AdminPanelProps> = ({
   proofs: propProofs,
   setProofs,
@@ -450,6 +460,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const [allProofs, setAllProofs] = useState<Proof[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [abuseStatusByUserId, setAbuseStatusByUserId] = useState<
+    Map<string, UserAbuseStatus>
+  >(() => new Map());
+  const [reactivatingUserIds, setReactivatingUserIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [allPayouts, setAllPayouts] = useState<Withdrawal[]>([]);
   const [allCampaigns, setAllCampaigns] = useState<Campaign[]>([]);
   const [campaignShareEvents, setCampaignShareEvents] = useState<any[]>([]);
@@ -542,6 +558,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     } else if (data) {
       setAllUsers(data);
     }
+  };
+
+  const fetchAbuseStatuses = async () => {
+    const { data, error } = await supabase
+      .from("user_abuse_tracking")
+      .select(
+        "user_id, rejected_submissions, rejected_campaigns, is_suspended, suspension_reason, suspension_until, last_violation",
+      );
+    if (error) {
+      console.warn("Permission abuse tracking denied", error);
+      return;
+    }
+    setAbuseStatusByUserId(
+      new Map((data || []).map((status) => [status.user_id, status])),
+    );
   };
 
   const fetchAllProofs = async () => {
@@ -656,6 +687,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     if (!isStaff) return;
 
     fetchAllUsers();
+    fetchAbuseStatuses();
     fetchAllProofs();
     fetchAllCampaigns();
     fetchAllPayouts();
@@ -670,6 +702,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         { event: "*", schema: "public", table: "users" },
         () => {
           fetchAllUsers();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_abuse_tracking" },
+        () => {
+          fetchAbuseStatuses();
         },
       )
       .on(
@@ -936,6 +975,48 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     } catch (e) {
       showFeedback("Erreur", "error");
     }
+  };
+
+  const handleReactivateSuspendedUser = (user: User) => {
+    if (!isSuperAdmin) return;
+    const abuseStatus = abuseStatusByUserId.get(user.id);
+    if (!abuseStatus?.is_suspended) return;
+
+    openConfirmModal(
+      {
+        variant: "success",
+        title: "Réactiver ce compte ?",
+        message: `La suspension de ${user.name || user.email || "cet utilisateur"} sera levée. Les compteurs de violations seront conservés.`,
+        confirmLabel: "Réactiver",
+        cancelLabel: "Annuler",
+      },
+      async () => {
+        setReactivatingUserIds((current) => new Set(current).add(user.id));
+        try {
+          const { error } = await supabase.rpc(
+            "admin_reactivate_suspended_user",
+            { target_user_id: user.id },
+          );
+          if (error) throw error;
+          await Promise.all([fetchAllUsers(), fetchAbuseStatuses()]);
+          showFeedback("Suspension levée et compte réactivé.", "success");
+        } catch (error) {
+          console.error("Erreur lors de la réactivation du compte suspendu:", error);
+          showFeedback(
+            error instanceof Error
+              ? `Impossible de réactiver le compte : ${error.message}`
+              : "Impossible de réactiver le compte.",
+            "error",
+          );
+        } finally {
+          setReactivatingUserIds((current) => {
+            const next = new Set(current);
+            next.delete(user.id);
+            return next;
+          });
+        }
+      },
+    );
   };
 
   const openVerificationDocument = async (path: string) => {
@@ -2907,16 +2988,54 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
           {paginatedUsers.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {paginatedUsers.map((user) => (
-                <article key={user.id} className=" min-h-[278px] rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-                  <div className="flex h-[170px] flex-col">
+              {paginatedUsers.map((user) => {
+                const abuseStatus = abuseStatusByUserId.get(user.id);
+                const suspensionExpired =
+                  abuseStatus?.suspension_until != null &&
+                  new Date(abuseStatus.suspension_until).getTime() <= Date.now();
+                return (
+                <article key={user.id} className="min-h-[278px] rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex min-h-[170px] flex-col">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#E7F4F4] text-base font-bold text-[#128686]">{user.name?.charAt(0) || "U"}</div>
                         <div className="min-w-0"><h4 className="truncate font-bold text-gray-900">{user.name || "Utilisateur sans nom"}</h4><p className="truncate text-xs font-medium text-gray-500" title={user.email}>{user.email || "Email indisponible"}</p></div>
                       </div>
-                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${user.status === "active" ? "bg-green-100 text-green-700" : user.status === "pending_verification" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{user.status === "active" ? "Actif" : user.status === "pending_verification" ? "A verifier" : user.status === "rejected" ? "Refuse" : "Bloque"}</span>
+                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${abuseStatus?.is_suspended ? "bg-red-100 text-red-700" : user.status === "active" ? "bg-green-100 text-green-700" : user.status === "pending_verification" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{abuseStatus?.is_suspended ? "Suspendu" : user.status === "active" ? "Actif" : user.status === "pending_verification" ? "A verifier" : user.status === "rejected" ? "Refuse" : "Bloque"}</span>
                     </div>
+                    {abuseStatus?.is_suspended && (
+                      <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-red-700">
+                            {suspensionExpired ? "Suspension expirée" : "Compte suspendu"}
+                          </span>
+                          {isSuperAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => handleReactivateSuspendedUser(user)}
+                              disabled={reactivatingUserIds.has(user.id)}
+                              className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[10px] font-bold text-green-700 shadow-sm hover:bg-green-50 disabled:opacity-50"
+                            >
+                              {reactivatingUserIds.has(user.id) ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <CheckCircle2 size={12} />
+                              )}
+                              Réactiver
+                            </button>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-red-700">
+                          {abuseStatus.suspension_reason || "Suspension pour violations répétées"}
+                        </p>
+                        <p className="mt-1 text-[10px] text-red-600">
+                          Preuves rejetées : {abuseStatus.rejected_submissions} · Campagnes rejetées : {abuseStatus.rejected_campaigns}
+                          {abuseStatus.suspension_until && !suspensionExpired
+                            ? ` · Jusqu’au ${new Date(abuseStatus.suspension_until).toLocaleString("fr-FR")}`
+                            : ""}
+                        </p>
+                      </div>
+                    )}
                     <div className="mt-5 grid grid-cols-2 gap-3">
                       <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Solde</p><p className="mt-1 text-sm font-bold text-gray-900">{user.balance?.toLocaleString() || 0} F</p></div>
                       <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Inscription</p><p className="mt-1 truncate text-sm font-bold text-gray-900" title={formatUserRegistrationDate(user.createdAt)}>{formatUserRegistrationDate(user.createdAt)}</p></div>
@@ -2934,7 +3053,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           ) : <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-sm font-medium text-gray-500">Aucun utilisateur ne correspond aux filtres selectionnes.</div>}
 
