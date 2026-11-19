@@ -13,5 +13,5 @@ const publicDir = path.join(__dirname, 'public');
 fs.writeFileSync(path.join(publicDir, 'favicon.svg'), svgContent);
 fs.writeFileSync(path.join(publicDir, 'mask-icon.svg'), svgContent);
 
-console.log('Icons created successfully!');
+// console.log('Icons created successfully!');
 

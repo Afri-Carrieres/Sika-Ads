@@ -36,7 +36,7 @@ export function InstallPrompt() {
     if (!installPrompt) return;
     installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
-    console.log(`✅ Installation: ${outcome}`);
+    // console.log(`✅ Installation: ${outcome}`);
     setInstallPrompt(null);
   };
 

@@ -12,7 +12,7 @@ const screenshotDir = path.join(__dirname, '../public/screenshots');
 [iconDir, screenshotDir].forEach(dir => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
-    console.log(`📁 Dossier créé: ${dir}`);
+    // console.log(`📁 Dossier créé: ${dir}`);
   }
 });
 

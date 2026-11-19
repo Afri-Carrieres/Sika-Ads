@@ -65,9 +65,9 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
 
         try {
           await os.init(initConfig);
-          console.log('[OneSignal] Config envoyée à init():', initConfig);
+          // console.log('[OneSignal] Config envoyée à init():', initConfig);
           setIsInitialized(true);
-          console.log('[OneSignal] SDK initialisé avec succès ✅');
+          // console.log('[OneSignal] SDK initialisé avec succès ✅');
 
           setPermission(getPermissionState());
           setIsSubscribed(!!os.User?.PushSubscription?.optedIn);
@@ -112,12 +112,12 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
       if (userId) {
         try {
           await os.login(userId);
-          console.log(`[OneSignal] Utilisateur connecté : ${userId}`);
+          // console.log(`[OneSignal] Utilisateur connecté : ${userId}`);
           if (userRole) {
             os.User?.addTag('role', userRole);
           }
         } catch (err) {
-          console.warn('[OneSignal] Erreur lors de la connexion utilisateur:', err);
+          // console.warn('[OneSignal] Erreur lors de la connexion utilisateur:', err);
         }
       } else {
         try {
@@ -138,7 +138,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
     try {
       const os = window.OneSignal;
       if (os?.Notifications) {
-        console.log('[OneSignal] Permission actuelle:', Notification.permission);
+        // console.log('[OneSignal] Permission actuelle:', Notification.permission);
         if (Notification.permission === 'denied') {
           alert("Les notifications sont bloquées pour ce site. Réactivez-les dans les paramètres du navigateur (icône 🔒 à côté de l'URL).");
           setIsLoading(false);
@@ -151,7 +151,7 @@ export function useOneSignal({ userId, userRole }: UseOneSignalOptions): UseOneS
         if (perm === 'granted' || perm === true) {
           await os.User?.PushSubscription?.optIn();
           setIsSubscribed(true);
-          console.log('[OneSignal] Permission accordée et abonnement activé ✅');
+          // console.log('[OneSignal] Permission accordée et abonnement activé ✅');
 
           const pushId = os.User?.PushSubscription?.id;
           if (userId && pushId) {

@@ -19,7 +19,7 @@ function walk(dir) {
           if (txt.includes('SikaAds')) {
             const newTxt = txt.split('SikaAds').join('SikaAds');
             fs.writeFileSync(full, newTxt, 'utf8');
-            console.log('Updated:', full);
+            // console.log('Updated:', full);
           }
         } catch (err) {
           console.error('Err', full, err.message);

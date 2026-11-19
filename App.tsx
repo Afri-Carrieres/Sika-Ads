@@ -280,7 +280,7 @@ const App: React.FC = () => {
     };
 
     const addNotification = (notif: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
-      console.log("Notification trigger:", notif);
+      // console.log("Notification trigger:", notif);
 
       // Déterminer le type de toast basé sur le type de notification
       let toastType: 'success' | 'error' | 'warning' | 'info' = 'info';
@@ -473,7 +473,7 @@ const App: React.FC = () => {
               }
             }
           });
-          console.log("Email de création de campagne envoyé ✅");
+          // console.log("Email de création de campagne envoyé ✅");
         } catch (emailErr) {
           console.warn("Échec envoi email création campagne:", emailErr);
         }
@@ -520,7 +520,7 @@ const App: React.FC = () => {
                 }
               }
             });
-            console.log("Email de confirmation de paiement envoyé ✅");
+            // console.log("Email de confirmation de paiement envoyé ✅");
           } catch (emailErr) {
             console.warn("Échec envoi email confirmation paiement:", emailErr);
           }

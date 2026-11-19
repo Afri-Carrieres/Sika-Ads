@@ -45,7 +45,7 @@ async function registerFirebaseServiceWorker(): Promise<ServiceWorkerRegistratio
       scope: '/firebase-cloud-messaging-push-scope',
     });
 
-    console.log('[Firebase] Service worker FCM enregistré ✅');
+    // console.log('[Firebase] Service worker FCM enregistré ✅');
     return swRegistration;
   } catch (err) {
     console.error('[Firebase] Échec enregistrement du service worker FCM:', err);

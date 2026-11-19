@@ -66,7 +66,7 @@ export const useUserData = (): UserDataHook => {
              * nous auto-créons le profil public avec le statut 'pending_verification' 
              * en extrayant les informations stockées dans user_metadata (full_name, momoNumber, etc.).
              */
-            console.log("useUserData: Profile not found in public.users, auto-creating from user_metadata...");
+            // console.log("useUserData: Profile not found in public.users, auto-creating from user_metadata...");
             const meta = user.user_metadata || {};
             const generatedRefCode = meta.referralCode
               || ((meta.full_name || 'AMB').substring(0, 3) + Math.floor(1000 + Math.random() * 9000)).toUpperCase().replace(/\s/g, '');
@@ -89,7 +89,7 @@ export const useUserData = (): UserDataHook => {
               if (insertErr) {
                 console.error("useUserData: Failed to auto-create missing user profile:", insertErr);
               } else {
-                console.log("useUserData: Profile auto-created from user_metadata ✅");
+                // console.log("useUserData: Profile auto-created from user_metadata ✅");
                 // Re-fetch pour peupler le state immédiatement après l'insertion
                 supabase.from('users').select('*').eq('id', user.id).single().then(({ data: freshData }) => {
                   if (freshData) setUserData(freshData as User);
@@ -116,7 +116,7 @@ export const useUserData = (): UserDataHook => {
           filter: `id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("useUserData: Realtime update received:", payload);
+          // console.log("useUserData: Realtime update received:", payload);
           if (payload.new) {
             setUserData(payload.new as User);
           }

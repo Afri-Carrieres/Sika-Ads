@@ -61,7 +61,7 @@ const NotificationBell: React.FC = () => {
 
     if (error) {
       // announcements might not exist or be disabled, log but don't crash
-      console.log("Global notifications/announcements not active or table missing:", error.message);
+      // console.log("Global notifications/announcements not active or table missing:", error.message);
       return;
     }
 

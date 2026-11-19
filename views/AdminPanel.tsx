@@ -68,6 +68,7 @@ import {
   Radio,
   Film,
   CalendarDays,
+  Tag,
 } from "lucide-react";
 
 import { supabase } from "../supabase";
@@ -164,34 +165,58 @@ const ProofReviewWorkspace: React.FC<{
   onReject: (proof: Proof) => void;
   onReanalyze: (proof: Proof) => void;
   reanalyzingProofId: string | null;
-}> = ({ proofs, selectedProof, statusFilter, onStatusFilterChange, onSelect, onPreview, onApprove, onReject, onReanalyze, reanalyzingProofId }) => {
+}> = ({
+  proofs,
+  selectedProof,
+  statusFilter,
+  onStatusFilterChange,
+  onSelect,
+  onPreview,
+  onApprove,
+  onReject,
+  onReanalyze,
+  reanalyzingProofId,
+}) => {
   const isReanalyzing = selectedProof?.id === reanalyzingProofId;
   const metrics = selectedProof
     ? [
         {
           label: "Vues détectées",
-          value: (selectedProof.aiAnalysis?.viewsCount ?? selectedProof.viewsCount ?? 0).toLocaleString("fr-FR"),
+          value: (
+            selectedProof.aiAnalysis?.viewsCount ??
+            selectedProof.viewsCount ??
+            0
+          ).toLocaleString("fr-FR"),
           score: selectedProof.aiAnalysis?.viewCountDetectionConfidence,
           color: "#12999a",
           icon: Eye,
         },
         {
           label: "Authenticité image",
-          value: selectedProof.aiAnalysis?.imageAuthenticityConfidence == null ? "—" : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
+          value:
+            selectedProof.aiAnalysis?.imageAuthenticityConfidence == null
+              ? "—"
+              : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
           score: selectedProof.aiAnalysis?.imageAuthenticityConfidence,
           color: "#7650ce",
           icon: ShieldCheck,
         },
         {
           label: "Authenticité vidéo",
-          value: selectedProof.aiAnalysis?.videoAuthenticityConfidence == null ? "—" : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
+          value:
+            selectedProof.aiAnalysis?.videoAuthenticityConfidence == null
+              ? "—"
+              : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
           score: selectedProof.aiAnalysis?.videoAuthenticityConfidence,
           color: "#43218f",
           icon: Film,
         },
         {
           label: "Cohérence",
-          value: selectedProof.aiAnalysis?.videoConsistencyScore == null ? "—" : `${selectedProof.aiAnalysis.videoConsistencyScore}%`,
+          value:
+            selectedProof.aiAnalysis?.videoConsistencyScore == null
+              ? "—"
+              : `${selectedProof.aiAnalysis.videoConsistencyScore}%`,
           score: selectedProof.aiAnalysis?.videoConsistencyScore,
           color: "#1d725d",
           icon: Activity,
@@ -212,13 +237,18 @@ const ProofReviewWorkspace: React.FC<{
           {/* <Shield size={18} className="text-teal-300" /> */}
         </header>
         <div className="shrink-0 border-b border-white/10 px-4 py-3">
-          <label htmlFor="proof-status-filter" className="mb-1.5 block text-xs font-medium text-gray-300">
+          <label
+            htmlFor="proof-status-filter"
+            className="mb-1.5 block text-xs font-medium text-gray-300"
+          >
             Filtrer par statut
           </label>
           <select
             id="proof-status-filter"
             value={statusFilter}
-            onChange={(event) => onStatusFilterChange(event.target.value as ProofStatusFilter)}
+            onChange={(event) =>
+              onStatusFilterChange(event.target.value as ProofStatusFilter)
+            }
             className="w-full rounded-md border border-white/15 bg-[#10141d] px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-teal-400"
           >
             <option value="pending">En attente</option>
@@ -230,7 +260,9 @@ const ProofReviewWorkspace: React.FC<{
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {proofs.map((proof) => {
             const isSelected = proof.id === selectedProof?.id;
-            const hasVideo = Boolean(proof.videoUrl || (proof as any).video_url);
+            const hasVideo = Boolean(
+              proof.videoUrl || (proof as any).video_url,
+            );
             return (
               <button
                 key={proof.id}
@@ -252,14 +284,29 @@ const ProofReviewWorkspace: React.FC<{
                     {proof.campaignName}
                   </span>
                   <span className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className={`rounded-[5px] px-2 py-0.5 text-[10px] font-semibold ${proof.aiAnalysis?.fraudAlert ? "bg-red-500 text-red-200" : proof.aiAnalysis?.isValid ? "bg-emerald-500 text-emerald-900" : "bg-amber-500 text-amber-100"}`}>
-                      {proof.aiAnalysis?.fraudAlert ? "Risque fraude" : proof.aiAnalysis?.isValid ? "IA favorable" : "À examiner"}
+                    <span
+                      className={`rounded-[5px] px-2 py-0.5 text-[10px] font-semibold ${proof.aiAnalysis?.fraudAlert ? "bg-red-500 text-red-200" : proof.aiAnalysis?.isValid ? "bg-emerald-500 text-emerald-900" : "bg-amber-500 text-amber-100"}`}
+                    >
+                      {proof.aiAnalysis?.fraudAlert
+                        ? "Risque fraude"
+                        : proof.aiAnalysis?.isValid
+                          ? "IA favorable"
+                          : "À examiner"}
                     </span>
-                    {hasVideo && <Film size={13} className="text-gray-400" aria-label="Vidéo jointe" />}
+                    {hasVideo && (
+                      <Film
+                        size={13}
+                        className="text-gray-400"
+                        aria-label="Vidéo jointe"
+                      />
+                    )}
                   </span>
                 </span>
                 <span className="shrink-0 text-[10px] text-gray-400">
-                  {new Date(proof.submittedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                  {new Date(proof.submittedAt).toLocaleDateString("fr-FR", {
+                    day: "2-digit",
+                    month: "short",
+                  })}
                 </span>
               </button>
             );
@@ -280,15 +327,25 @@ const ProofReviewWorkspace: React.FC<{
                 Révision manuelle
               </h2>
               <p className="mt-1 text-sm text-gray-500">
-                {selectedProof.userName || "Ambassadeur"} · {selectedProof.campaignName}
+                {selectedProof.userName || "Ambassadeur"} ·{" "}
+                {selectedProof.campaignName}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className={`rounded-md px-2.5 py-1.5 font-semibold ${selectedProof.status === "pending" ? "bg-amber-50 text-amber-700" : selectedProof.status === "validated" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
-                {selectedProof.status === "pending" ? "En attente" : selectedProof.status === "validated" ? "Validée" : "Rejetée"}
+              <span
+                className={`rounded-md px-2.5 py-1.5 font-semibold ${selectedProof.status === "pending" ? "bg-amber-50 text-amber-700" : selectedProof.status === "validated" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}
+              >
+                {selectedProof.status === "pending"
+                  ? "En attente"
+                  : selectedProof.status === "validated"
+                    ? "Validée"
+                    : "Rejetée"}
               </span>
               <span className="rounded-md bg-gray-100 px-2.5 py-1.5 text-gray-600">
-                {new Date(selectedProof.submittedAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
+                {new Date(selectedProof.submittedAt).toLocaleDateString(
+                  "fr-FR",
+                  { day: "2-digit", month: "short", year: "numeric" },
+                )}
               </span>
             </div>
           </header>
@@ -296,24 +353,47 @@ const ProofReviewWorkspace: React.FC<{
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <button
               type="button"
-              onClick={() => onPreview({ url: selectedProof.downloadURL, type: "image" })}
+              onClick={() =>
+                onPreview({ url: selectedProof.downloadURL, type: "image" })
+              }
               className="group relative aspect-video overflow-hidden rounded-lg border border-gray-200 bg-gray-100"
               aria-label="Agrandir la preuve image"
             >
-              <img src={selectedProof.downloadURL} alt="Preuve soumise" className="h-full w-full object-contain transition-transform group-hover:scale-[1.02]" />
-              <span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-xs font-medium text-white">Capture de preuve</span>
-              <span className="absolute right-2 top-2 rounded bg-white/90 p-2 text-gray-700"><Eye size={16} /></span>
+              <img
+                src={selectedProof.downloadURL}
+                alt="Preuve soumise"
+                className="h-full w-full object-contain transition-transform group-hover:scale-[1.02]"
+              />
+              <span className="absolute bottom-2 left-2 rounded bg-black/65 px-2 py-1 text-xs font-medium text-white">
+                Capture de preuve
+              </span>
+              <span className="absolute right-2 top-2 rounded bg-white/90 p-2 text-gray-700">
+                <Eye size={16} />
+              </span>
             </button>
-            {(selectedProof.videoUrl || (selectedProof as any).video_url) ? (
+            {selectedProof.videoUrl || (selectedProof as any).video_url ? (
               <button
                 type="button"
-                onClick={() => onPreview({ url: (selectedProof.videoUrl || (selectedProof as any).video_url)!, type: "video" })}
+                onClick={() =>
+                  onPreview({
+                    url: (selectedProof.videoUrl ||
+                      (selectedProof as any).video_url)!,
+                    type: "video",
+                  })
+                }
                 className="group relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
                 aria-label="Lire la vidéo soumise"
               >
-                <Film size={30} className="absolute left-4 top-4 text-white/50" />
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover:scale-110"><Play size={25} fill="currentColor" /></span>
-                <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">Vidéo soumise · Lire</span>
+                <Film
+                  size={30}
+                  className="absolute left-4 top-4 text-white/50"
+                />
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover:scale-110">
+                  <Play size={25} fill="currentColor" />
+                </span>
+                <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">
+                  Vidéo soumise · Lire
+                </span>
               </button>
             ) : (
               <div className="flex aspect-video items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400">
@@ -326,32 +406,74 @@ const ProofReviewWorkspace: React.FC<{
             {metrics.map(({ label, value, score, color, icon: Icon }) => {
               const progress = Math.min(100, Math.max(0, Number(score) || 0));
               return (
-                <div key={label} className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-gray-200 p-3 sm:p-4">
+                <div
+                  key={label}
+                  className="flex min-w-0 items-center justify-between gap-2 rounded-lg border border-gray-200 p-3 sm:p-4"
+                >
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-medium text-gray-500">{label}</p>
-                    <p className="mt-1 truncate text-lg font-bold tabular-nums text-gray-950 sm:text-xl">{value}</p>
-                    <p className="text-xs text-gray-500">{label === "Vues détectées" ? "Vues" : "Authenticité / score"}</p>
+                    <p className="truncate text-xs font-medium text-gray-500">
+                      {label}
+                    </p>
+                    <p className="mt-1 truncate text-lg font-bold tabular-nums text-gray-950 sm:text-xl">
+                      {value}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {label === "Vues détectées"
+                        ? "Vues"
+                        : "Authenticité / score"}
+                    </p>
                   </div>
-                  <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full" style={{ background: `conic-gradient(${color} ${progress}%, #e8e9ef ${progress}%)` }}>
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-[11px] font-semibold tabular-nums text-gray-700">{score == null ? <Icon size={16} style={{ color }} /> : `${progress}%`}</span>
+                  <div
+                    className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full"
+                    style={{
+                      background: `conic-gradient(${color} ${progress}%, #e8e9ef ${progress}%)`,
+                    }}
+                  >
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-[11px] font-semibold tabular-nums text-gray-700">
+                      {score == null ? (
+                        <Icon size={16} style={{ color }} />
+                      ) : (
+                        `${progress}%`
+                      )}
+                    </span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <section className={`min-h-24 rounded-lg border p-4 ${selectedProof.aiAnalysis?.fraudAlert ? "border-red-200 bg-red-50/60" : "border-gray-200 bg-white"}`}>
+          <section
+            className={`min-h-24 rounded-lg border p-4 ${selectedProof.aiAnalysis?.fraudAlert ? "border-red-200 bg-red-50/60" : "border-gray-200 bg-white"}`}
+          >
             <div className="mb-2 flex items-center gap-2">
-              <Shield size={16} className={selectedProof.aiAnalysis?.fraudAlert ? "text-red-600" : "text-[#128686]"} />
-              <h3 className="text-sm font-bold text-gray-900">Analyse et justification IA</h3>
-              {selectedProof.aiAnalysis?.fraudAlert && <span className="rounded bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase text-red-700">Risque de fraude</span>}
+              <Shield
+                size={16}
+                className={
+                  selectedProof.aiAnalysis?.fraudAlert
+                    ? "text-red-600"
+                    : "text-[#128686]"
+                }
+              />
+              <h3 className="text-sm font-bold text-gray-900">
+                Analyse et justification IA
+              </h3>
+              {selectedProof.aiAnalysis?.fraudAlert && (
+                <span className="rounded bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase text-red-700">
+                  Risque de fraude
+                </span>
+              )}
             </div>
             <p className="text-sm leading-relaxed text-gray-700">
-              {selectedProof.aiAnalysis?.reason || "Aucune justification IA n’est disponible pour cette preuve. Vérifiez les médias et les informations avant de prendre une décision."}
+              {selectedProof.aiAnalysis?.reason ||
+                "Aucune justification IA n’est disponible pour cette preuve. Vérifiez les médias et les informations avant de prendre une décision."}
             </p>
             {selectedProof.aiAnalysis?.fraudEvidenceDetails?.length ? (
               <ul className="mt-2 list-inside list-disc space-y-1 text-xs text-red-700">
-                {selectedProof.aiAnalysis.fraudEvidenceDetails.map((detail, index) => <li key={`${detail}-${index}`}>{detail}</li>)}
+                {selectedProof.aiAnalysis.fraudEvidenceDetails.map(
+                  (detail, index) => (
+                    <li key={`${detail}-${index}`}>{detail}</li>
+                  ),
+                )}
               </ul>
             ) : null}
           </section>
@@ -362,29 +484,49 @@ const ProofReviewWorkspace: React.FC<{
             disabled={Boolean(reanalyzingProofId)}
             className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#128686] px-4 py-2.5 text-sm font-bold text-[#0e6b6b] transition-colors hover:bg-[#f0fafa] disabled:cursor-wait disabled:opacity-60"
           >
-            {isReanalyzing ? <Loader2 size={17} className="animate-spin" /> : <RefreshCcw size={16} />}
-            {isReanalyzing ? "Nouvelle analyse en cours…" : reanalyzingProofId ? "Une réanalyse est en cours…" : "Réanalyser avec l’IA"}
+            {isReanalyzing ? (
+              <Loader2 size={17} className="animate-spin" />
+            ) : (
+              <RefreshCcw size={16} />
+            )}
+            {isReanalyzing
+              ? "Nouvelle analyse en cours…"
+              : reanalyzingProofId
+                ? "Une réanalyse est en cours…"
+                : "Réanalyser avec l’IA"}
           </button>
 
           {selectedProof.status === "pending" ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button type="button" onClick={() => onApprove(selectedProof)} className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700">
+              <button
+                type="button"
+                onClick={() => onApprove(selectedProof)}
+                className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-emerald-700"
+              >
                 <Check size={18} /> Approuver manuellement
               </button>
-              <button type="button" onClick={() => onReject(selectedProof)} className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700">
+              <button
+                type="button"
+                onClick={() => onReject(selectedProof)}
+                className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
+              >
                 <X size={18} /> Rejeter la preuve
               </button>
             </div>
           ) : (
             <p className="rounded-lg bg-gray-50 px-4 py-3 text-center text-sm font-medium text-gray-500">
               Cette preuve a déjà été traitée.
-              {selectedProof.status === "rejected" && selectedProof.rejectionReason ? ` Motif : ${selectedProof.rejectionReason}` : ""}
+              {selectedProof.status === "rejected" &&
+              selectedProof.rejectionReason
+                ? ` Motif : ${selectedProof.rejectionReason}`
+                : ""}
             </p>
           )}
         </article>
       ) : (
         <div className="grid min-h-[520px] place-items-center rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          Sélectionnez une preuve dans la liste pour examiner ses médias et son analyse.
+          Sélectionnez une preuve dans la liste pour examiner ses médias et son
+          analyse.
         </div>
       )}
     </section>
@@ -431,6 +573,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     | "campaignPayments"
     | "gomboChecker"
     | "pushBroadcast"
+    | "promotions"
   >("overview");
   const [previewMedia, setPreviewMedia] = useState<{
     url: string;
@@ -446,7 +589,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   >("Total Subscriptions");
   const [isSendingPush, setIsSendingPush] = useState(false);
 
-  const {loading: loadingUser } = useUserData();
+  const { loading: loadingUser } = useUserData();
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
@@ -475,6 +618,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     () => new Map(allUsers.map((u) => [u.id, u])),
     [allUsers],
   );
+
+  // States pour les codes promo
+  const [promoAmbassadors, setPromoAmbassadors] = useState<any[]>([]);
+  const [promoConversionRequests, setPromoConversionRequests] = useState<any[]>([]);
+  const [selectedPromoUserId, setSelectedPromoUserId] = useState("");
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [isSavingPromoCode, setIsSavingPromoCode] = useState(false);
+  const [promoSearchTerm, setPromoSearchTerm] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [userRegistrationStart, setUserRegistrationStart] = useState("");
@@ -512,7 +663,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [selectedProofId, setSelectedProofId] = useState<string | null>(null);
   const [viewsInput, setViewsInput] = useState<string>("");
   const [isValidating, setIsValidating] = useState(false);
-  const [reanalyzingProofId, setReanalyzingProofId] = useState<string | null>(null);
+  const [reanalyzingProofId, setReanalyzingProofId] = useState<string | null>(
+    null,
+  );
   const [rejectingProof, setRejectingProof] = useState<Proof | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
@@ -530,6 +683,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     top: number;
     right: number;
   } | null>(null);
+
+  // --- Campaign Filters ---
+  const [campaignSearch, setCampaignSearch] = useState("");
+  const [campaignStatusFilter, setCampaignStatusFilter] = useState<
+    "all" | "active" | "paused" | "pending" | "completed" | "rejected"
+  >("all");
+  const [campaignCategoryFilter, setCampaignCategoryFilter] = useState("all");
+  const [campaignBudgetMin, setCampaignBudgetMin] = useState("");
+  const [campaignBudgetMax, setCampaignBudgetMax] = useState("");
 
   // --- Financial & Operational Filters ---
   const [withdrawalSearch, setWithdrawalSearch] = useState("");
@@ -624,7 +786,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     if (error) {
       console.warn("Permission Campaigns denied", error);
     } else if (data) {
-      setAllCampaigns(data);
+      // Détection des campagnes actives dont le budget est totalement épuisé
+      const exhausted = data.filter(
+        (c) => c.status === "active" && (c.remainingBudget ?? 0) <= 0,
+      );
+
+      if (exhausted.length > 0) {
+        const exhaustedIds = exhausted.map((c) => c.id);
+        void supabase
+          .from("campaigns")
+          .update({ status: "completed", updatedAt: new Date().toISOString() })
+          .in("id", exhaustedIds)
+          .then(({ error: updateErr }) => {
+            if (updateErr) console.warn("Failed to auto-complete exhausted campaigns", updateErr);
+          });
+
+        const updatedData = data.map((c) =>
+          exhaustedIds.includes(c.id) ? { ...c, status: "completed" as const } : c,
+        );
+        setAllCampaigns(updatedData);
+      } else {
+        setAllCampaigns(data);
+      }
     }
   };
 
@@ -753,6 +936,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     };
   }, [isStaff]);
 
+  const fetchPromotionalData = async () => {
+    const [ambassadors, requests] = await Promise.all([
+      supabase
+        .from("promo_ambassadors")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("promo_conversion_requests")
+        .select("*")
+        .order("created_at", { ascending: false }),
+    ]);
+    if (ambassadors.error)
+      console.error("Chargement des codes promo impossible:", ambassadors.error);
+    if (requests.error)
+      console.error("Chargement des conversions impossible:", requests.error);
+    setPromoAmbassadors(ambassadors.data || []);
+    setPromoConversionRequests(requests.data || []);
+  };
+
+  useEffect(() => {
+    if (view !== "promotions" || !isSuperAdmin) return;
+    void fetchPromotionalData();
+  }, [view, isSuperAdmin]);
+
   // Sync with Sidebar Tabs
   useEffect(() => {
     if (!activeTab) return;
@@ -760,6 +967,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     else if (activeTab === "admin-validation") setView("validation");
     else if (activeTab === "admin-campaigns") setView("campaigns");
     else if (activeTab === "admin-users" && isSuperAdmin) setView("users");
+    else if (activeTab === "admin-promotions" && isSuperAdmin) setView("promotions");
     else if (activeTab === "admin-payouts" && isSuperAdmin) setView("payouts");
     else if (activeTab === "admin-team" && isSuperAdmin) setView("team");
     else if (activeTab === "admin-withdrawals") setView("withdrawals");
@@ -907,6 +1115,55 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleAssignPromoCode = async () => {
+    if (!isSuperAdmin || !selectedPromoUserId || !promoCodeInput.trim()) return;
+    setIsSavingPromoCode(true);
+    const { error } = await supabase.rpc("assign_promotional_code", {
+      p_user_id: selectedPromoUserId,
+      promo_code: promoCodeInput.trim().toUpperCase(),
+    });
+    setIsSavingPromoCode(false);
+    if (error) {
+      showFeedback(
+        error.message.includes("duplicate key") || error.message.includes("unique")
+          ? "Ce code est déjà utilisé par un autre ambassadeur."
+          : `Impossible d’attribuer ce code promo : ${error.message}`,
+        "error",
+      );
+      return;
+    }
+    showFeedback("Code promo attribué avec succès !");
+    setPromoCodeInput("");
+    setSelectedPromoUserId("");
+    fetchAllUsers();
+    void fetchPromotionalData();
+  };
+
+  const handleReviewPromoConversion = async (
+    requestId: string,
+    decision: "approved" | "rejected",
+  ) => {
+    if (!isSuperAdmin) return;
+    const { error } = await supabase.rpc("review_promotional_conversion", {
+      p_request_id: requestId,
+      p_decision: decision,
+    });
+    if (error) {
+      showFeedback(
+        `Impossible de traiter cette demande : ${error.message}`,
+        "error",
+      );
+      return;
+    }
+    showFeedback(
+      decision === "approved"
+        ? "Conversion validée et créditée avec succès."
+        : "Conversion refusée; les points ont été restitués.",
+    );
+    void fetchPromotionalData();
+    fetchAllUsers();
+  };
+
   const handleDemoteMember = async (userId: string) => {
     const sessionRes = await supabase.auth.getSession();
     const currentUserId = sessionRes.data.session?.user.id;
@@ -1001,7 +1258,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           await Promise.all([fetchAllUsers(), fetchAbuseStatuses()]);
           showFeedback("Suspension levée et compte réactivé.", "success");
         } catch (error) {
-          console.error("Erreur lors de la réactivation du compte suspendu:", error);
+          console.error(
+            "Erreur lors de la réactivation du compte suspendu:",
+            error,
+          );
           showFeedback(
             error instanceof Error
               ? `Impossible de réactiver le compte : ${error.message}`
@@ -1215,13 +1475,30 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         })
         .eq("id", validatingProof.userId);
 
+      const newRemainingBudget = remainingBudget - earnings;
+      const isBudgetExhausted = newRemainingBudget <= 0;
+
       await supabase
         .from("campaigns")
         .update({
-          remainingBudget: remainingBudget - earnings,
+          remainingBudget: newRemainingBudget,
           viewsCurrent: viewsCurrent + views,
+          ...(isBudgetExhausted ? { status: "completed", updatedAt: new Date().toISOString() } : {}),
         })
         .eq("id", campaign.id);
+
+      setAllCampaigns((prev) =>
+        prev.map((c) =>
+          c.id === campaign.id
+            ? {
+                ...c,
+                remainingBudget: newRemainingBudget,
+                viewsCurrent: viewsCurrent + views,
+                ...(isBudgetExhausted ? { status: "completed" as const } : {}),
+              }
+            : c,
+        ),
+      );
 
       // Notification personnalisée si le budget était limité
       const notificationMessage = wasBudgetLimited
@@ -1558,8 +1835,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   }, [allPayouts]);
 
   const filteredUsers = useMemo(() => {
-    const minimumBalance = userMinBalance === "" ? null : Number(userMinBalance);
-    const maximumBalance = userMaxBalance === "" ? null : Number(userMaxBalance);
+    const minimumBalance =
+      userMinBalance === "" ? null : Number(userMinBalance);
+    const maximumBalance =
+      userMaxBalance === "" ? null : Number(userMaxBalance);
     const startDate = userRegistrationStart
       ? new Date(`${userRegistrationStart}T00:00:00`)
       : null;
@@ -1570,7 +1849,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     return allUsers.filter((user) => {
       const matchesSearch =
         (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+        (user.email &&
+          user.email.toLowerCase().includes(searchTerm.toLowerCase()));
       const balance = Number(user.balance || 0);
       const registrationDate = user.createdAt ? new Date(user.createdAt) : null;
       const hasValidRegistrationDate =
@@ -1602,6 +1882,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     userRegistrationEnd,
     userMinBalance,
     userMaxBalance,
+  ]);
+
+  useEffect(() => {
+    setCampaignPage(1);
+  }, [
+    campaignSearch,
+    campaignStatusFilter,
+    campaignCategoryFilter,
+    campaignBudgetMin,
+    campaignBudgetMax,
   ]);
 
   const filteredProofs = useMemo(
@@ -1636,11 +1926,54 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   }, [filteredUsers, userPage]);
 
   // Pagination for Campaigns
-  const totalCampaignPages = Math.ceil(allCampaigns.length / ITEMS_PER_PAGE);
+  const campaignCategories = useMemo(() => {
+    const cats = Array.from(
+      new Set(allCampaigns.map((c) => c.category).filter(Boolean)),
+    );
+    return cats.sort();
+  }, [allCampaigns]);
+
+  const filteredCampaigns = useMemo(() => {
+    const minBudget =
+      campaignBudgetMin === "" ? null : Number(campaignBudgetMin);
+    const maxBudget =
+      campaignBudgetMax === "" ? null : Number(campaignBudgetMax);
+    return allCampaigns
+      .map((c) => {
+        const isExhausted = c.status === "active" && (c.remainingBudget ?? 0) <= 0;
+        return isExhausted ? { ...c, status: "completed" as const } : c;
+      })
+      .filter((c) => {
+        const matchesSearch =
+          (c.title || "").toLowerCase().includes(campaignSearch.toLowerCase()) ||
+          (c.category || "").toLowerCase().includes(campaignSearch.toLowerCase());
+        const matchesStatus =
+          campaignStatusFilter === "all" || c.status === campaignStatusFilter;
+        const matchesCategory =
+          campaignCategoryFilter === "all" ||
+          c.category === campaignCategoryFilter;
+        const budget = c.totalBudget || 0;
+        const matchesBudget =
+          (minBudget === null || budget >= minBudget) &&
+          (maxBudget === null || budget <= maxBudget);
+        return matchesSearch && matchesStatus && matchesCategory && matchesBudget;
+      });
+  }, [
+    allCampaigns,
+    campaignSearch,
+    campaignStatusFilter,
+    campaignCategoryFilter,
+    campaignBudgetMin,
+    campaignBudgetMax,
+  ]);
+
+  const totalCampaignPages = Math.ceil(
+    filteredCampaigns.length / ITEMS_PER_PAGE,
+  );
   const paginatedCampaigns = useMemo(() => {
     const start = (campaignPage - 1) * ITEMS_PER_PAGE;
-    return allCampaigns.slice(start, start + ITEMS_PER_PAGE);
-  }, [allCampaigns, campaignPage]);
+    return filteredCampaigns.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredCampaigns, campaignPage]);
 
   // Pagination for Team
   const totalTeamPages = Math.ceil(teamMembers.length / ITEMS_PER_PAGE);
@@ -1812,6 +2145,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             {view === "gomboChecker" && "Vérificateur GomboPlus"}
             {view === "pushBroadcast" &&
               "Envoi de Notifications Push (OneSignal)"}
+            {view === "promotions" && "Codes Promotionnels & Parrainage"}
           </h2>
           <p className="text-gray-500 text-sm font-medium mt-1">
             Console de gestion SikaAds Togo
@@ -2357,98 +2691,278 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       ══════════════════════════════════════════ */}
       {view === "campaigns" && (
         <div className="space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-8 border-b border-gray-50 bg-gray-50/20">
-              <h3 className="font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                <Megaphone className="text-[#128686]" />
-                Liste des Campagnes
+          {/* ── Banner ── */}
+          <div className="bg-[#128686] text-white p-8 rounded-[2rem] shadow-xl shadow-[#128686]/20 flex items-center justify-between relative overflow-hidden">
+            <div className="relative z-10">
+              <p className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                Gestion Campagnes
+              </p>
+              <h3 className="text-5xl font-bold tracking-tighter">
+                {filteredCampaigns.length} campagne
+                {filteredCampaigns.length !== 1 ? "s" : ""}
               </h3>
+              {filteredCampaigns.length !== allCampaigns.length && (
+                <p className="text-[#A9DADA] text-xs mt-1">
+                  {allCampaigns.length} au total
+                </p>
+              )}
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest">
-                  <tr>
-                    <th className="px-8 py-6">Campagne</th>
-                    <th className="px-8 py-6">Budget</th>
-                    <th className="px-8 py-6">Vues / Cibles</th>
-                    <th className="px-8 py-6">Statut</th>
-                    <th className="px-8 py-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {paginatedCampaigns.map((camp) => (
-                    <tr
-                      key={camp.id}
-                      className="hover:bg-gray-50/30 transition-all"
+            <Megaphone
+              size={80}
+              className="text-white/10 absolute -right-4 -bottom-4 -rotate-12"
+            />
+          </div>
+
+          {/* ── Filtres ── */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] lg:items-end">
+              {/* Recherche */}
+              <label className="block sm:col-span-2 lg:col-span-1">
+                <span className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  <Search size={13} /> Recherche
+                </span>
+                <div className="relative">
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={15}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Titre, catégorie…"
+                    value={campaignSearch}
+                    onChange={(e) => setCampaignSearch(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                  />
+                </div>
+              </label>
+              {/* Statut */}
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Statut
+                </span>
+                <select
+                  value={campaignStatusFilter}
+                  onChange={(e) =>
+                    setCampaignStatusFilter(e.target.value as any)
+                  }
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="active">Active</option>
+                  <option value="paused">En pause</option>
+                  <option value="pending">En attente</option>
+                  <option value="completed">Terminée</option>
+                  <option value="rejected">Rejetée</option>
+                </select>
+              </label>
+              {/* Catégorie */}
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Catégorie
+                </span>
+                <select
+                  value={campaignCategoryFilter}
+                  onChange={(e) => setCampaignCategoryFilter(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                >
+                  <option value="all">Toutes catégories</option>
+                  {campaignCategories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {/* Budget min */}
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Budget min (F)
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={campaignBudgetMin}
+                  onChange={(e) => setCampaignBudgetMin(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
+              </label>
+              {/* Budget max */}
+              <label className="block">
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Budget max (F)
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="Sans limite"
+                  value={campaignBudgetMax}
+                  onChange={(e) => setCampaignBudgetMax(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
+              </label>
+              {/* Reset */}
+              <button
+                type="button"
+                onClick={() => {
+                  setCampaignSearch("");
+                  setCampaignStatusFilter("all");
+                  setCampaignCategoryFilter("all");
+                  setCampaignBudgetMin("");
+                  setCampaignBudgetMax("");
+                }}
+                className="h-10 w-10 rounded-lg border border-gray-200 text-gray-500 transition-colors hover:border-[#128686] hover:bg-[#E7F4F4] hover:text-[#128686]"
+                title="Réinitialiser les filtres"
+                aria-label="Réinitialiser les filtres"
+              >
+                <RefreshCcw size={16} className="mx-auto" />
+              </button>
+            </div>
+          </div>
+
+          {/* ── Grille de Cards ── */}
+          {paginatedCampaigns.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {paginatedCampaigns.map((camp) => {
+                const spent = camp.totalBudget - camp.remainingBudget;
+                const progress =
+                  camp.totalBudget > 0
+                    ? Math.min(
+                        100,
+                        Math.round((spent / camp.totalBudget) * 100),
+                      )
+                    : 0;
+                const statusConfig = {
+                  active: {
+                    label: "Active",
+                    cls: "bg-green-100 text-green-700",
+                    icon: <Zap size={10} />,
+                  },
+                  paused: {
+                    label: "En pause",
+                    cls: "bg-yellow-100 text-yellow-700",
+                    icon: <PauseCircle size={10} />,
+                  },
+                  pending: {
+                    label: "En attente",
+                    cls: "bg-amber-100 text-amber-700",
+                    icon: <Clock size={10} />,
+                  },
+                  completed: {
+                    label: "Terminée",
+                    cls: "bg-gray-100 text-gray-600",
+                    icon: <CheckCircle2 size={10} />,
+                  },
+                  rejected: {
+                    label: "Rejetée",
+                    cls: "bg-red-100 text-red-600",
+                    icon: <X size={10} />,
+                  },
+                } as Record<
+                  string,
+                  { label: string; cls: string; icon: React.ReactNode }
+                >;
+                const st = statusConfig[camp.status] ?? {
+                  label: camp.status,
+                  cls: "bg-gray-100 text-gray-600",
+                  icon: null,
+                };
+                return (
+                  <article key={camp.id} className="rounded-2xl p-2 border border-gray-200 bg-white overflow-hidden shadow-sm transition-all hover:shadow-md flex flex-col">
+                    {/* Grand visuel de la campagne */}
+                    <div
+                      className="relative h-48 sm:h-52 w-full verflow-hidden group cursor-pointer"
+                      onClick={() => camp.imageUrl && setPreviewMedia({ url: camp.imageUrl, type: "image" })}
                     >
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={camp.imageUrl}
-                            alt=""
-                            className="w-12 h-12 rounded-xl object-cover bg-gray-100"
-                          />
-                          <div>
-                            <p className="font-bold text-gray-900 leading-tight">
-                              {camp.title}
-                            </p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-1">
-                              {camp.category}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <p className="font-bold text-gray-900">
-                          {camp.totalBudget.toLocaleString()} F
-                        </p>
-                        <p className="text-[10px] text-gray-400 font-medium">
-                          Restant: {camp.remainingBudget.toLocaleString()} F
-                        </p>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-[#128686]"
-                              style={{
-                                width: `${Math.min(100, ((camp.totalBudget - camp.remainingBudget) / camp.totalBudget) * 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-xs font-bold text-gray-600">
-                            {Math.round(
-                              ((camp.totalBudget - camp.remainingBudget) /
-                                camp.totalBudget) *
-                                100,
-                            )}
-                            %
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span
-                          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 w-fit ${
-                            camp.status === "active"
-                              ? "bg-green-100 text-green-700"
-                              : camp.status === "paused"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {camp.status === "active" ? (
-                            <Zap size={10} />
-                          ) : (
-                            <PauseCircle size={10} />
-                          )}
-                          {camp.status}
+                      <img
+                        src={camp.imageUrl}
+                        alt={camp.title}
+                        className="w-full h-full  rounded-2xl object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+
+                      {/* Badge de statut */}
+                      <div className="absolute top-3 left-3">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm backdrop-blur-md ${st.cls}`}>
+                          {st.icon}{st.label}
                         </span>
-                      </td>
-                      <td className="px-8 py-6 text-right">
+                      </div>
+
+                      {/* Catégorie */}
+                      {camp.category && (
+                        <span className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg">
+                          {camp.category}
+                        </span>
+                      )}
+
+                      {/* Bouton Agrandir */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewMedia({ url: camp.imageUrl, type: "image" });
+                        }}
+                        className="absolute top-3 right-3 p-2 bg-white/80 hover:bg-white text-gray-700 rounded-lg backdrop-blur-md transition-all shadow-sm opacity-80 group-hover:opacity-100"
+                        title="Agrandir l'image"
+                        aria-label="Agrandir l'image"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    </div>
+
+                    {/* Contenu de la card */}
+                    <div className="p-2 flex flex-col gap-4 flex-1">
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-base leading-tight truncate" title={camp.title}>
+                          {camp.title}
+                        </h4>
+                        <h6 className=" mt-2 text-[15px] text-gray-900 font-medium">
+                          Annonceur : {camp.advertiserName}
+                        </h6>
+                        <p className="text-[11px] text-gray-400 font-medium mt-1 flex items-center gap-1">
+                          <CalendarDays size={12} />
+                          Créée le {formatDate(camp.createdAt)}
+                        </p>
+                      </div>
+
+                      {/* Budget Stats */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Budget total</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">{camp.totalBudget.toLocaleString()} F</p>
+                        </div>
+                        <div className="rounded-xl bg-gray-50 p-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Restant</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">{camp.remainingBudget.toLocaleString()} F</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div>
+                        <div className="flex justify-between mb-1.5">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Progression budget</span>
+                          <span className="text-[10px] font-bold text-gray-600">{progress}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${progress >= 90 ? "bg-red-500" : progress >= 60 ? "bg-amber-500" : "bg-[#128686]"}`}
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Footer CPV + Bouton Gérer */}
+                      <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <span className="flex items-center gap-1 text-xs text-gray-500 font-medium">
+                          <DollarSign size={13} className="text-[#128686]" />
+                          CPV : <span className="text-gray-900 font-bold ml-0.5">{camp.cpv ?? "—"} F</span>
+                        </span>
+
                         <button
                           onClick={(e) => {
-                            const rect =
-                              e.currentTarget.getBoundingClientRect();
+                            const rect = e.currentTarget.getBoundingClientRect();
                             if (openMenuId === camp.id) {
                               setOpenMenuId(null);
                               setMenuPosition(null);
@@ -2468,20 +2982,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             className={`transition-transform duration-200 ${openMenuId === camp.id ? "rotate-180" : ""}`}
                           />
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            <Pagination
-              currentPage={campaignPage}
-              totalPages={totalCampaignPages}
-              onPageChange={setCampaignPage}
-              totalItems={allCampaigns.length}
-              itemsPerPage={ITEMS_PER_PAGE}
-            />
-          </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-sm font-medium text-gray-500">
+              Aucune campagne ne correspond aux filtres sélectionnés.
+            </div>
+          )}
+
+          <Pagination
+            currentPage={campaignPage}
+            totalPages={totalCampaignPages}
+            onPageChange={setCampaignPage}
+            totalItems={filteredCampaigns.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
 
           {/* Menu déroulant global pour les actions de campagne */}
           {openMenuId &&
@@ -2522,8 +3041,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       onClick={async () => {
                         setOpenMenuId(null);
                         setMenuPosition(null);
-                        const newStatus =
-                          camp.status === "active" ? "paused" : "active";
+                        const isCurrentlyActive = camp.status === "active";
+                        if (!isCurrentlyActive && (camp.remainingBudget ?? 0) <= 0) {
+                          showFeedback(
+                            "Impossible d'activer une campagne dont le budget est totalement épuisé. Veuillez d'abord augmenter son budget.",
+                            "error",
+                          );
+                          return;
+                        }
+                        const newStatus = isCurrentlyActive ? "paused" : "active";
                         try {
                           await supabase
                             .from("campaigns")
@@ -2532,6 +3058,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                               updatedAt: new Date().toISOString(),
                             })
                             .eq("id", camp.id);
+                          setAllCampaigns((prev) =>
+                            prev.map((c) =>
+                              c.id === camp.id ? { ...c, status: newStatus as any } : c,
+                            ),
+                          );
                           showFeedback(
                             `Campagne ${newStatus === "active" ? "activée" : "mise en pause"} !`,
                           );
@@ -2965,22 +3496,71 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto] lg:items-end">
               <label className="block">
-                <span className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500"><CalendarDays size={14} /> Inscrit a partir du</span>
-                <input type="date" value={userRegistrationStart} onChange={(event) => setUserRegistrationStart(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+                <span className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  <CalendarDays size={14} /> Inscrit a partir du
+                </span>
+                <input
+                  type="date"
+                  value={userRegistrationStart}
+                  onChange={(event) =>
+                    setUserRegistrationStart(event.target.value)
+                  }
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Inscrit jusqu'au</span>
-                <input type="date" value={userRegistrationEnd} onChange={(event) => setUserRegistrationEnd(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Inscrit jusqu'au
+                </span>
+                <input
+                  type="date"
+                  value={userRegistrationEnd}
+                  onChange={(event) =>
+                    setUserRegistrationEnd(event.target.value)
+                  }
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Solde minimum</span>
-                <input type="number" min="0" inputMode="numeric" placeholder="0 F" value={userMinBalance} onChange={(event) => setUserMinBalance(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Solde minimum
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="0 F"
+                  value={userMinBalance}
+                  onChange={(event) => setUserMinBalance(event.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
               </label>
               <label className="block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">Solde maximum</span>
-                <input type="number" min="0" inputMode="numeric" placeholder="Sans limite" value={userMaxBalance} onChange={(event) => setUserMaxBalance(event.target.value)} className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15" />
+                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                  Solde maximum
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  placeholder="Sans limite"
+                  value={userMaxBalance}
+                  onChange={(event) => setUserMaxBalance(event.target.value)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-700 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
               </label>
-              <button type="button" onClick={() => { setUserRegistrationStart(""); setUserRegistrationEnd(""); setUserMinBalance(""); setUserMaxBalance(""); }} className="h-10 w-10 rounded-lg border border-gray-200 text-gray-500 transition-colors hover:border-[#128686] hover:bg-[#E7F4F4] hover:text-[#128686]" title="Reinitialiser les filtres" aria-label="Reinitialiser les filtres">
+              <button
+                type="button"
+                onClick={() => {
+                  setUserRegistrationStart("");
+                  setUserRegistrationEnd("");
+                  setUserMinBalance("");
+                  setUserMaxBalance("");
+                }}
+                className="h-10 w-10 rounded-lg border border-gray-200 text-gray-500 transition-colors hover:border-[#128686] hover:bg-[#E7F4F4] hover:text-[#128686]"
+                title="Reinitialiser les filtres"
+                aria-label="Reinitialiser les filtres"
+              >
                 <RefreshCcw size={16} className="mx-auto" />
               </button>
             </div>
@@ -2992,73 +3572,230 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 const abuseStatus = abuseStatusByUserId.get(user.id);
                 const suspensionExpired =
                   abuseStatus?.suspension_until != null &&
-                  new Date(abuseStatus.suspension_until).getTime() <= Date.now();
+                  new Date(abuseStatus.suspension_until).getTime() <=
+                    Date.now();
                 return (
-                <article key={user.id} className="min-h-[278px] rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-                  <div className="flex min-h-[170px] flex-col">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#E7F4F4] text-base font-bold text-[#128686]">{user.name?.charAt(0) || "U"}</div>
-                        <div className="min-w-0"><h4 className="truncate font-bold text-gray-900">{user.name || "Utilisateur sans nom"}</h4><p className="truncate text-xs font-medium text-gray-500" title={user.email}>{user.email || "Email indisponible"}</p></div>
-                      </div>
-                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${abuseStatus?.is_suspended ? "bg-red-100 text-red-700" : user.status === "active" ? "bg-green-100 text-green-700" : user.status === "pending_verification" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>{abuseStatus?.is_suspended ? "Suspendu" : user.status === "active" ? "Actif" : user.status === "pending_verification" ? "A verifier" : user.status === "rejected" ? "Refuse" : "Bloque"}</span>
-                    </div>
-                    {abuseStatus?.is_suspended && (
-                      <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-red-700">
-                            {suspensionExpired ? "Suspension expirée" : "Compte suspendu"}
-                          </span>
-                          {isSuperAdmin && (
-                            <button
-                              type="button"
-                              onClick={() => handleReactivateSuspendedUser(user)}
-                              disabled={reactivatingUserIds.has(user.id)}
-                              className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[10px] font-bold text-green-700 shadow-sm hover:bg-green-50 disabled:opacity-50"
+                  <article
+                    key={user.id}
+                    className="min-h-[278px] rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <div className="flex min-h-[170px] flex-col">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#E7F4F4] text-base font-bold text-[#128686]">
+                            {user.name?.charAt(0) || "U"}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="truncate font-bold text-gray-900">
+                              {user.name || "Utilisateur sans nom"}
+                            </h4>
+                            <p
+                              className="truncate text-xs font-medium text-gray-500"
+                              title={user.email}
                             >
-                              {reactivatingUserIds.has(user.id) ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <CheckCircle2 size={12} />
-                              )}
-                              Réactiver
-                            </button>
-                          )}
+                              {user.email || "Email indisponible"}
+                            </p>
+                          </div>
                         </div>
-                        <p className="mt-1 text-xs text-red-700">
-                          {abuseStatus.suspension_reason || "Suspension pour violations répétées"}
-                        </p>
-                        <p className="mt-1 text-[10px] text-red-600">
-                          Preuves rejetées : {abuseStatus.rejected_submissions} · Campagnes rejetées : {abuseStatus.rejected_campaigns}
-                          {abuseStatus.suspension_until && !suspensionExpired
-                            ? ` · Jusqu’au ${new Date(abuseStatus.suspension_until).toLocaleString("fr-FR")}`
-                            : ""}
-                        </p>
+                        <span
+                          className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${abuseStatus?.is_suspended ? "bg-red-100 text-red-700" : user.status === "active" ? "bg-green-100 text-green-700" : user.status === "pending_verification" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}
+                        >
+                          {abuseStatus?.is_suspended
+                            ? "Suspendu"
+                            : user.status === "active"
+                              ? "Actif"
+                              : user.status === "pending_verification"
+                                ? "A verifier"
+                                : user.status === "rejected"
+                                  ? "Refuse"
+                                  : "Bloque"}
+                        </span>
                       </div>
-                    )}
-                    <div className="mt-5 grid grid-cols-2 gap-3">
-                      <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Solde</p><p className="mt-1 text-sm font-bold text-gray-900">{user.balance?.toLocaleString() || 0} F</p></div>
-                      <div className="rounded-lg bg-gray-50 p-3"><p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Inscription</p><p className="mt-1 truncate text-sm font-bold text-gray-900" title={formatUserRegistrationDate(user.createdAt)}>{formatUserRegistrationDate(user.createdAt)}</p></div>
+                      {abuseStatus?.is_suspended && (
+                        <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-red-700">
+                              {suspensionExpired
+                                ? "Suspension expirée"
+                                : "Compte suspendu"}
+                            </span>
+                            {isSuperAdmin && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleReactivateSuspendedUser(user)
+                                }
+                                disabled={reactivatingUserIds.has(user.id)}
+                                className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-[10px] font-bold text-green-700 shadow-sm hover:bg-green-50 disabled:opacity-50"
+                              >
+                                {reactivatingUserIds.has(user.id) ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <CheckCircle2 size={12} />
+                                )}
+                                Réactiver
+                              </button>
+                            )}
+                          </div>
+                          <p className="mt-1 text-xs text-red-700">
+                            {abuseStatus.suspension_reason ||
+                              "Suspension pour violations répétées"}
+                          </p>
+                          <p className="mt-1 text-[10px] text-red-600">
+                            Preuves rejetées :{" "}
+                            {abuseStatus.rejected_submissions} · Campagnes
+                            rejetées : {abuseStatus.rejected_campaigns}
+                            {abuseStatus.suspension_until && !suspensionExpired
+                              ? ` · Jusqu’au ${new Date(abuseStatus.suspension_until).toLocaleString("fr-FR")}`
+                              : ""}
+                          </p>
+                        </div>
+                      )}
+                      <div className="mt-5 grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-gray-50 p-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                            Solde
+                          </p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">
+                            {user.balance?.toLocaleString() || 0} F
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-gray-50 p-3">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                            Inscription
+                          </p>
+                          <p
+                            className="mt-1 truncate text-sm font-bold text-gray-900"
+                            title={formatUserRegistrationDate(user.createdAt)}
+                          >
+                            {formatUserRegistrationDate(user.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <label className="mt-4 block">
+                        <span className="sr-only">
+                          Role de {user.name || "cet utilisateur"}
+                        </span>
+                        <select
+                          value={user.role}
+                          onChange={(event) =>
+                            handleRoleChange(
+                              user.id,
+                              event.target.value as UserRole,
+                            )
+                          }
+                          className={`w-full rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest outline-none ring-1 ring-inset focus:ring-2 focus:ring-[#128686] ${user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR ? "bg-[#D9ECEC] text-[#0E6B6B] ring-[#128686]/20" : "bg-gray-100 text-gray-600 ring-gray-200"}`}
+                        >
+                          <option value={UserRole.AMBASSADOR}>
+                            Ambassadeur
+                          </option>
+                          <option value={UserRole.MODERATOR}>Moderateur</option>
+                          <option value={UserRole.ADMIN}>Admin</option>
+                        </select>
+                      </label>
+                      <div className="mt-auto flex flex-wrap items-center gap-1 pt-4">
+                        {user.status === "pending_verification" &&
+                          user.verification_document_path && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openVerificationDocument(
+                                    user.verification_document_path!,
+                                  )
+                                }
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]"
+                                title="Ouvrir la piece d'identite"
+                                aria-label="Ouvrir la piece d'identite"
+                              >
+                                <Eye size={17} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleVerificationDecision(user, "active")
+                                }
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-green-600 hover:bg-green-50"
+                                title="Valider la majorite"
+                                aria-label="Valider la majorite"
+                              >
+                                <CheckCircle2 size={17} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleVerificationDecision(user, "rejected")
+                                }
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-red-500 hover:bg-red-50"
+                                title="Refuser la verification"
+                                aria-label="Refuser la verification"
+                              >
+                                <X size={17} />
+                              </button>
+                            </>
+                          )}
+                        {user.email && (
+                          <button
+                            type="button"
+                            onClick={() => handleResetPassword(user.email!)}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]"
+                            title="Reinitialiser le mot de passe"
+                            aria-label="Reinitialiser le mot de passe"
+                          >
+                            <Key size={17} />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleToggleUserBlock(user.id, user.status)
+                          }
+                          className={`flex h-9 w-9 items-center justify-center rounded-lg ${user.status === "active" ? "text-red-500 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}`}
+                          title={
+                            user.status === "active"
+                              ? "Bloquer l'utilisateur"
+                              : "Debloquer l'utilisateur"
+                          }
+                          aria-label={
+                            user.status === "active"
+                              ? "Bloquer l'utilisateur"
+                              : "Debloquer l'utilisateur"
+                          }
+                        >
+                          {user.status === "active" ? (
+                            <Ban size={17} />
+                          ) : (
+                            <CheckCircle2 size={17} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteUser(user)}
+                          className="ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50"
+                          title="Supprimer definitivement"
+                          aria-label="Supprimer definitivement"
+                        >
+                          <Trash2 size={17} />
+                        </button>
+                      </div>
                     </div>
-                    <label className="mt-4 block"><span className="sr-only">Role de {user.name || "cet utilisateur"}</span>
-                      <select value={user.role} onChange={(event) => handleRoleChange(user.id, event.target.value as UserRole)} className={`w-full rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-widest outline-none ring-1 ring-inset focus:ring-2 focus:ring-[#128686] ${user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR ? "bg-[#D9ECEC] text-[#0E6B6B] ring-[#128686]/20" : "bg-gray-100 text-gray-600 ring-gray-200"}`}>
-                        <option value={UserRole.AMBASSADOR}>Ambassadeur</option><option value={UserRole.MODERATOR}>Moderateur</option><option value={UserRole.ADMIN}>Admin</option>
-                      </select>
-                    </label>
-                    <div className="mt-auto flex flex-wrap items-center gap-1 pt-4">
-                      {user.status === "pending_verification" && user.verification_document_path && <><button type="button" onClick={() => openVerificationDocument(user.verification_document_path!)} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]" title="Ouvrir la piece d'identite" aria-label="Ouvrir la piece d'identite"><Eye size={17} /></button><button type="button" onClick={() => handleVerificationDecision(user, "active")} className="flex h-9 w-9 items-center justify-center rounded-lg text-green-600 hover:bg-green-50" title="Valider la majorite" aria-label="Valider la majorite"><CheckCircle2 size={17} /></button><button type="button" onClick={() => handleVerificationDecision(user, "rejected")} className="flex h-9 w-9 items-center justify-center rounded-lg text-red-500 hover:bg-red-50" title="Refuser la verification" aria-label="Refuser la verification"><X size={17} /></button></>}
-                      {user.email && <button type="button" onClick={() => handleResetPassword(user.email!)} className="flex h-9 w-9 items-center justify-center rounded-lg text-[#128686] hover:bg-[#E7F4F4]" title="Reinitialiser le mot de passe" aria-label="Reinitialiser le mot de passe"><Key size={17} /></button>}
-                      <button type="button" onClick={() => handleToggleUserBlock(user.id, user.status)} className={`flex h-9 w-9 items-center justify-center rounded-lg ${user.status === "active" ? "text-red-500 hover:bg-red-50" : "text-green-600 hover:bg-green-50"}`} title={user.status === "active" ? "Bloquer l'utilisateur" : "Debloquer l'utilisateur"} aria-label={user.status === "active" ? "Bloquer l'utilisateur" : "Debloquer l'utilisateur"}>{user.status === "active" ? <Ban size={17} /> : <CheckCircle2 size={17} />}</button>
-                      <button type="button" onClick={() => handleDeleteUser(user)} className="ml-auto flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50" title="Supprimer definitivement" aria-label="Supprimer definitivement"><Trash2 size={17} /></button>
-                    </div>
-                  </div>
-                </article>
+                  </article>
                 );
               })}
             </div>
-          ) : <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-sm font-medium text-gray-500">Aucun utilisateur ne correspond aux filtres selectionnes.</div>}
+          ) : (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-16 text-center text-sm font-medium text-gray-500">
+              Aucun utilisateur ne correspond aux filtres selectionnes.
+            </div>
+          )}
 
-          <Pagination currentPage={userPage} totalPages={totalUserPages} onPageChange={setUserPage} totalItems={filteredUsers.length} itemsPerPage={ITEMS_PER_PAGE} />
+          <Pagination
+            currentPage={userPage}
+            totalPages={totalUserPages}
+            onPageChange={setUserPage}
+            totalItems={filteredUsers.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+          />
 
           <div className="hidden">
             <div className="overflow-x-auto">
@@ -3225,6 +3962,313 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               totalItems={filteredUsers.length}
               itemsPerPage={ITEMS_PER_PAGE}
             />
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════
+          VIEW: PROMOTIONS (SUPER ADMIN ONLY)
+      ══════════════════════════════════════════ */}
+      {view === "promotions" && isSuperAdmin && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          {/* ── Banner ── */}
+          <div className="bg-[#128686] text-white p-8 rounded-[2rem] shadow-xl shadow-[#128686]/20 flex items-center justify-between relative overflow-hidden">
+            <div className="relative z-10 max-w-xl">
+              <p className="text-[#A9DADA] text-[10px] font-bold uppercase tracking-widest mb-1">
+                Programme d'Affiliation & Ambassadeurs
+              </p>
+              <h3 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                Codes Promotionnels
+              </h3>
+              <p className="text-sm text-[#E7F4F4] mt-2 leading-relaxed">
+                Attribuez un code personnalisé aux ambassadeurs partenaires. Chaque nouveau compte vérifié utilisant ce code rapporte 2 points à l'ambassadeur (10 points = 1 FCFA).
+              </p>
+            </div>
+            <div className="relative z-10 hidden sm:flex gap-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center min-w-[110px]">
+                <p className="text-[10px] uppercase font-bold text-[#A9DADA]">Codes actifs</p>
+                <p className="text-2xl font-bold mt-1">{promoAmbassadors.length}</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center min-w-[110px]">
+                <p className="text-[10px] uppercase font-bold text-[#A9DADA]">En attente</p>
+                <p className="text-2xl font-bold mt-1 text-amber-300">
+                  {promoConversionRequests.filter((r) => r.status === "pending").length}
+                </p>
+              </div>
+            </div>
+            <Tag size={120} className="text-white/10 absolute -right-6 -bottom-6 -rotate-12 pointer-events-none" />
+          </div>
+
+          {/* ── Formulaire d'attribution ── */}
+          <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-5">
+            <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-xl bg-[#E7F4F4] text-[#128686] flex items-center justify-center font-bold">
+                <Tag size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg">Attribuer ou modifier un Code Promo</h3>
+                <p className="text-xs text-gray-500 font-medium">Sélectionnez un ambassadeur et définissez son code promotionnel unique.</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                  Ambassadeur
+                </label>
+                <select
+                  value={selectedPromoUserId}
+                  onChange={(e) => {
+                    const userId = e.target.value;
+                    setSelectedPromoUserId(userId);
+                    const currentPromo = promoAmbassadors.find((p) => p.user_id === userId);
+                    const user = allUsers.find((u) => u.id === userId);
+                    setPromoCodeInput(currentPromo?.code || user?.referralCode || "");
+                  }}
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900 bg-white outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                >
+                  <option value="">Sélectionner un ambassadeur...</option>
+                  {allUsers
+                    .filter((u) => u.role === UserRole.AMBASSADOR || !u.role)
+                    .map((user) => {
+                      const hasPromo = promoAmbassadors.some((p) => p.user_id === user.id);
+                      return (
+                        <option key={user.id} value={user.id}>
+                          {user.name || "Sans nom"} {user.email ? `(${user.email})` : ""} {hasPromo ? "★ (A déjà un code)" : ""}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                  Code Promotionnel (3 à 20 caractères)
+                </label>
+                <input
+                  type="text"
+                  value={promoCodeInput}
+                  onChange={(e) =>
+                    setPromoCodeInput(
+                      e.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z0-9]/g, "")
+                        .slice(0, 20),
+                    )
+                  }
+                  placeholder="Ex: SIKA2026, VIPAMBASSADEUR..."
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono font-bold uppercase text-gray-900 outline-none focus:border-[#128686] focus:ring-2 focus:ring-[#128686]/15"
+                />
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={handleAssignPromoCode}
+                  disabled={isSavingPromoCode || !selectedPromoUserId || promoCodeInput.trim().length < 3}
+                  className="w-full h-[46px] rounded-xl bg-[#128686] hover:bg-[#0E6B6B] text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#128686]/20"
+                >
+                  {isSavingPromoCode ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Tag size={16} />
+                  )}
+                  {isSavingPromoCode ? "Enregistrement..." : "Attribuer le code"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Demandes de Conversion de Points ── */}
+          <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                  <CreditCard size={18} className="text-[#128686]" />
+                  Demandes de conversion de points
+                </h3>
+                <p className="text-xs text-gray-500 font-medium mt-0.5">
+                  Les ambassadeurs convertissent leurs points promotionnels en FCFA vers leur solde.
+                </p>
+              </div>
+              <span className="bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
+                {promoConversionRequests.filter((r) => r.status === "pending").length} en attente
+              </span>
+            </div>
+
+            {promoConversionRequests.length === 0 ? (
+              <div className="py-12 border border-dashed border-gray-200 rounded-2xl text-center text-gray-400 text-sm">
+                Aucune demande de conversion de points pour le moment.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest border-b border-gray-100">
+                    <tr>
+                      <th className="px-6 py-4">Ambassadeur</th>
+                      <th className="px-6 py-4">Points</th>
+                      <th className="px-6 py-4">Montant FCFA</th>
+                      <th className="px-6 py-4">Date</th>
+                      <th className="px-6 py-4">Statut</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-sm">
+                    {promoConversionRequests.map((request) => {
+                      const user = userById.get(request.user_id);
+                      return (
+                        <tr key={request.id} className="hover:bg-gray-50/40 transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="font-bold text-gray-900">{user?.name || "Ambassadeur inconnu"}</p>
+                            <p className="text-xs text-gray-400">{user?.email || request.user_id}</p>
+                          </td>
+                          <td className="px-6 py-4 font-bold text-gray-800">
+                            {request.points?.toLocaleString()} pts
+                          </td>
+                          <td className="px-6 py-4 font-bold text-[#128686]">
+                            {Number(request.amount_fcfa || 0).toLocaleString()} FCFA
+                          </td>
+                          <td className="px-6 py-4 text-xs text-gray-500">
+                            {formatDate(request.created_at)}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                                request.status === "approved"
+                                  ? "bg-green-100 text-green-700"
+                                  : request.status === "rejected"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-amber-100 text-amber-700"
+                              }`}
+                            >
+                              {request.status === "approved"
+                                ? "Validée"
+                                : request.status === "rejected"
+                                  ? "Refusée"
+                                  : "En attente"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {request.status === "pending" ? (
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleReviewPromoConversion(request.id, "approved")}
+                                  className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
+                                >
+                                  <Check size={14} /> Valider
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleReviewPromoConversion(request.id, "rejected")}
+                                  className="inline-flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm"
+                                >
+                                  <X size={14} /> Refuser
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400 font-medium">Traitée</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* ── Liste des codes promo actifs ── */}
+          <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                  <Tag size={18} className="text-[#128686]" />
+                  Codes Promotionnels Actifs ({promoAmbassadors.length})
+                </h3>
+                <p className="text-xs text-gray-500 font-medium mt-0.5">
+                  Liste des ambassadeurs autorisés à diffuser un code promotionnel.
+                </p>
+              </div>
+
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                <input
+                  type="text"
+                  placeholder="Filtrer nom ou code..."
+                  value={promoSearchTerm}
+                  onChange={(e) => setPromoSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-xs border border-gray-200 rounded-xl outline-none focus:border-[#128686]"
+                />
+              </div>
+            </div>
+
+            {promoAmbassadors.length === 0 ? (
+              <div className="py-12 border border-dashed border-gray-200 rounded-2xl text-center text-gray-400 text-sm">
+                Aucun code promotionnel attribué pour le moment.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest border-b border-gray-100">
+                    <tr>
+                      <th className="px-6 py-4">Ambassadeur</th>
+                      <th className="px-6 py-4">Code Promo</th>
+                      <th className="px-6 py-4">Attribué le</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 text-sm">
+                    {promoAmbassadors
+                      .filter((p) => {
+                        const user = userById.get(p.user_id);
+                        const search = promoSearchTerm.toLowerCase();
+                        return (
+                          !promoSearchTerm ||
+                          (p.code || "").toLowerCase().includes(search) ||
+                          (user?.name || "").toLowerCase().includes(search) ||
+                          (user?.email || "").toLowerCase().includes(search)
+                        );
+                      })
+                      .map((promo) => {
+                        const user = userById.get(promo.user_id);
+                        return (
+                          <tr key={promo.user_id} className="hover:bg-gray-50/40 transition-colors">
+                            <td className="px-6 py-4">
+                              <p className="font-bold text-gray-900">{user?.name || "Ambassadeur"}</p>
+                              <p className="text-xs text-gray-400">{user?.email || promo.user_id}</p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#E7F4F4] text-[#0E6B6B] font-mono font-bold text-sm tracking-wider border border-[#128686]/20">
+                                <Tag size={13} className="text-[#128686]" />
+                                {promo.code}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-xs text-gray-500">
+                              {formatDate(promo.created_at)}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedPromoUserId(promo.user_id);
+                                  setPromoCodeInput(promo.code || "");
+                                  window.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
+                                className="inline-flex items-center gap-1 text-[#128686] hover:text-[#0A4F50] text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-[#E7F4F4] transition-all"
+                              >
+                                <Pencil size={13} />
+                                Modifier
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -4391,7 +5435,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 {
                   label: "Authenticité image",
                   value:
-                    selectedProof.aiAnalysis?.imageAuthenticityConfidence == null
+                    selectedProof.aiAnalysis?.imageAuthenticityConfidence ==
+                    null
                       ? "—"
                       : `${selectedProof.aiAnalysis.imageAuthenticityConfidence}%`,
                   icon: ShieldCheck,
@@ -4400,7 +5445,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 {
                   label: "Authenticité vidéo",
                   value:
-                    selectedProof.aiAnalysis?.videoAuthenticityConfidence == null
+                    selectedProof.aiAnalysis?.videoAuthenticityConfidence ==
+                    null
                       ? "—"
                       : `${selectedProof.aiAnalysis.videoAuthenticityConfidence}%`,
                   icon: Film,
@@ -4428,7 +5474,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       {value}
                     </p>
                   </div>
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}
+                  >
                     <Icon size={19} />
                   </span>
                 </div>
@@ -4492,7 +5540,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 <div>
                   <h3 className="font-semibold">Preuves à réviser</h3>
                   <p className="mt-1 text-xs text-gray-400">
-                    {filteredProofs.length} résultat{filteredProofs.length === 1 ? "" : "s"}
+                    {filteredProofs.length} résultat
+                    {filteredProofs.length === 1 ? "" : "s"}
                   </p>
                 </div>
                 <Shield size={18} className="text-teal-300" />
@@ -4531,14 +5580,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                 ? "IA favorable"
                                 : "À examiner"}
                           </span>
-                          {videoUrl && <Film size={13} className="text-gray-400" aria-label="Vidéo jointe" />}
+                          {videoUrl && (
+                            <Film
+                              size={13}
+                              className="text-gray-400"
+                              aria-label="Vidéo jointe"
+                            />
+                          )}
                         </span>
                       </span>
                       <span className="shrink-0 text-[10px] text-gray-400">
-                        {new Date(proof.submittedAt).toLocaleDateString("fr-FR", {
-                          day: "2-digit",
-                          month: "short",
-                        })}
+                        {new Date(proof.submittedAt).toLocaleDateString(
+                          "fr-FR",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                          },
+                        )}
                       </span>
                     </button>
                   );
@@ -4552,332 +5610,351 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
             </aside>
 
             <div className="min-w-0">
-            {filteredProofs
-              .filter((proof) => proof.id === selectedProof?.id)
-              .map((proof) => (
-                <div
-                  key={proof.id}
-                  className="min-h-[520px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col md:flex-row"
-                >
+              {filteredProofs
+                .filter((proof) => proof.id === selectedProof?.id)
+                .map((proof) => (
                   <div
-                    className="group relative min-h-[260px] w-full shrink-0 cursor-pointer overflow-hidden bg-gray-100 md:min-h-full md:w-2/5"
-                    onClick={() =>
-                      setPreviewMedia({ url: proof.downloadURL, type: "image" })
-                    }
+                    key={proof.id}
+                    className="min-h-[520px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm flex flex-col md:flex-row"
                   >
-                    <img
-                      src={proof.downloadURL}
-                      className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                      alt="Proof"
-                    />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
-                      <Eye size={24} className="text-white" />
+                    <div
+                      className="group relative min-h-[260px] w-full shrink-0 cursor-pointer overflow-hidden bg-gray-100 md:min-h-full md:w-2/5"
+                      onClick={() =>
+                        setPreviewMedia({
+                          url: proof.downloadURL,
+                          type: "image",
+                        })
+                      }
+                    >
+                      <img
+                        src={proof.downloadURL}
+                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        alt="Proof"
+                      />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-sm">
+                        <Eye size={24} className="text-white" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-7">
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-lg text-gray-900 leading-none">
-                            {proof.userName}
-                          </h3>
+                    <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-7">
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-lg text-gray-900 leading-none">
+                              {proof.userName}
+                            </h3>
+                            {(proof.videoUrl || (proof as any).video_url) && (
+                              <span className="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                <Film size={10} /> +Vidéo
+                              </span>
+                            )}
+                          </div>
                           {(proof.videoUrl || (proof as any).video_url) && (
-                            <span className="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
-                              <Film size={10} /> +Vidéo
-                            </span>
-                          )}
-                        </div>
-                        {(proof.videoUrl || (proof as any).video_url) && (
-                          <button
-                            onClick={() =>
-                              setPreviewMedia({
-                                url: (proof.videoUrl ||
-                                  (proof as any).video_url)!,
-                                type: "video",
-                              })
-                            }
-                            className="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold uppercase py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-colors"
-                          >
-                            <Play size={12} /> Lire Vidéo
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-xs text-[#128686] font-bold uppercase tracking-widest mt-2">
-                        {proof.campaignName}
-                      </p>
-                      <p className="text-[10px] text-gray-400 font-medium mt-1">
-                        {new Date(proof.submittedAt).toLocaleDateString(
-                          "fr-FR",
-                          { day: "2-digit", month: "short", year: "numeric" },
-                        )}
-                      </p>
-                    </div>
-
-                    {(proof.videoUrl || (proof as any).video_url) && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPreviewMedia({
-                            url: (proof.videoUrl || (proof as any).video_url)!,
-                            type: "video",
-                          })
-                        }
-                        className="group/video relative mb-4 flex min-h-36 items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
-                        aria-label="Lire la vidéo de preuve"
-                      >
-                        <Film size={32} className="absolute left-4 top-4 text-white/50" />
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover/video:scale-110">
-                          <Play size={23} fill="currentColor" />
-                        </span>
-                        <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">
-                          Lire la vidéo soumise
-                        </span>
-                      </button>
-                    )}
-
-                    {/* Analyse IA */}
-                    {proof.aiAnalysis ? (
-                      <div
-                        className={`rounded-2xl p-4 mb-4 border space-y-3 ${
-                          proof.aiAnalysis.fraudAlert
-                            ? "bg-red-50 border-red-100"
-                            : proof.aiAnalysis.isValid
-                              ? "bg-emerald-50 border-emerald-100"
-                              : "bg-amber-50 border-amber-100"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Shield
-                              size={13}
-                              className={
-                                proof.aiAnalysis.fraudAlert
-                                  ? "text-red-500"
-                                  : proof.aiAnalysis.isValid
-                                    ? "text-emerald-600"
-                                    : "text-amber-500"
+                            <button
+                              onClick={() =>
+                                setPreviewMedia({
+                                  url: (proof.videoUrl ||
+                                    (proof as any).video_url)!,
+                                  type: "video",
+                                })
                               }
-                            />
-                            <span
-                              className={`text-[10px] font-bold uppercase tracking-widest ${
-                                proof.aiAnalysis.fraudAlert
-                                  ? "text-red-600"
-                                  : proof.aiAnalysis.isValid
-                                    ? "text-emerald-700"
-                                    : "text-amber-600"
-                              }`}
+                              className="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold uppercase py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-colors"
                             >
-                              Analyse IA
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
-                                proof.aiAnalysis.fraudAlert
-                                  ? "bg-red-100 text-red-700"
-                                  : proof.aiAnalysis.isValid
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-amber-100 text-amber-700"
-                              }`}
-                            >
-                              {proof.aiAnalysis.fraudAlert
-                                ? "⚠ Fraude"
-                                : proof.aiAnalysis.isValid
-                                  ? "✓ Valide"
-                                  : "✗ Invalide"}
-                            </span>
-                            {proof.aiAnalysis.suggestedAction && (
-                              <span
-                                className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
-                                  proof.aiAnalysis.suggestedAction === "approve"
-                                    ? "bg-green-100 text-green-700"
-                                    : proof.aiAnalysis.suggestedAction ===
-                                        "reject"
-                                      ? "bg-red-100 text-red-700"
-                                      : "bg-[#D9ECEC] text-[#0E6B6B]"
-                                }`}
-                              >
-                                {proof.aiAnalysis.suggestedAction === "approve"
-                                  ? "✓ Auto-approuver"
-                                  : proof.aiAnalysis.suggestedAction ===
-                                      "reject"
-                                    ? "✗ Auto-rejeter"
-                                    : "👤 Révision manuelle"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Scores de confiance */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                              Confiance globale
-                            </p>
-                            <div className="flex items-center gap-1.5">
-                              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    proof.aiAnalysis.confidence >= 70
-                                      ? "bg-emerald-500"
-                                      : proof.aiAnalysis.confidence >= 40
-                                        ? "bg-amber-400"
-                                        : "bg-red-400"
-                                  }`}
-                                  style={{
-                                    width: `${proof.aiAnalysis.confidence}%`,
-                                  }}
-                                />
-                              </div>
-                              <span className="text-xs font-bold text-gray-700">
-                                {proof.aiAnalysis.confidence}%
-                              </span>
-                            </div>
-                          </div>
-                          <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                              Vues détectées
-                            </p>
-                            <p className="text-sm font-bold text-gray-900">
-                              {proof.aiAnalysis.viewsCount.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Scores de confiance granulaires */}
-                        {(proof.aiAnalysis.imageAuthenticityConfidence ||
-                          proof.aiAnalysis.viewCountDetectionConfidence ||
-                          proof.aiAnalysis.platformUICompliance) && (
-                          <div className="bg-white/70 rounded-xl p-2.5 space-y-2">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                              Scores spécifiques
-                            </p>
-                            {proof.aiAnalysis.imageAuthenticityConfidence && (
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">
-                                  Authenticité image
-                                </span>
-                                <span className="font-bold text-gray-900">
-                                  {proof.aiAnalysis.imageAuthenticityConfidence}
-                                  %
-                                </span>
-                              </div>
-                            )}
-                            {proof.aiAnalysis.viewCountDetectionConfidence && (
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">
-                                  Détection vues
-                                </span>
-                                <span className="font-bold text-gray-900">
-                                  {
-                                    proof.aiAnalysis
-                                      .viewCountDetectionConfidence
-                                  }
-                                  %
-                                </span>
-                              </div>
-                            )}
-                            {proof.aiAnalysis.platformUICompliance && (
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="text-gray-600 font-medium">
-                                  Conformité interface
-                                </span>
-                                <span className="font-bold text-gray-900">
-                                  {proof.aiAnalysis.platformUICompliance}%
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Type de fraude */}
-                        {proof.aiAnalysis.fraudType &&
-                          proof.aiAnalysis.fraudType !== "none" && (
-                            <div className="bg-white/70 rounded-xl p-2.5">
-                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                                Type de fraude
-                              </p>
-                              <p className="text-[11px] font-bold text-red-600">
-                                {proof.aiAnalysis.fraudType.replace(/_/g, " ")}
-                              </p>
-                            </div>
+                              <Play size={12} /> Lire Vidéo
+                            </button>
                           )}
-
-                        {/* Détails des éléments de fraude */}
-                        {proof.aiAnalysis.fraudEvidenceDetails &&
-                          proof.aiAnalysis.fraudEvidenceDetails.length > 0 && (
-                            <div className="bg-white/70 rounded-xl p-2.5">
-                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                                Éléments suspects
-                              </p>
-                              <ul className="space-y-1">
-                                {proof.aiAnalysis.fraudEvidenceDetails.map(
-                                  (detail, idx) => (
-                                    <li
-                                      key={idx}
-                                      className="text-[10px] text-red-600 font-medium flex gap-2"
-                                    >
-                                      <span className="shrink-0">•</span>
-                                      <span>{detail}</span>
-                                    </li>
-                                  ),
-                                )}
-                              </ul>
-                            </div>
+                        </div>
+                        <p className="text-xs text-[#128686] font-bold uppercase tracking-widest mt-2">
+                          {proof.campaignName}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium mt-1">
+                          {new Date(proof.submittedAt).toLocaleDateString(
+                            "fr-FR",
+                            { day: "2-digit", month: "short", year: "numeric" },
                           )}
-
-                        {proof.aiAnalysis.reason && (
-                          <div className="bg-white/70 rounded-xl p-2.5">
-                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                              Motif IA
-                            </p>
-                            <p className="text-[11px] text-gray-600 font-medium leading-snug">
-                              {proof.aiAnalysis.reason}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 mb-4 border border-gray-100">
-                        <AlertTriangle
-                          size={13}
-                          className="text-gray-400 shrink-0"
-                        />
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                          Aucune analyse IA disponible
                         </p>
                       </div>
-                    )}
 
-                    <div className="flex gap-3 mt-auto">
+                      {(proof.videoUrl || (proof as any).video_url) && (
                         <button
-                        onClick={() => setRejectingProof(proof)}
-                        disabled={proof.status !== "pending"}
-                        className="flex-1 rounded-lg bg-red-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Refuser la preuve
-                      </button>
-                      <button
-                        disabled={proof.status !== "pending"}
-                        onClick={() => {
-                          setValidatingProof(proof);
-                          setViewsInput(
-                            proof.aiAnalysis?.viewsCount?.toString() || "0",
-                          );
-                        }}
-                        className="flex-1 rounded-lg bg-emerald-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Approuver manuellement
-                      </button>
+                          type="button"
+                          onClick={() =>
+                            setPreviewMedia({
+                              url: (proof.videoUrl ||
+                                (proof as any).video_url)!,
+                              type: "video",
+                            })
+                          }
+                          className="group/video relative mb-4 flex min-h-36 items-center justify-center overflow-hidden rounded-lg bg-gray-950 text-white"
+                          aria-label="Lire la vidéo de preuve"
+                        >
+                          <Film
+                            size={32}
+                            className="absolute left-4 top-4 text-white/50"
+                          />
+                          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-600 shadow-lg transition-transform group-hover/video:scale-110">
+                            <Play size={23} fill="currentColor" />
+                          </span>
+                          <span className="absolute bottom-3 left-4 text-xs font-semibold text-white/80">
+                            Lire la vidéo soumise
+                          </span>
+                        </button>
+                      )}
+
+                      {/* Analyse IA */}
+                      {proof.aiAnalysis ? (
+                        <div
+                          className={`rounded-2xl p-4 mb-4 border space-y-3 ${
+                            proof.aiAnalysis.fraudAlert
+                              ? "bg-red-50 border-red-100"
+                              : proof.aiAnalysis.isValid
+                                ? "bg-emerald-50 border-emerald-100"
+                                : "bg-amber-50 border-amber-100"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Shield
+                                size={13}
+                                className={
+                                  proof.aiAnalysis.fraudAlert
+                                    ? "text-red-500"
+                                    : proof.aiAnalysis.isValid
+                                      ? "text-emerald-600"
+                                      : "text-amber-500"
+                                }
+                              />
+                              <span
+                                className={`text-[10px] font-bold uppercase tracking-widest ${
+                                  proof.aiAnalysis.fraudAlert
+                                    ? "text-red-600"
+                                    : proof.aiAnalysis.isValid
+                                      ? "text-emerald-700"
+                                      : "text-amber-600"
+                                }`}
+                              >
+                                Analyse IA
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                                  proof.aiAnalysis.fraudAlert
+                                    ? "bg-red-100 text-red-700"
+                                    : proof.aiAnalysis.isValid
+                                      ? "bg-emerald-100 text-emerald-700"
+                                      : "bg-amber-100 text-amber-700"
+                                }`}
+                              >
+                                {proof.aiAnalysis.fraudAlert
+                                  ? "⚠ Fraude"
+                                  : proof.aiAnalysis.isValid
+                                    ? "✓ Valide"
+                                    : "✗ Invalide"}
+                              </span>
+                              {proof.aiAnalysis.suggestedAction && (
+                                <span
+                                  className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest ${
+                                    proof.aiAnalysis.suggestedAction ===
+                                    "approve"
+                                      ? "bg-green-100 text-green-700"
+                                      : proof.aiAnalysis.suggestedAction ===
+                                          "reject"
+                                        ? "bg-red-100 text-red-700"
+                                        : "bg-[#D9ECEC] text-[#0E6B6B]"
+                                  }`}
+                                >
+                                  {proof.aiAnalysis.suggestedAction ===
+                                  "approve"
+                                    ? "✓ Auto-approuver"
+                                    : proof.aiAnalysis.suggestedAction ===
+                                        "reject"
+                                      ? "✗ Auto-rejeter"
+                                      : "👤 Révision manuelle"}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Scores de confiance */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-white/70 rounded-xl p-2.5">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                Confiance globale
+                              </p>
+                              <div className="flex items-center gap-1.5">
+                                <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      proof.aiAnalysis.confidence >= 70
+                                        ? "bg-emerald-500"
+                                        : proof.aiAnalysis.confidence >= 40
+                                          ? "bg-amber-400"
+                                          : "bg-red-400"
+                                    }`}
+                                    style={{
+                                      width: `${proof.aiAnalysis.confidence}%`,
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-xs font-bold text-gray-700">
+                                  {proof.aiAnalysis.confidence}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="bg-white/70 rounded-xl p-2.5">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                Vues détectées
+                              </p>
+                              <p className="text-sm font-bold text-gray-900">
+                                {proof.aiAnalysis.viewsCount.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Scores de confiance granulaires */}
+                          {(proof.aiAnalysis.imageAuthenticityConfidence ||
+                            proof.aiAnalysis.viewCountDetectionConfidence ||
+                            proof.aiAnalysis.platformUICompliance) && (
+                            <div className="bg-white/70 rounded-xl p-2.5 space-y-2">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                Scores spécifiques
+                              </p>
+                              {proof.aiAnalysis.imageAuthenticityConfidence && (
+                                <div className="flex items-center justify-between text-[10px]">
+                                  <span className="text-gray-600 font-medium">
+                                    Authenticité image
+                                  </span>
+                                  <span className="font-bold text-gray-900">
+                                    {
+                                      proof.aiAnalysis
+                                        .imageAuthenticityConfidence
+                                    }
+                                    %
+                                  </span>
+                                </div>
+                              )}
+                              {proof.aiAnalysis
+                                .viewCountDetectionConfidence && (
+                                <div className="flex items-center justify-between text-[10px]">
+                                  <span className="text-gray-600 font-medium">
+                                    Détection vues
+                                  </span>
+                                  <span className="font-bold text-gray-900">
+                                    {
+                                      proof.aiAnalysis
+                                        .viewCountDetectionConfidence
+                                    }
+                                    %
+                                  </span>
+                                </div>
+                              )}
+                              {proof.aiAnalysis.platformUICompliance && (
+                                <div className="flex items-center justify-between text-[10px]">
+                                  <span className="text-gray-600 font-medium">
+                                    Conformité interface
+                                  </span>
+                                  <span className="font-bold text-gray-900">
+                                    {proof.aiAnalysis.platformUICompliance}%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Type de fraude */}
+                          {proof.aiAnalysis.fraudType &&
+                            proof.aiAnalysis.fraudType !== "none" && (
+                              <div className="bg-white/70 rounded-xl p-2.5">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                  Type de fraude
+                                </p>
+                                <p className="text-[11px] font-bold text-red-600">
+                                  {proof.aiAnalysis.fraudType.replace(
+                                    /_/g,
+                                    " ",
+                                  )}
+                                </p>
+                              </div>
+                            )}
+
+                          {/* Détails des éléments de fraude */}
+                          {proof.aiAnalysis.fraudEvidenceDetails &&
+                            proof.aiAnalysis.fraudEvidenceDetails.length >
+                              0 && (
+                              <div className="bg-white/70 rounded-xl p-2.5">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                  Éléments suspects
+                                </p>
+                                <ul className="space-y-1">
+                                  {proof.aiAnalysis.fraudEvidenceDetails.map(
+                                    (detail, idx) => (
+                                      <li
+                                        key={idx}
+                                        className="text-[10px] text-red-600 font-medium flex gap-2"
+                                      >
+                                        <span className="shrink-0">•</span>
+                                        <span>{detail}</span>
+                                      </li>
+                                    ),
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+
+                          {proof.aiAnalysis.reason && (
+                            <div className="bg-white/70 rounded-xl p-2.5">
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                                Motif IA
+                              </p>
+                              <p className="text-[11px] text-gray-600 font-medium leading-snug">
+                                {proof.aiAnalysis.reason}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5 mb-4 border border-gray-100">
+                          <AlertTriangle
+                            size={13}
+                            className="text-gray-400 shrink-0"
+                          />
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            Aucune analyse IA disponible
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3 mt-auto">
+                        <button
+                          onClick={() => setRejectingProof(proof)}
+                          disabled={proof.status !== "pending"}
+                          className="flex-1 rounded-lg bg-red-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Refuser la preuve
+                        </button>
+                        <button
+                          disabled={proof.status !== "pending"}
+                          onClick={() => {
+                            setValidatingProof(proof);
+                            setViewsInput(
+                              proof.aiAnalysis?.viewsCount?.toString() || "0",
+                            );
+                          }}
+                          className="flex-1 rounded-lg bg-emerald-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Approuver manuellement
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            {filteredProofs.length > 0 && selectedProof?.status !== "pending" && (
-              <p className="mt-3 text-center text-xs text-gray-500">
-                Cette preuve a déjà été traitée. Les actions sont désactivées.
-              </p>
-            )}
+                ))}
+              {filteredProofs.length > 0 &&
+                selectedProof?.status !== "pending" && (
+                  <p className="mt-3 text-center text-xs text-gray-500">
+                    Cette preuve a déjà été traitée. Les actions sont
+                    désactivées.
+                  </p>
+                )}
             </div>
           </div>
         </div>

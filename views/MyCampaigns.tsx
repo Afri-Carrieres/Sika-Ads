@@ -405,7 +405,25 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
         return;
       }
 
-      setCampaigns(campaignsData);
+      // Auto-complétion des campagnes actives dont le budget est épuisé
+      const exhausted = campaignsData.filter(
+        (c) => c.status === "active" && (c.remainingBudget ?? 0) <= 0,
+      );
+      if (exhausted.length > 0) {
+        const exhaustedIds = exhausted.map((c) => c.id);
+        void supabase
+          .from("campaigns")
+          .update({ status: "completed", updatedAt: new Date().toISOString() })
+          .in("id", exhaustedIds);
+      }
+
+      setCampaigns(
+        campaignsData.map((c) =>
+          c.status === "active" && (c.remainingBudget ?? 0) <= 0
+            ? { ...c, status: "completed" }
+            : c,
+        ),
+      );
 
       // 2. Fetch shares and clicks aggregates for user's campaigns
       const campaignIds = campaignsData.map((c) => c.id);
@@ -497,20 +515,21 @@ const MyCampaigns: React.FC<MyCampaignsProps> = ({
       );
     }
 
+    const isBudgetExhausted = (campaign.remainingBudget ?? 0) <= 0;
+    if (campaign.status === "completed" || (campaign.status === "active" && isBudgetExhausted)) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+          <CheckCircle size={12} />
+          Terminée
+        </span>
+      );
+    }
+
     if (campaign.status === "active") {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
           <CheckCircle size={12} />
           Active
-        </span>
-      );
-    }
-
-    if (campaign.status === "completed") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-          <CheckCircle size={12} />
-          Terminée
         </span>
       );
     }
