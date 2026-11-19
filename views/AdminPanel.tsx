@@ -69,6 +69,7 @@ import {
   Film,
   CalendarDays,
   Tag,
+  Coins,
 } from "lucide-react";
 
 import { supabase } from "../supabase";
@@ -2956,7 +2957,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       {/* Footer CPV + Bouton Gérer */}
                       <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
                         <span className="flex items-center gap-1 text-xs text-gray-500 font-medium">
-                          <DollarSign size={13} className="text-[#128686]" />
+                          <Coins size={13} className="text-[#128686]" />
                           CPV : <span className="text-gray-900 font-bold ml-0.5">{camp.cpv ?? "—"} F</span>
                         </span>
 
